@@ -5,7 +5,7 @@ local M = {}
 function M.init()
   require "nvim-treesitter".define_modules {
     tree_docs = {
-      module_path = "nvim-tree-docs.docs",
+      module_path = "nvim-tree-docs.internal",
       is_supported = function(lang)
         return queries.get_query(lang, 'docs') ~= nil
       end
