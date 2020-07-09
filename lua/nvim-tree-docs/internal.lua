@@ -2,6 +2,7 @@ local locals = require "nvim-treesitter.locals"
 local queries = require "nvim-treesitter.query"
 local ts_utils = require "nvim-treesitter.ts_utils"
 local templates = require "nvim-tree-docs.template"
+local Collector = require "nvim-tree-docs.collector"
 local api = vim.api
 
 local M = {}
@@ -18,6 +19,7 @@ function M.doc_node_at_cursor()
   if not doc_data or not node then return end
 
   local doc_tbl = templates.execute_template(doc_data)
+
 
   if not doc_tbl then return end
 
@@ -55,68 +57,29 @@ end
 
 function M.collect_docs(bufnr)
   local bufnr = bufnr or api.nvim_get_current_buf()
-  local result = {}
+  local result = Collector:new()
   local locals = locals.get_locals(bufnr, 'docs')
 
   -- TODO: Clean this up and abstract it...
   -- TODO: Cache this logic
 
   for _, match in ipairs(locals) do
-    print(vim.inspect(match))
-    if match['function'] and match['function'].definition then
-      local def = match['function'].definition
-      local def_node = def.node
-      local id = get_node_id(def_node)
-
-      if not result[id] then
-        result[id] = {
-          type = 'function',
-          definition = def,
-          parameters = {},
-          name = nil,
-          ['return'] = nil
-        }
-      end
-
+    if match['function'] then
       -- TODO: add type data
-
-      if match['function'].name then
-        result[id].name = match['function'].name
-      end
-
-      if match['function'].parameter then
-        table.insert(result[id].parameters, match['function'].parameter)
-      end
-
-      if match['function']['return'] then
-        result[id]['return'] = match['function']['return']
-      end
-    elseif match.variable and match.variable.definition then
-      local def = match.variable.definition
-      local def_node = def.node
-      local id = get_node_id(def_node)
-
-      if not result[id] then
-        result[id] = {
-          type = 'variable',
-          definition = def,
-          var_type = nil,
-          initial_value = nil,
-          name = nil
-        }
-      end
-
-      -- TODO: add type data
-
-      if match.variable.name then
-        result[id].name = match.variable.name
-      end
-
-      if match.variable.initial_value then
-        result[id].initial_value = match.variable.initial_value
-      end
+      result:add(match['function'], {
+        type = 'function',
+        list_keys = { 'parameters' },
+        extract_keys = { 'name', 'parameters', 'return' }
+      })
+    elseif match.variable then
+      result:add(match.variable, {
+        type = 'variable',
+        extract_keys = { 'name', 'var_type', 'initial_value' }
+      })
     end
   end
+
+  -- print(vim.inspect(result))
 
   -- TODO: sort parameters by node range here
 
