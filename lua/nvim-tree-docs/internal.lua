@@ -14,17 +14,13 @@ end
 
 function M.doc_node_at_cursor()
   local doc_data, node = M.get_docs_at_cursor()
-  local template = templates.get_template()
 
-  if not doc_data
-    or not node
-    or not template
-    or not template[doc_data.type]
-  then
-    return
-  end
+  if not doc_data or not node then return end
 
-  local doc_tbl = template[doc_data.type](doc_data)
+  local doc_tbl = templates.execute_template(doc_data)
+
+  if not doc_tbl then return end
+
   local node_start_row, _, _ = node:start()
 
   -- TODO: Handle indentation here... should be easy if we have the nodes start column
@@ -47,7 +43,7 @@ function M.get_doc_data_for_node(node, bufnr)
   local node_start_row, node_start_col, _ = node:start()
 
   for _, def in pairs(doc_data) do
-    local def_start_row, def_start_col, _ = def.definition:start()
+    local def_start_row, def_start_col, _ = def.definition.node:start()
 
     if def_start_row == node_start_row and node_start_col >= def_start_col then
       return def
@@ -62,10 +58,11 @@ function M.collect_docs(bufnr)
   local result = {}
   local locals = locals.get_locals(bufnr, 'docs')
 
-  -- TODO: Clean this up an abstract it...
+  -- TODO: Clean this up and abstract it...
   -- TODO: Cache this logic
 
   for _, match in ipairs(locals) do
+    print(vim.inspect(match))
     if match['function'] and match['function'].definition then
       local def = match['function'].definition
       local def_node = def.node
@@ -74,7 +71,7 @@ function M.collect_docs(bufnr)
       if not result[id] then
         result[id] = {
           type = 'function',
-          definition = def_node,
+          definition = def,
           parameters = {},
           name = nil,
           ['return'] = nil
@@ -84,16 +81,15 @@ function M.collect_docs(bufnr)
       -- TODO: add type data
 
       if match['function'].name then
-        result[id].name = match['function'].name.node
+        result[id].name = match['function'].name
       end
 
       if match['function'].parameter then
-        table.insert(result[id].parameters, match['function'].parameter.node)
+        table.insert(result[id].parameters, match['function'].parameter)
       end
 
-      -- TODO: get return detection working
       if match['function']['return'] then
-        result[id]['return'] = match['function']['return'].node
+        result[id]['return'] = match['function']['return']
       end
     elseif match.variable and match.variable.definition then
       local def = match.variable.definition
@@ -103,22 +99,26 @@ function M.collect_docs(bufnr)
       if not result[id] then
         result[id] = {
           type = 'variable',
-          definition = def_node,
+          definition = def,
           var_type = nil,
           initial_value = nil,
           name = nil
         }
       end
 
+      -- TODO: add type data
+
       if match.variable.name then
-        result[id].name = match.variable.name.node
+        result[id].name = match.variable.name
       end
 
       if match.variable.initial_value then
-        result[id].initial_value = match.variable.initial_value.node
+        result[id].initial_value = match.variable.initial_value
       end
     end
   end
+
+  -- TODO: sort parameters by node range here
 
   return result
 end
