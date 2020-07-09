@@ -1,4 +1,5 @@
 local locals = require "nvim-treesitter.locals"
+local configs = require "nvim-treesitter.configs"
 local queries = require "nvim-treesitter.query"
 local ts_utils = require "nvim-treesitter.ts_utils"
 local templates = require "nvim-tree-docs.template"
@@ -44,7 +45,7 @@ function M.get_doc_data_for_node(node, bufnr)
   local doc_data = M.collect_docs(bufnr)
   local node_start_row, node_start_col, _ = node:start()
 
-  for _, def in pairs(doc_data) do
+  for _, def in pairs(doc_data:get_items()) do
     local def_start_row, def_start_col, _ = def.definition.node:start()
 
     if def_start_row == node_start_row and node_start_col >= def_start_col then
@@ -57,39 +58,45 @@ end
 
 function M.collect_docs(bufnr)
   local bufnr = bufnr or api.nvim_get_current_buf()
-  local result = Collector:new()
-  local locals = locals.get_locals(bufnr, 'docs')
 
-  -- TODO: Clean this up and abstract it...
   -- TODO: Cache this logic
+  local collector = Collector.new {
+    ['function'] = {
+      keys = {
+        'name',
+        'return',
+        { key = 'parameters', is_list = true },
+      }
+    },
+    variable = {
+      keys = { 'name', 'var_type', 'initial_value' }
+    }
+  }
 
-  for _, match in ipairs(locals) do
-    if match['function'] then
-      -- TODO: add type data
-      result:add(match['function'], {
-        type = 'function',
-        list_keys = { 'parameters' },
-        extract_keys = { 'name', 'parameters', 'return' }
-      })
-    elseif match.variable then
-      result:add(match.variable, {
-        type = 'variable',
-        extract_keys = { 'name', 'var_type', 'initial_value' }
-      })
-    end
-  end
-
-  -- print(vim.inspect(result))
+  collector:collect_all(locals.get_locals(bufnr, 'docs'))
 
   -- TODO: sort parameters by node range here
 
-  return result
+  return collector
 end
 
-function M.attach(bufnr, lang)
+function M.attach(bufnr)
+  local buf = bufnr or api.nvim_get_current_buf()
+  local config = configs.get_module('tree_docs')
+
+  for fn, mapping in pairs(config.keymaps) do
+    local cmd = string.format(":lua require 'nvim-tree-docs.internal'.%s()<CR>", fn)
+    api.nvim_buf_set_keymap(bufnr, 'n', mapping, cmd, { silent = true })
+  end
 end
 
 function M.detach(bufnr)
+  local buf = bufnr or api.nvim_get_current_buf()
+
+  local config = configs.get_module('tree_docs')
+  for _, mapping in pairs(config.keymaps) do
+    api.nvim_buf_del_keymap(buf, 'n', mapping)
+  end
 end
 
 return M
