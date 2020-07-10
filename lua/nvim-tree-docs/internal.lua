@@ -23,9 +23,18 @@ local function indent_lines(lines, count)
 end
 
 function M.doc_node_at_cursor()
-  local doc_data, node = M.get_docs_at_cursor()
+  local node_at_point = ts_utils.get_node_at_cursor()
 
-  if not doc_data or not node then return end
+  M.doc_node(node_at_point)
+end
+
+function M.doc_node(node, bufnr)
+  if not node then return end
+
+  local bufnr = bufnr or api.nvim_get_current_buf()
+  local doc_data = M.get_doc_data_for_node(node, bufnr)
+
+  if not doc_data then return end
 
   local doc_lines = templates.execute_template(doc_data)
 
@@ -34,21 +43,11 @@ function M.doc_node_at_cursor()
   local node_start_row, node_start_col, _ = doc_data.definition.node:start()
 
   api.nvim_buf_set_lines(
-    0,
+    bufnr,
     node_start_row,
     node_start_row,
     false,
     indent_lines(doc_lines, node_start_col))
-end
-
-function M.get_docs_at_cursor()
-  local node = ts_utils.get_node_at_cursor()
-
-  if node then
-    return M.get_doc_data_for_node(node), node
-  end
-
-  return nil, nil
 end
 
 function M.get_doc_data_for_node(node, bufnr)
@@ -73,36 +72,7 @@ function M.collect_docs(bufnr)
     return M.doc_cache[bufnr].docs
   end
 
-  -- TODO: Cache this logic
-  local collector = Collector.new {
-    ['function'] = {
-      keys = {
-        'name',
-        'return',
-        'doc',
-        { key = 'parameters', is_list = true },
-      }
-    },
-    variable = {
-      keys = { 'name', 'var_type', 'initial_value', 'doc' }
-    },
-    method = {
-      keys = {
-        'name',
-        'return',
-        'doc',
-        'class',
-        { key = 'parameters', is_list = true },
-      }
-    },
-    class = {
-      keys = {
-        'name',
-        { key = 'extensions', is_list = true },
-        { key = 'implementations', is_list = true }
-      }
-    }
-  }
+  local collector = Collector.new()
 
   collector:collect_all(locals.get_locals(bufnr, 'docs'))
 

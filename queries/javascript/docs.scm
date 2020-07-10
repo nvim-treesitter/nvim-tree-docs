@@ -39,7 +39,7 @@
             parameters: (formal_parameters
                           (identifier)? @method.parameters.name)
             body: (statement_block
-                    (return_statement)? @method.return)) @method.definition))) @method.class
+                    (return_statement)? @method.return)) @method.definition)))
 
 ; Method params with default values `a = 123`
 (class_declaration
@@ -52,7 +52,17 @@
                             left: (shorthand_property_identifier) @method.parameters.name
                             right: (_) @method.parameters.default_value))) @method.definition)))
 
+; Classes
 (class_declaration
   name: (identifier) @class.name
   (class_heritage
     (identifier) @class.extensions.name)?) @class.definition
+
+; Class members
+(class_declaration
+  name: (identifier) @member.class
+  body: (class_body
+          ((comment)* @member.doc
+          (public_field_definition
+            property: (property_identifier) @member.name) @member.definition)))
+

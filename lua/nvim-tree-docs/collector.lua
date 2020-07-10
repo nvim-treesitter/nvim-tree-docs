@@ -1,5 +1,46 @@
 local Collector = {}
 
+local default_type_defs = {
+  ['function'] = {
+    keys = {
+      'name',
+      'return',
+      'doc',
+      { key = 'parameters', is_list = true },
+    }
+  },
+  variable = {
+    keys = { 'name', 'var_type', 'initial_value', 'doc' }
+  },
+  method = {
+    keys = {
+      'name',
+      'return',
+      'doc',
+      'class',
+      'visibility',
+      { key = 'parameters', is_list = true },
+    }
+  },
+  class = {
+    keys = {
+      'doc',
+      'name',
+      { key = 'extensions', is_list = true },
+      { key = 'implementations', is_list = true }
+    }
+  },
+  member = {
+    keys = {
+      'class',
+      'doc',
+      'name',
+      'visibility',
+      'member_type'
+    }
+  }
+}
+
 local function get_node_id(node)
   local start_row, start_col, end_row, end_column = node:range()
 
@@ -36,7 +77,7 @@ end
 
 function Collector.new(type_defs)
   local instance = {
-    type_defs = type_defs or {},
+    type_defs = vim.tbl_extend('force', default_type_defs, type_defs or {}),
     items = {},
     lists = {}
   }

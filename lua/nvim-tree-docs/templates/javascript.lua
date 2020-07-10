@@ -50,4 +50,12 @@ M.class = template.compile [[
  */
 ]]
 
+M.member = template.compile [[
+/**
+ * Description
+ * @memberOf <%= ctx.text(ctx.class.node) %n>
+ * @type {any}
+ */
+]]
+
 return M
