@@ -3,9 +3,9 @@ local template = require "nvim-tree-docs.template"
 local M = {}
 
 M['function'] = template.compile [[
--- Description
+--- Description
 <? for _, p in ipairs(ctx.parameters) do ?>
--- @param <%= ctx.text(p) %> the <%= ctx.text(p) %n>
+-- @param <%= ctx.text(p) %>: the <%= ctx.text(p) %n>
 <? end ?>
 <? if ctx['return'] then ?>
 -- @returns
@@ -13,7 +13,7 @@ M['function'] = template.compile [[
 ]]
 
 M['variable'] = template.compile [[
--- Description
+--- Description
 ]]
 
 return M

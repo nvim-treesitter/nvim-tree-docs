@@ -8,10 +8,18 @@ local api = vim.api
 
 local M = {}
 
-local function get_node_id(node)
-  local start_row, start_col, end_row, end_column = node:range()
+M.doc_cache = {}
 
-  return string.format([[%d_%d_%d_%d]], start_row, start_col, end_row, end_column)
+local function indent_lines(lines, count)
+  if not count or count == 0 then return lines end
+
+  local result = {}
+
+  for _, line in ipairs(lines) do
+    table.insert(result, string.rep(' ', count) .. line)
+  end
+
+  return result
 end
 
 function M.doc_node_at_cursor()
@@ -19,16 +27,18 @@ function M.doc_node_at_cursor()
 
   if not doc_data or not node then return end
 
-  local doc_tbl = templates.execute_template(doc_data)
+  local doc_lines = templates.execute_template(doc_data)
 
+  if not doc_lines then return end
 
-  if not doc_tbl then return end
+  local node_start_row, node_start_col, _ = doc_data.definition.node:start()
 
-  local node_start_row, _, _ = node:start()
-
-  -- TODO: Handle indentation here... should be easy if we have the nodes start column
-
-  api.nvim_buf_set_lines(0, node_start_row, node_start_row, false, doc_tbl)
+  api.nvim_buf_set_lines(
+    0,
+    node_start_row,
+    node_start_row,
+    false,
+    indent_lines(doc_lines, node_start_col))
 end
 
 function M.get_docs_at_cursor()
@@ -59,6 +69,10 @@ end
 function M.collect_docs(bufnr)
   local bufnr = bufnr or api.nvim_get_current_buf()
 
+  if M.doc_cache[bufnr] and M.doc_cache[bufnr].tick == api.nvim_buf_get_changedtick(bufnr) then
+    return M.doc_cache[bufnr].docs
+  end
+
   -- TODO: Cache this logic
   local collector = Collector.new {
     ['function'] = {
@@ -80,18 +94,22 @@ function M.collect_docs(bufnr)
         'class',
         { key = 'parameters', is_list = true },
       }
+    },
+    class = {
+      keys = {
+        'name',
+        { key = 'extensions', is_list = true },
+        { key = 'implementations', is_list = true }
+      }
     }
   }
 
   collector:collect_all(locals.get_locals(bufnr, 'docs'))
 
-  -- Sort all parameters by position
-  collector:sort_list('parameters', function(a, b)
-    local _, _, a_pos = a.name.node:start()
-    local _, _, b_pos = b.name.node:start()
-
-    return a_pos < b_pos
-  end)
+  M.doc_cache[bufnr] = {
+    tick = api.nvim_buf_get_changedtick(bufnr),
+    docs = collector
+  }
 
   return collector
 end

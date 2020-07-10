@@ -1,3 +1,4 @@
+;TODO: Figure out a way to avoid so much duplication
 ; Function params
 (
   (comment)* @function.doc
@@ -30,6 +31,7 @@
 
 ; Method params
 (class_declaration
+  name: (identifier) @method.class
   body: (class_body
           ((comment)* @method.doc
           (method_definition
@@ -41,10 +43,16 @@
 
 ; Method params with default values `a = 123`
 (class_declaration
+  name: (identifier) @method.class
   body: (class_body
           ((comment)* @method.doc
           (method_definition
             parameters: (formal_parameters
                           (assignment_pattern
                             left: (shorthand_property_identifier) @method.parameters.name
-                            right: (_) @method.parameters.default_value))) @method.definition))) @method.class
+                            right: (_) @method.parameters.default_value))) @method.definition)))
+
+(class_declaration
+  name: (identifier) @class.name
+  (class_heritage
+    (identifier) @class.extensions.name)?) @class.definition

@@ -37,7 +37,8 @@ end
 function Collector.new(type_defs)
   local instance = {
     type_defs = type_defs or {},
-    items = {}
+    items = {},
+    lists = {}
   }
 
   setmetatable(instance, { __index = Collector })
@@ -51,6 +52,8 @@ function Collector:collect_all(matches)
       self:add(type, match[type])
     end
   end
+
+  self:sort()
 end
 
 function Collector:get_items()
@@ -67,6 +70,7 @@ function Collector:collect(id, match, key_def)
   if type(key_def) == 'table' then
     is_list = key_def.is_list or false
     key = key_def.key
+    sorter = key_def.sorter or Collector.sort_by_name_node_comp
   end
 
   if not key then return end
@@ -74,6 +78,8 @@ function Collector:collect(id, match, key_def)
   if is_list then
     if type(entry[key]) ~= 'table' then
       entry[key] = {}
+      -- Track lists so they can be sorted after collection
+      table.insert(self.lists, { list = entry[key], sorter = sorter })
     end
 
     table.insert(entry[key], match[key])
@@ -82,12 +88,24 @@ function Collector:collect(id, match, key_def)
   end
 end
 
-function Collector:sort_list(key, comp)
-  for _, item in pairs(self:get_items()) do
-    if type(item[key]) == 'table' then
-      table.sort(item[key], comp)
+function Collector:sort()
+  for _, list_entry in ipairs(self.lists) do
+    if type(list_entry.sorter) == 'function' then
+      table.sort(list_entry.list, list_entry.sorter)
     end
   end
+end
+
+function Collector.sort_by_name_node_comp(a, b)
+  if not a.name
+    or not a.name.node
+    or not b.name
+    or not b.name.node then return false end
+
+  local _, _, a_pos = a.name.node:start()
+  local _, _, b_pos = b.name.node:start()
+
+  return a_pos < b_pos
 end
 
 return Collector
