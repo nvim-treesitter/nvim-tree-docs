@@ -65,17 +65,33 @@ function M.collect_docs(bufnr)
       keys = {
         'name',
         'return',
+        'doc',
         { key = 'parameters', is_list = true },
       }
     },
     variable = {
-      keys = { 'name', 'var_type', 'initial_value' }
+      keys = { 'name', 'var_type', 'initial_value', 'doc' }
+    },
+    method = {
+      keys = {
+        'name',
+        'return',
+        'doc',
+        'class',
+        { key = 'parameters', is_list = true },
+      }
     }
   }
 
   collector:collect_all(locals.get_locals(bufnr, 'docs'))
 
-  -- TODO: sort parameters by node range here
+  -- Sort all parameters by position
+  collector:sort_list('parameters', function(a, b)
+    local _, _, a_pos = a.name.node:start()
+    local _, _, b_pos = b.name.node:start()
+
+    return a_pos < b_pos
+  end)
 
   return collector
 end

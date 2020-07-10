@@ -82,4 +82,12 @@ function Collector:collect(id, match, key_def)
   end
 end
 
+function Collector:sort_list(key, comp)
+  for _, item in pairs(self:get_items()) do
+    if type(item[key]) == 'table' then
+      table.sort(item[key], comp)
+    end
+  end
+end
+
 return Collector
