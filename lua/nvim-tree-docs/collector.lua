@@ -3,6 +3,7 @@ local Collector = {}
 local default_type_defs = {
   ['function'] = {
     keys = {
+      'root',
       'name',
       'return',
       'doc',
@@ -14,6 +15,7 @@ local default_type_defs = {
   },
   method = {
     keys = {
+      'root',
       'name',
       'return',
       'doc',
@@ -25,6 +27,7 @@ local default_type_defs = {
   class = {
     keys = {
       'doc',
+      'root',
       'name',
       { key = 'extensions', is_list = true },
       { key = 'implementations', is_list = true }
@@ -32,6 +35,7 @@ local default_type_defs = {
   },
   member = {
     keys = {
+      'root',
       'class',
       'doc',
       'name',
@@ -120,7 +124,28 @@ function Collector:collect(id, match, key_def)
     if type(entry[key]) ~= 'table' then
       entry[key] = {}
       -- Track lists so they can be sorted after collection
-      table.insert(self.lists, { list = entry[key], sorter = sorter })
+      table.insert(self.lists, { list = entry[key], sorter = sorter, nodes = {} })
+    end
+
+    -- Entries will be merged for lists with definition tags.
+    if (match[key].definition) then
+      local node_id = get_node_id(match[key].definition.node)
+      local list_entry_for_node = nil
+
+      for _, list_entry in ipairs(self.lists) do
+        if list_entry.list == entry[key] then
+          list_entry_for_node = list_entry
+          break
+        end
+      end
+
+      if list_entry_for_node then
+        if vim.tbl_contains(list_entry_for_node.nodes, node_id) then
+          return
+        end
+
+        table.insert(list_entry_for_node.nodes, node_id)
+      end
     end
 
     table.insert(entry[key], match[key])
