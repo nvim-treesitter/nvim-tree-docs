@@ -7,12 +7,14 @@ local Collector = {}
 
 local collector_metatable = {
   __index = function(tbl, key)
+    --- Allow list lookups `collector[1]`
     if type(key) == 'number' then
       local id = tbl.__order[key]
 
       return id and tbl.__entries[id] or nil
     end
 
+    -- Everything else falls to the collector table.
     return Collector[key]
   end
 }

@@ -4,8 +4,8 @@ local M = {}
 
 M['function'] = template.compile [[
 --- Description
-<? for _, p in ipairs(ctx.parameters) do ?>
--- @param <%= ctx.text(p) %>: the <%= ctx.text(p) %n>
+<? for _, p in ctx.for_each(ctx.parameters) do ?>
+-- @param <%= ctx.text(p.name.node) %>: the <%= ctx.text(p.name.node) %n>
 <? end ?>
 <? if ctx['return'] then ?>
 -- @returns
