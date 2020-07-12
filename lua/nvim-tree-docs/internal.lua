@@ -61,7 +61,7 @@ function M.get_doc_data_for_node(node, bufnr)
   local doc_data = M.collect_docs(bufnr)
   local node_start_row, node_start_col, _ = node:start()
 
-  for _, def in pairs(doc_data:get_items()) do
+  for _, def in doc_data:iterate() do
     local def_start_row, def_start_col, _ = get_root_def_node(def):start()
 
     if def_start_row == node_start_row and node_start_col >= def_start_col then
@@ -80,8 +80,13 @@ function M.collect_docs(bufnr)
   end
 
   local collector = Collector.new()
+  local doc_matches = locals.get_locals(bufnr, 'docs')
 
-  collector:collect_all(locals.get_locals(bufnr, 'docs'))
+  for _, item in ipairs(doc_matches) do
+    for kind, match in pairs(item) do
+      collector:add(kind, match)
+    end
+  end
 
   M.doc_cache[bufnr] = {
     tick = api.nvim_buf_get_changedtick(bufnr),

@@ -11,7 +11,10 @@ end
 M['function'] = template.compile [[
 /**
  * <%= ctx.text(ctx.name.node) %n>
-<? for _, p in ipairs(ctx.parameters) do ?>
+<? if ctx.export then ?>
+ * @export
+<? end ?>
+<? for _, p in ctx.for_each(ctx.parameters) do ?>
  * @param <%= ctx.get_param_name(p) %> {any} The <%= ctx.text(p.name.node) %n>
 <? end ?>
 <? if ctx['return'] then ?>
@@ -23,6 +26,9 @@ M['function'] = template.compile [[
 M.variable = template.compile [[
 /**
  * Description
+<? if ctx.export then ?>
+ * @export
+<? end ?>
  * @type {any}
  */
 ]]
@@ -31,7 +37,7 @@ M.method = template.compile [[
 /**
  * <%= ctx.text(ctx.name.node) %n>
  * @memberOf <%= ctx.text(ctx.class.node) %n>
-<? for _, p in ipairs(ctx.parameters) do ?>
+<? for _, p in ctx.for_each(ctx.parameters) do ?>
  * @param <%= ctx.get_param_name(p) %> {any} The <%= ctx.text(p.name.node) %n>
 <? end ?>
 <? if ctx['return'] then ?>
@@ -44,7 +50,10 @@ M.class = template.compile [[
 /**
  * The <%= ctx.text(ctx.name.node) %> class.
  * @class <%= ctx.text(ctx.name.node) %n>
-<? for _, e in ipairs(ctx.extensions) do ?>
+<? if ctx.export then ?>
+ * @export
+<? end ?>
+<? for _, e in ctx.for_each(ctx.extentions) do ?>
  * @extends <%= ctx.text(e.name.node) %n>
 <? end ?>
  */

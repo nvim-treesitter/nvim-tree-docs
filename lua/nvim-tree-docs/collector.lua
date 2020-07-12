@@ -1,48 +1,20 @@
+--- A collector is a special type of "list" that
+-- keeps track of node results and merges entries
+-- that share the same definition.
+-- This provides us with the ability to match multiple
+-- queries against the same "node".
 local Collector = {}
 
-local default_type_defs = {
-  ['function'] = {
-    keys = {
-      'root',
-      'name',
-      'return',
-      'doc',
-      { key = 'parameters', is_list = true },
-    }
-  },
-  variable = {
-    keys = { 'name', 'var_type', 'initial_value', 'doc' }
-  },
-  method = {
-    keys = {
-      'root',
-      'name',
-      'return',
-      'doc',
-      'class',
-      'visibility',
-      { key = 'parameters', is_list = true },
-    }
-  },
-  class = {
-    keys = {
-      'doc',
-      'root',
-      'name',
-      { key = 'extensions', is_list = true },
-      { key = 'implementations', is_list = true }
-    }
-  },
-  member = {
-    keys = {
-      'root',
-      'class',
-      'doc',
-      'name',
-      'visibility',
-      'member_type'
-    }
-  }
+local collector_metatable = {
+  __index = function(tbl, key)
+    if type(key) == 'number' then
+      local id = tbl.__order[key]
+
+      return id and tbl.__entries[id] or nil
+    end
+
+    return Collector[key]
+  end
 }
 
 local function get_node_id(node)
@@ -51,127 +23,86 @@ local function get_node_id(node)
   return string.format([[%d_%d_%d_%d]], start_row, start_col, end_row, end_column)
 end
 
-function Collector:add(type, match)
+function Collector:add(kind, match)
   if not match then return end
 
-  local type_def = self.type_defs[type] or {}
-  local key_defs = type_def.keys or {}
   local def = match.definition
 
   if not def then return end
 
   local def_node = def.node
-  local id = get_node_id(def_node)
+  local node_id = get_node_id(def_node)
 
-  if not self:get(id) then
-    self.items[id] = {
-      type = type,
+  if not self.__entries[node_id] then
+    local order_index = 1
+    local _, _, def_start_byte = def_node:start()
+
+    for id, entry in pairs(self.__entries) do
+      local _, _, start_byte = entry.definition.node:start()
+
+      if def_start_byte < start_byte then
+        break
+      end
+
+      order_index = order_index + 1
+    end
+
+    table.insert(self.__order, order_index, node_id)
+
+    self.__entries[node_id] = {
+      kind = kind,
       definition = def
     }
   end
 
-  for _, key in ipairs(key_defs) do
-    self:collect(id, match, key)
+  for key, submatch in pairs(match) do
+    if key ~= 'definition' then
+      self:collect(self.__entries[node_id], submatch, key)
+    end
   end
 end
 
-function Collector:get(id)
-  return self.items[id]
+function Collector:collect(entry, match, key)
+  if match.definition then
+    if not entry[key] then
+      entry[key] = Collector.new()
+    end
+
+    entry[key]:add(key, match)
+  elseif not entry[key] then
+    entry[key] = match
+  elseif key == 'root' and match.node then
+    -- Always take the furthest root node
+    local _, _, current_root = entry[key].node:start()
+    local _, _, new_root = match.node:start()
+
+    if new_root < current_root then
+      entry[key] = match
+    end
+  end
 end
 
-function Collector.new(type_defs)
+function Collector:iterate()
+  local i = 1
+
+  return function()
+    local id = self.__order[i]
+
+    if not id then return nil end
+
+    i = i + 1
+
+    return i - 1, self.__entries[id]
+  end
+end
+
+function Collector.new()
   local instance = {
-    type_defs = vim.tbl_extend('force', default_type_defs, type_defs or {}),
-    items = {},
-    lists = {}
+    __entries = {},
+    __order = {}
   }
 
-  setmetatable(instance, { __index = Collector })
-
-  return instance
-end
-
-function Collector:collect_all(matches)
-  for _, match in ipairs(matches) do
-    for type, _ in pairs(self.type_defs) do
-      self:add(type, match[type])
-    end
-  end
-
-  self:sort()
-end
-
-function Collector:get_items()
-  return self.items
-end
-
-function Collector:collect(id, match, key_def)
-  if not self:get(id) then return end
-
-  local entry = self.items[id]
-  local is_list = false
-  local key = key_def
-
-  if type(key_def) == 'table' then
-    is_list = key_def.is_list or false
-    key = key_def.key
-    sorter = key_def.sorter or Collector.sort_by_name_node_comp
-  end
-
-  if not key then return end
-
-  if is_list then
-    if type(entry[key]) ~= 'table' then
-      entry[key] = {}
-      -- Track lists so they can be sorted after collection
-      table.insert(self.lists, { list = entry[key], sorter = sorter, nodes = {} })
-    end
-
-    -- Entries will be merged for lists with definition tags.
-    if (match[key].definition) then
-      local node_id = get_node_id(match[key].definition.node)
-      local list_entry_for_node = nil
-
-      for _, list_entry in ipairs(self.lists) do
-        if list_entry.list == entry[key] then
-          list_entry_for_node = list_entry
-          break
-        end
-      end
-
-      if list_entry_for_node then
-        if vim.tbl_contains(list_entry_for_node.nodes, node_id) then
-          return
-        end
-
-        table.insert(list_entry_for_node.nodes, node_id)
-      end
-    end
-
-    table.insert(entry[key], match[key])
-  elseif not entry[key] then
-    entry[key] = match[key]
-  end
-end
-
-function Collector:sort()
-  for _, list_entry in ipairs(self.lists) do
-    if type(list_entry.sorter) == 'function' then
-      table.sort(list_entry.list, list_entry.sorter)
-    end
-  end
-end
-
-function Collector.sort_by_name_node_comp(a, b)
-  if not a.name
-    or not a.name.node
-    or not b.name
-    or not b.name.node then return false end
-
-  local _, _, a_pos = a.name.node:start()
-  local _, _, b_pos = b.name.node:start()
-
-  return a_pos < b_pos
+  return setmetatable(instance, collector_metatable)
 end
 
 return Collector

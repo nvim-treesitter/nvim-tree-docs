@@ -17,10 +17,10 @@ end
 function M.execute_template(data, bufnr, ft)
   local templates = M.get_template(bufnr, ft)
 
-  if not templates or not templates[data.type] then return end
+  if not templates or not templates[data.kind] then return end
 
   local context = M.get_template_context(data)
-  local lines = vim.split(templates[data.type](context), "\n")
+  local lines = vim.split(templates[data.kind](context), "\n")
 
   -- Trim leading/trailing blank lines
   if lines[1] == '' then
@@ -41,6 +41,9 @@ function M.get_template_context(data, ft)
         local text = ts_utils.get_node_text(node)
 
         return multi and text or text[1] or ''
+      end,
+      for_each = function(collector)
+        return collector and collector:iterate() or function() return nil end
       end
     }),
     {
