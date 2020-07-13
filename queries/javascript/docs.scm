@@ -1,5 +1,3 @@
-;TODO: Figure out a way to avoid so much duplication
-
 ; ---- Functions
 
 (
@@ -105,10 +103,10 @@
 
 ; Class members
 (
-  (identifier) @member.class
+  (identifier)? @member.class
   (class_body
     ((comment)+? @member.doc
     (public_field_definition
-      property: (property_identifier) @member.name) @member.definition))
+      (property_identifier) @member.name) @member.definition))
 )
 

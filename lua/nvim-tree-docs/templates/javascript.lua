@@ -2,20 +2,22 @@ local template = require "nvim-tree-docs.template"
 
 local M = {}
 
-function M.get_param_name(ctx, p)
-  local name = ctx.text(p.name.node)
+M.context = {}
 
-  return p.default_value and string.format("[%s=%s]", name, ctx.text(p.default_value.node)) or name
+function M.context.get_param_name(ctx, p)
+  local name = ctx.text(p.name)
+
+  return p.default_value and string.format("[%s=%s]", name, ctx.text(p.default_value)) or name
 end
 
 M['function'] = template.compile [[
 /**
- * <%= ctx.text(ctx.name.node) %n>
+ * <%= ctx.text(ctx.name) %n>
 <? if ctx.export then ?>
  * @export
 <? end ?>
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
- * @param <%= ctx.get_param_name(p) %> {any} The <%= ctx.text(p.name.node) %n>
+ * @param <%= ctx.get_param_name(p) %> {any} The <%= ctx.text(p.name) %n>
 <? end ?>
 <? if ctx['return'] then ?>
  * @returns
@@ -35,10 +37,12 @@ M.variable = template.compile [[
 
 M.method = template.compile [[
 /**
- * <%= ctx.text(ctx.name.node) %n>
- * @memberOf <%= ctx.text(ctx.class.node) %n>
+ * <%= ctx.text(ctx.name) %n>
+<? if ctx.class then ?>
+ * @memberOf <%= ctx.text(ctx.class) %n>
+<? end ?>
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
- * @param <%= ctx.get_param_name(p) %> {any} The <%= ctx.text(p.name.node) %n>
+ * @param <%= ctx.get_param_name(p) %> {any} The <%= ctx.text(p.name) %n>
 <? end ?>
 <? if ctx['return'] then ?>
  * @returns
@@ -48,13 +52,13 @@ M.method = template.compile [[
 
 M.class = template.compile [[
 /**
- * The <%= ctx.text(ctx.name.node) %> class.
- * @class <%= ctx.text(ctx.name.node) %n>
+ * The <%= ctx.text(ctx.name) %> class.
+ * @class <%= ctx.text(ctx.name) %n>
 <? if ctx.export then ?>
  * @export
 <? end ?>
 <? for _, e in ctx.for_each(ctx.extentions) do ?>
- * @extends <%= ctx.text(e.name.node) %n>
+ * @extends <%= ctx.text(e.name) %n>
 <? end ?>
  */
 ]]
@@ -62,7 +66,9 @@ M.class = template.compile [[
 M.member = template.compile [[
 /**
  * Description
- * @memberOf <%= ctx.text(ctx.class.node) %n>
+<? if ctx.class then ?>
+ * @memberOf <%= ctx.text(ctx.class) %n>
+<? end ?>
  * @type {any}
  */
 ]]

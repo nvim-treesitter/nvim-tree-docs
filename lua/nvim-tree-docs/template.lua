@@ -37,7 +37,15 @@ end
 function M.get_template_context(data, ft)
   return setmetatable(
     vim.tbl_extend("force", data, {
+      -- Simple way to extract text from a match or node.
       text = function(node, multi)
+        if not node or type(node) ~= 'table' then return '' end
+
+        -- Safe access to matches
+        if node.node then
+          node = node.node
+        end
+
         local text = ts_utils.get_node_text(node)
 
         return multi and text or text[1] or ''
@@ -48,21 +56,21 @@ function M.get_template_context(data, ft)
     }),
     {
       __index = function(tbl, key)
+        -- Any unknown key will be looked up on the template modules context table.
+        -- This allows for the adding of language specific util methods.
         local existing = rawget(tbl, key)
 
         if existing then return existing end
 
         local template_mod = M.get_template(nil, ft)
 
-        if not template_mod[key] then
+        if not template_mod.context or not type(template_mod.context[key]) then
           return nil
         end
 
-        local fn = function(...) return template_mod[key](tbl, ...) end
+        rawset(tbl, key, template_mod.context[key])
 
-        rawset(tbl, key, fn)
-
-        return fn
+        return template_mod.context[key]
       end
     }
   )
