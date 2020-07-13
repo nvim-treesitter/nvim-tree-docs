@@ -38,17 +38,22 @@ function M.get_template_context(data, ft)
   return setmetatable(
     vim.tbl_extend("force", data, {
       -- Simple way to extract text from a match or node.
-      text = function(node, multi)
-        if not node or type(node) ~= 'table' then return '' end
+      text = function(node, default, multi)
+        local default = default or ''
+
+        if not node or type(node) ~= 'table' then return default end
 
         -- Safe access to matches
         if node.node then
           node = node.node
         end
 
-        local text = ts_utils.get_node_text(node)
+        local lines = ts_utils.get_node_text(node)
 
-        return multi and text or text[1] or ''
+        if multi then return lines end
+
+
+        return lines[1] and lines[1] ~= '' and lines[1] or default
       end,
       for_each = function(collector)
         return collector and collector:iterate() or function() return nil end
@@ -68,9 +73,14 @@ function M.get_template_context(data, ft)
           return nil
         end
 
-        rawset(tbl, key, template_mod.context[key])
+        -- All context functions get passed the context as their first argument.
+        local result = type(template_mod.context[key]) == 'function'
+          and function(...) return template_mod.context[key](tbl, ...) end
+          or template_mod.context[key];
 
-        return template_mod.context[key]
+        rawset(tbl, key, result)
+
+        return result
       end
     }
   )

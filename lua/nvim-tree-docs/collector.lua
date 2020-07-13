@@ -73,12 +73,20 @@ function Collector:collect(entry, match, key)
     entry[key]:add(key, match)
   elseif not entry[key] then
     entry[key] = match
-  elseif key == 'root' and match.node then
-    -- Always take the furthest root node
-    local _, _, current_root = entry[key].node:start()
-    local _, _, new_root = match.node:start()
+  elseif key == 'start_point' and match.node then
+    -- Always take the furthest start node
+    local _, _, current_start = entry[key].node:start()
+    local _, _, new_start = match.node:start()
 
-    if new_root < current_root then
+    if new_start < current_start then
+      entry[key] = match
+    end
+  elseif key == 'end_point' and match.node then
+    -- Always take the latest end node
+    local _, _, current_end = entry[key].node:end_()
+    local _, _, new_end = match.node:end_()
+
+    if new_end > current_end then
       entry[key] = match
     end
   end

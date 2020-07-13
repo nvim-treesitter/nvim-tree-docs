@@ -22,8 +22,12 @@ local function indent_lines(lines, count)
   return result
 end
 
-local function get_root_def_node(entry)
-  return entry.root and entry.root.node or entry.definition.node
+local function get_start_node(entry)
+  return entry.start_point and entry.start_point.node or entry.definition.node
+end
+
+local function get_end_node(entry)
+  return entry.end_point and entry.end_point.node or entry.definition.node
 end
 
 function M.doc_node_at_cursor()
@@ -45,9 +49,9 @@ function M.doc_node(node, bufnr)
   if not doc_lines then return end
 
   -- Root node to use for indentation of the doc comment.
-  local root_node = doc_data.root and doc_data.root.node or doc_data.definition.node
+  local start_node = get_start_node(doc_data)
 
-  local node_start_row, node_start_col, _ = root_node:start()
+  local node_start_row, node_start_col, _ = start_node:start()
 
   api.nvim_buf_set_lines(
     bufnr,
@@ -59,12 +63,13 @@ end
 
 function M.get_doc_data_for_node(node, bufnr)
   local doc_data = M.collect_docs(bufnr)
-  local node_start_row, node_start_col, _ = node:start()
+  local _, _, node_start = node:start()
 
   for _, def in doc_data:iterate() do
-    local def_start_row, def_start_col, _ = get_root_def_node(def):start()
+    local _, _, start_point = get_start_node(def):start()
+    local _, _, end_point = get_end_node(def):end_()
 
-    if def_start_row == node_start_row and node_start_col >= def_start_col then
+    if node_start >= start_point and node_start < end_point then
       return def
     end
   end

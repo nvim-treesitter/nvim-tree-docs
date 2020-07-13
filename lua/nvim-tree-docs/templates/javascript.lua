@@ -7,7 +7,13 @@ M.context = {}
 function M.context.get_param_name(ctx, p)
   local name = ctx.text(p.name)
 
-  return p.default_value and string.format("[%s=%s]", name, ctx.text(p.default_value)) or name
+  if p.default_value then
+    return string.format("[%s=%s]", name, ctx.text(p.default_value))
+  elseif p.optional then
+    return string.format("[%s]", name)
+  else
+    return name
+  end
 end
 
 M['function'] = template.compile [[
@@ -17,10 +23,10 @@ M['function'] = template.compile [[
  * @export
 <? end ?>
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
- * @param <%= ctx.get_param_name(p) %> {any} The <%= ctx.text(p.name) %n>
+ * @param <%= ctx.get_param_name(p) %> {<%= ctx.text(p.type, 'any') %>} - The <%= ctx.text(p.name) %n>
 <? end ?>
 <? if ctx['return'] then ?>
- * @returns
+ * @returns {<%= ctx.text(ctx.return_type, 'any') %>}
 <? end ?>
  */
 ]]
@@ -42,7 +48,7 @@ M.method = template.compile [[
  * @memberOf <%= ctx.text(ctx.class) %n>
 <? end ?>
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
- * @param <%= ctx.get_param_name(p) %> {any} The <%= ctx.text(p.name) %n>
+ * @param <%= ctx.get_param_name(p) %> {<%= ctx.text(ctx.type, 'any')%>} - The <%= ctx.text(p.name) %n>
 <? end ?>
 <? if ctx['return'] then ?>
  * @returns
@@ -57,6 +63,9 @@ M.class = template.compile [[
 <? if ctx.export then ?>
  * @export
 <? end ?>
+<? for _, impl in ctx.for_each(ctx.implementations) do ?>
+ * @implements <%= ctx.text(impl.name) %n>
+<? end ?>
 <? for _, e in ctx.for_each(ctx.extentions) do ?>
  * @extends <%= ctx.text(e.name) %n>
 <? end ?>
@@ -66,10 +75,13 @@ M.class = template.compile [[
 M.member = template.compile [[
 /**
  * Description
+<? if ctx.readonly then ?>
+ * @readonly
+<? end ?>
 <? if ctx.class then ?>
  * @memberOf <%= ctx.text(ctx.class) %n>
 <? end ?>
- * @type {any}
+ * @type {<%= ctx.text(ctx.type, 'any') %>}
  */
 ]]
 
