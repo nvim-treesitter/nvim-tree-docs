@@ -30,6 +30,23 @@ local function get_end_node(entry)
   return entry.end_point and entry.end_point.node or entry.definition.node
 end
 
+local function get_insert_loc(entry)
+  local start_node = get_start_node(entry)
+
+  for key, match in pairs(entry) do
+    local direction = string.match(key, "^insert_([a-z]+)")
+    local col = 0
+
+    if direction then
+      local at_col = string.match(key, "_at_(%d+)$")
+
+      return match.node, direction, (at_col or col)
+    end
+  end
+
+  return start_node, 'above', 0
+end
+
 function M.doc_node_at_cursor()
   local node_at_point = ts_utils.get_node_at_cursor()
 
@@ -58,12 +75,17 @@ function M.doc_all_in_range()
   M.generate_docs(edits)
 end
 
-function M.node_to_lsp_range(node)
-  local start_line, start_col, end_line, end_col = node:range()
+function M.node_to_lsp_range(node, direction)
+  local start_row, _, end_row, _ = node:range()
+  local row = start_row
+
+  if direction == 'below' then
+    row = end_row + 1
+  end
 
   return {
-    start = {  line = start_line, character = 0 },
-    ['end'] = { line = start_line, character = 0 }
+    start = {  line = row, character = 0 },
+    ['end'] = { line = row, character = 0 }
   }
 end
 
@@ -76,9 +98,10 @@ function M.generate_docs(doc_data_list, bufnr)
 
     if doc_lines then
       local start_node = get_start_node(doc_data)
+      local insert_node, direction, at_col = get_insert_loc(doc_data)
       local _, node_start_col, _ = start_node:start()
-      local range = M.node_to_lsp_range(start_node)
-      local new_text = indent_lines(doc_lines, node_start_col)
+      local range = M.node_to_lsp_range(insert_node, direction)
+      local new_text = indent_lines(doc_lines, node_start_col + at_col)
 
       table.insert(edits, { range = range, newText = table.concat(new_text, '\n') .. '\n' })
     end
