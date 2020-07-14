@@ -9,23 +9,25 @@ function M.context.get_param_name(ctx, p)
 
   if p.default_value then
     return string.format("[%s=%s]", name, ctx.text(p.default_value))
+  elseif p.optional then
+    return string.format("[%s]", name)
+  else
+    return name
   end
-
-  return name
 end
 
 M['function'] = template.compile [[
 /**
  * <%= ctx.text(ctx.name) %n> description
  *
-<? if ctx.export then ?>
- * @export
+<? for _, g in ctx.for_each(ctx.generics) do ?>
+ * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %> type
 <? end ?>
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
- * @param <%= ctx.get_param_name(p) %> {any} - The <%= ctx.text(p.name) %> argument
+ * @param <%= ctx.get_param_name(p) %> - The <%= ctx.text(p.name) %> argument
 <? end ?>
 <? if ctx['return'] then ?>
- * @returns {any} The result
+ * @returns The result
 <? end ?>
  */
 ]]
@@ -43,14 +45,12 @@ M.variable = template.compile [[
 M.method = template.compile [[
 /**
  * <%= ctx.text(ctx.name) %n>
-<? if ctx.class then ?>
- * @memberOf <%= ctx.text(ctx.class) %n>
-<? end ?>
+ *
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
- * @param <%= ctx.get_param_name(p) %> {any} - The <%= ctx.text(p.name) %> argument
+ * @param <%= ctx.get_param_name(p) %> - The <%= ctx.text(p.name) %n> argument
 <? end ?>
 <? if ctx['return'] then ?>
- * @returns
+ * @returns The result
 <? end ?>
  */
 ]]
@@ -58,12 +58,8 @@ M.method = template.compile [[
 M.class = template.compile [[
 /**
  * The <%= ctx.text(ctx.name) %> class.
- * @class <%= ctx.text(ctx.name) %n>
-<? if ctx.export then ?>
- * @export
-<? end ?>
-<? for _, e in ctx.for_each(ctx.extentions) do ?>
- * @extends <%= ctx.text(e.name) %n>
+<? for _, g in ctx.for_each(ctx.generics) do ?>
+ * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %n> type
 <? end ?>
  */
 ]]
@@ -71,10 +67,6 @@ M.class = template.compile [[
 M.member = template.compile [[
 /**
  * Description
-<? if ctx.class then ?>
- * @memberOf <%= ctx.text(ctx.class) %n>
-<? end ?>
- * @type {any}
  */
 ]]
 
