@@ -24,7 +24,7 @@ local context_api = {
     return lines[1] and lines[1] ~= '' and lines[1] or default
   end,
   has_any = function(matches)
-    for _, match in ipairs(matches) do
+    for _, match in pairs(matches) do
       local is_collector = Collector.is(match)
 
       if (is_collector and not match:is_empty()) or (not is_collector and match) then

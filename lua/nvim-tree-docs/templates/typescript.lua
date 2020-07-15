@@ -43,8 +43,11 @@ M.variable = template.compile [[
 M.method = template.compile [[
 /**
  * The <%= ctx.text(ctx.name) %> method
-<? if ctx.has_any({ ctx.parameters, ctx['return'] }) then ?>
+<? if ctx.has_any({ ctx.parameters, ctx.generics, ctx['return'] }) then ?>
  *
+<? end ?>
+<? for _, g in ctx.for_each(ctx.generics) do ?>
+ * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %n> type
 <? end ?>
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
  * @param <%= ctx.get_param_name(p) %> - The <%= ctx.text(p.name) %n> argument

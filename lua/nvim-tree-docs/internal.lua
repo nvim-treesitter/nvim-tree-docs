@@ -53,13 +53,17 @@ function M.doc_node_at_cursor()
   M.doc_node(node_at_point)
 end
 
-function M.doc_all_in_range()
+function M.get_docs_from_selection()
   local _, start_line, _, _ = unpack(vim.fn.getpos("'<"))
   local _, end_line, _, _ = unpack(vim.fn.getpos("'>"))
 
   start_line = start_line - 1
   end_line = end_line - 1
 
+  return M.get_docs_in_range(start_line, end_line)
+end
+
+function M.get_docs_in_range(start_line, end_line)
   local doc_data = M.collect_docs(bufnr)
   local edits = {}
 
@@ -72,7 +76,11 @@ function M.doc_all_in_range()
     end
   end
 
-  M.generate_docs(edits)
+  return edits
+end
+
+function M.doc_all_in_range()
+  M.generate_docs(M.get_docs_from_selection())
 end
 
 function M.node_to_lsp_range(node, direction)
