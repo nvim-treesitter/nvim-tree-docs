@@ -18,7 +18,7 @@ end
 
 M['function'] = template.compile [[
 /**
- * <%= ctx.text(ctx.name) %n> description
+ * The <%= ctx.text(ctx.name) %n> function
 <? if ctx.has_any({ ctx.generics, ctx.parameters, ctx['return'] }) then ?>
  *
 <? end ?>
@@ -36,13 +36,13 @@ M['function'] = template.compile [[
 
 M.variable = template.compile [[
 /**
- * Description
+ * The <%= ctx.text(ctx.name) %> variable
  */
 ]]
 
 M.method = template.compile [[
 /**
- * <%= ctx.text(ctx.name) %n>
+ * The <%= ctx.text(ctx.name) %> method
 <? if ctx.has_any({ ctx.parameters, ctx['return'] }) then ?>
  *
 <? end ?>
