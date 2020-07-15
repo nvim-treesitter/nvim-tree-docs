@@ -45,14 +45,14 @@
   (lexical_declaration
     (variable_declarator
       name: (identifier) @variable.name
-      value: (_)? @variable.initial_value) @variable.definition) @variable.root
+      value: (_)? @variable.initial_value) @variable.definition) @variable.start_point
 )
 
 (
   (comment)+? @variable.doc
   (export_statement
     (lexical_declaration
-      (variable_declarator) @variable.definition)) @variable.root @variable.export
+      (variable_declarator) @variable.definition)) @variable.start_point @variable.export
 )
 
 ; ----- Methods
@@ -63,21 +63,33 @@
     ((comment)+? @method.doc
     (method_definition
       name: (property_identifier) @method.name
+      type_parameters: (type_parameters
+        (type_parameter
+          (type_identifier) @method.generics.name @method.generics.definition))?
+      parameters: (formal_parameters) @method.end_point
+      return_type: (type_annotation
+        (_) @method.return_type)? @method.end_point
       body: (statement_block
         (return_statement)? @method.return)) @method.definition))
 )
 
-; Method params
+; Required method params
 (method_definition
   parameters: (formal_parameters
-    (identifier) @method.parameters.name @method.parameters.definition)) @method.definition
+    (required_parameter
+      (identifier) @method.parameters.name @method.parameters.definition
+      (type_annotation
+        (_) @method.parameters.type)?
+      value: (_)? @method.parameters.default_value @method.parameters.optional))) @method.definition
 
-; Method params with default values `a = 123`
+; Optional method params
 (method_definition
   parameters: (formal_parameters
-    (assignment_pattern
-      left: (shorthand_property_identifier) @method.parameters.name @method.parameters.definition
-      right: (_) @method.parameters.default_value))) @method.definition
+    (optional_parameter
+      (identifier) @method.parameters.name @method.parameters.definition
+      (type_annotation
+        (_) @method.parameters.type)?
+      value: (_)? @method.parameters.default_value @method.parameters.optional))) @method.definition
 
 ; ----- Classes
 
@@ -85,45 +97,74 @@
 (
   (comment)+? @class.doc
   (class_declaration
-    name: (type_identifier) @class.name
+    name: (type_identifier) @class.name @class.end_point
+    type_parameters: (type_parameters
+      (type_parameter
+        (type_identifier) @class.generics.name @class.generics.definition))? @class.end_point
     (class_heritage
       (extends_clause
         (type_identifier) @class.extentions.name @class.extentions.definition)?
       (implements_clause
-        (type_identifier) @class.implementations.name @class.implementations.definition)?
-    )?
-  ) @class.definition
-)
-
-(
-  (comment)+? @class.doc
-  (class
-    name: (type_identifier)? @class.name
-    (class_heritage
-      (identifier) @class.extentions.name @class.extentions.definition)?) @class.definition
+        (type_identifier) @class.implementations.name @class.implementations.definition)?)? @class.end_point) @class.definition
 )
 
 ; Exported Classes `export class Test {}`
 (
   (comment)+? @class.doc
   (export_statement
-    declaration: (class_declaration) @class.definition) @class.export @class.root
-)
-
-(
-  (comment)+? @class.doc
-  (export_statement
-    declaration: (class) @class.definition) @class.export @class.root
+    declaration: (class_declaration) @class.definition) @class.export @class.start_point
 )
 
 ; Class members
 (
-  (type_identifier)? @member.class
+  (identifier)? @member.class
   (class_body
     ((comment)+? @member.doc
     (public_field_definition
-      (readonly)? @member.readonly
-      type: (type_annotation (_) @member.type)?
-      name: (property_identifier) @member.name) @member.definition))
+      (property_identifier) @member.name @member.end_point) @member.definition))
+)
+
+; ---- Interfaces
+
+(
+  (comment)+? @interface.doc
+  (interface_declaration
+    name: (_) @interface.name @interface.end_point
+    type_parameters: (type_parameters
+      (type_parameter
+        (type_identifier) @interface.generics.name @interface.generics.definition))? @interface.end_point
+    (extends_clause
+      (_) @interface.extentions.name @interface.extentions.definition)? @interface.end_point) @interface.definition
+)
+
+(
+  (comment)+? @interface.doc
+  (export_statement
+    (interface_declaration) @interface.definition) @interface.start_point
+)
+
+(
+  (comment)+? @interface.doc
+  (property_signature
+    name: (_) @property_signature.name
+    type: (type_annotation
+      (_) @property_signature.type)? @proprety_signature.end_point) @property_signature.definition
+)
+
+; ---- Types
+
+(
+  (comment)+? @interface.doc
+  (type_alias_declaration
+    name: (_) @type_alias.name @type_alias.end_point
+    type_parameters: (type_parameters
+      (type_parameter
+        (type_identifier) @type_alias.generics.name @type_alias.generics.definition))? @type_alias.end_point) @type_alias.definition
+)
+
+(
+  (comment)+? @type_alias.doc
+  (export_statement
+    (type_alias_declaration) @type_alias.definition) @type_alias.start_point
 )
 

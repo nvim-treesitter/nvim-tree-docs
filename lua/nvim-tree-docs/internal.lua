@@ -67,7 +67,7 @@ function M.doc_all_in_range()
     local start_row, _, _ = get_start_node(def):start()
     local end_row, _, _ = get_end_node(def):end_()
 
-    if start_row >= start_row and end_row <= end_line then
+    if start_row >= start_line and end_row <= end_line then
       table.insert(edits, def)
     end
   end

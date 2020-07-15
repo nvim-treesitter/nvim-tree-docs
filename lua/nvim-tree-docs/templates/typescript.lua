@@ -35,10 +35,6 @@ M['function'] = template.compile [[
 M.variable = template.compile [[
 /**
  * Description
-<? if ctx.export then ?>
- * @export
-<? end ?>
- * @type {any}
  */
 ]]
 
@@ -58,6 +54,7 @@ M.method = template.compile [[
 M.class = template.compile [[
 /**
  * The <%= ctx.text(ctx.name) %> class.
+ *
 <? for _, g in ctx.for_each(ctx.generics) do ?>
  * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %n> type
 <? end ?>
@@ -67,6 +64,28 @@ M.class = template.compile [[
 M.member = template.compile [[
 /**
  * Description
+ */
+]]
+
+M.interface = template.compile [[
+/**
+ * The <%= ctx.text(ctx.name) %> interface.
+ *
+<? for _, g in ctx.for_each(ctx.generics) do ?>
+ * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %n> type
+<? end ?>
+ */
+]]
+
+M.property_signature = M.member
+
+M.type_alias = template.compile [[
+/**
+ * The <%= ctx.text(ctx.name) %> type.
+ *
+<? for _, g in ctx.for_each(ctx.generics) do ?>
+ * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %n> type
+<? end ?>
  */
 ]]
 
