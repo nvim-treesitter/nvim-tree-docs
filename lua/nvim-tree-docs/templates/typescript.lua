@@ -19,7 +19,9 @@ end
 M['function'] = template.compile [[
 /**
  * <%= ctx.text(ctx.name) %n> description
+<? if ctx.has_any({ ctx.generics, ctx.parameters, ctx['return'] }) then ?>
  *
+<? end ?>
 <? for _, g in ctx.for_each(ctx.generics) do ?>
  * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %> type
 <? end ?>
@@ -41,7 +43,9 @@ M.variable = template.compile [[
 M.method = template.compile [[
 /**
  * <%= ctx.text(ctx.name) %n>
+<? if ctx.has_any({ ctx.parameters, ctx['return'] }) then ?>
  *
+<? end ?>
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
  * @param <%= ctx.get_param_name(p) %> - The <%= ctx.text(p.name) %n> argument
 <? end ?>
@@ -54,7 +58,9 @@ M.method = template.compile [[
 M.class = template.compile [[
 /**
  * The <%= ctx.text(ctx.name) %> class.
+<? if ctx.has_any({ ctx.generics }) then ?>
  *
+<? end ?>
 <? for _, g in ctx.for_each(ctx.generics) do ?>
  * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %n> type
 <? end ?>
@@ -70,7 +76,9 @@ M.member = template.compile [[
 M.interface = template.compile [[
 /**
  * The <%= ctx.text(ctx.name) %> interface.
+<? if ctx.has_any({ ctx.generics }) then ?>
  *
+<? end ?>
 <? for _, g in ctx.for_each(ctx.generics) do ?>
  * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %n> type
 <? end ?>
@@ -82,7 +90,9 @@ M.property_signature = M.member
 M.type_alias = template.compile [[
 /**
  * The <%= ctx.text(ctx.name) %> type.
+<? if ctx.has_any({ ctx.generics }) then ?>
  *
+<? end ?>
 <? for _, g in ctx.for_each(ctx.generics) do ?>
  * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %n> type
 <? end ?>

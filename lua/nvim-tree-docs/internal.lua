@@ -170,8 +170,10 @@ function M.attach(bufnr)
       mode = 'v'
     end
 
-    local cmd = string.format(":lua require 'nvim-tree-docs.internal'.%s()<CR>", fn)
-    api.nvim_buf_set_keymap(bufnr, mode, mapping, cmd, { silent = true })
+    if mapping then
+      local cmd = string.format(":lua require 'nvim-tree-docs.internal'.%s()<CR>", fn)
+      api.nvim_buf_set_keymap(bufnr, mode, mapping, cmd, { silent = true })
+    end
   end
 end
 
@@ -186,7 +188,9 @@ function M.detach(bufnr)
       mode = 'v'
     end
 
-    api.nvim_buf_del_keymap(buf, mode, mapping)
+    if mapping then
+      api.nvim_buf_del_keymap(buf, mode, mapping)
+    end
   end
 end
 

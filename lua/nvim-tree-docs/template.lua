@@ -1,7 +1,43 @@
 local ts_utils = require "nvim-treesitter.ts_utils"
+local Collector = require "nvim-tree-docs.collector"
 local api = vim.api
 
 local M = {}
+
+local context_api = {
+  -- Simple way to extract text from a match or node.
+  text = function(node, default, multi)
+    local default = default or ''
+
+    if not node or type(node) ~= 'table' then return default end
+
+    -- Safe access to matches
+    if node.node then
+      node = node.node
+    end
+
+    local lines = ts_utils.get_node_text(node)
+
+    if multi then return lines end
+
+
+    return lines[1] and lines[1] ~= '' and lines[1] or default
+  end,
+  has_any = function(matches)
+    for _, match in ipairs(matches) do
+      local is_collector = Collector.is(match)
+
+      if (is_collector and not match:is_empty()) or (not is_collector and match) then
+        return true
+      end
+    end
+
+    return false
+  end,
+  for_each = function(collector)
+    return collector and collector:iterate() or function() return nil end
+  end
+}
 
 function M.get_template(bufnr, ft)
   local bufnr = bufnr or api.nvim_get_current_buf()
@@ -36,29 +72,7 @@ end
 
 function M.get_template_context(data, ft)
   return setmetatable(
-    vim.tbl_extend("force", data, {
-      -- Simple way to extract text from a match or node.
-      text = function(node, default, multi)
-        local default = default or ''
-
-        if not node or type(node) ~= 'table' then return default end
-
-        -- Safe access to matches
-        if node.node then
-          node = node.node
-        end
-
-        local lines = ts_utils.get_node_text(node)
-
-        if multi then return lines end
-
-
-        return lines[1] and lines[1] ~= '' and lines[1] or default
-      end,
-      for_each = function(collector)
-        return collector and collector:iterate() or function() return nil end
-      end
-    }),
+    vim.tbl_extend("force", data, context_api),
     {
       __index = function(tbl, key)
         -- Any unknown key will be looked up on the template modules context table.

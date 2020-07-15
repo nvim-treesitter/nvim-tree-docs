@@ -91,6 +91,28 @@
         (_) @method.parameters.type)?
       value: (_)? @method.parameters.default_value @method.parameters.optional))) @method.definition
 
+; Method signatures (required params)
+(method_signature
+  name: (property_identifier) @method.name
+  parameters: (formal_parameters
+    (required_parameter
+      (identifier) @method.parameters.name @method.parameters.definition
+      (type_annotation
+        (_) @method.parameters.type)?)?)
+  return_type: (type_annotation
+    (_) @method.return_type)? @method.end_point) @method.definition
+
+; Method signatures (optional params)
+(method_signature
+  name: (property_identifier) @method.name
+  parameters: (formal_parameters
+    (optional_parameter
+      (identifier) @method.parameters.name @method.parameters.definition
+      (type_annotation
+        (_) @method.parameters.type)?)?)
+  return_type: (type_annotation
+    (_) @method.return_type)? @method.end_point) @method.definition
+
 ; ----- Classes
 
 ; Classes
@@ -122,6 +144,14 @@
     ((comment)+? @member.doc
     (public_field_definition
       (property_identifier) @member.name @member.end_point) @member.definition))
+)
+
+; Decorated members
+(
+  (comment)+? @member.doc
+  (decorator)+? @member.start_point
+  (public_field_definition
+    (property_identifier) @member.name @member.end_point) @member.definition
 )
 
 ; ---- Interfaces

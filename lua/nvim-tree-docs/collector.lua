@@ -106,6 +106,10 @@ function Collector:iterate()
   end
 end
 
+function Collector:is_empty()
+  return #self.__order == 0
+end
+
 function Collector.new()
   local instance = {
     __entries = {},
@@ -113,6 +117,10 @@ function Collector.new()
   }
 
   return setmetatable(instance, collector_metatable)
+end
+
+function Collector.is(value)
+  return type(value) == 'table' and type(value.__entries) == 'table'
 end
 
 return Collector
