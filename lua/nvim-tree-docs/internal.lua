@@ -1,4 +1,3 @@
-local locals = require "nvim-treesitter.locals"
 local configs = require "nvim-treesitter.configs"
 local queries = require "nvim-treesitter.query"
 local ts_utils = require "nvim-treesitter.ts_utils"
@@ -151,7 +150,7 @@ function M.collect_docs(bufnr)
   end
 
   local collector = Collector.new()
-  local doc_matches = locals.get_locals(bufnr, 'docs')
+  local doc_matches = queries.collect_group_results(bufnr, 'docs')
 
   for _, item in ipairs(doc_matches) do
     for kind, match in pairs(item) do
