@@ -29,23 +29,6 @@ local function get_end_node(entry)
   return entry.end_point and entry.end_point.node or entry.definition.node
 end
 
-local function get_insert_loc(entry)
-  local start_node = get_start_node(entry)
-
-  for key, match in pairs(entry) do
-    local direction = string.match(key, "^insert_([a-z]+)")
-    local col = 0
-
-    if direction then
-      local at_col = string.match(key, "_at_(%d+)$")
-
-      return match.node, direction, (at_col or col)
-    end
-  end
-
-  return start_node, 'above', 0
-end
-
 function M.doc_node_at_cursor()
   local node_at_point = ts_utils.get_node_at_cursor()
 
@@ -82,33 +65,27 @@ function M.doc_all_in_range()
   M.generate_docs(M.get_docs_from_selection())
 end
 
-function M.node_to_lsp_range(node, direction)
-  local start_row, _, end_row, _ = node:range()
-  local row = start_row
-
-  if direction == 'below' then
-    row = end_row + 1
-  end
-
-  return {
-    start = {  line = row, character = 0 },
-    ['end'] = { line = row, character = 0 }
-  }
-end
-
 function M.generate_docs(doc_data_list, bufnr)
   local edits = {}
   local bufnr = bufnr or api.nvim_get_current_buf()
 
   for _, doc_data in ipairs(doc_data_list) do
-    local doc_lines = templates.execute_template(doc_data)
+    local node_start_row, node_start_col, _ = get_start_node(doc_data):start()
+    local node_end_row, _, _ = get_end_node(doc_data):end_()
+
+    if not doc_data.__content then
+      doc_data.__content = api.nvim_buf_get_lines(bufnr, node_start_row, node_end_row + 1, false)
+    end
+
+    local doc_lines = templates.execute_template(doc_data, node_start_col)
 
     if doc_lines then
-      local start_node = get_start_node(doc_data)
-      local insert_node, direction, at_col = get_insert_loc(doc_data)
-      local _, node_start_col, _ = start_node:start()
-      local range = M.node_to_lsp_range(insert_node, direction)
-      local new_text = indent_lines(doc_lines, node_start_col + at_col)
+      local range = {
+        start = {  line = node_start_row, character = 0 },
+        ['end'] = { line = node_end_row + 1, character = 0 }
+      }
+
+      local new_text = doc_lines, node_start_col
 
       table.insert(edits, { range = range, newText = table.concat(new_text, '\n') .. '\n' })
     end

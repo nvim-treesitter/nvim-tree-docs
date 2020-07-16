@@ -4,8 +4,12 @@ local M = {}
 
 M['function'] = template.compile [[
 """
-Description
+Some text on top
 """
+<@ content @>
+    """
+    Description
+    """
 ]]
 
 return M

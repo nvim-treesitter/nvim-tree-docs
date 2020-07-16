@@ -39,6 +39,28 @@ local context_api = {
   end
 }
 
+local function indent_lines(lines, count)
+  if not count or count == 0 then return lines end
+
+  local result = {}
+
+  for _, line in ipairs(lines) do
+    table.insert(result, string.rep(' ', count) .. line)
+  end
+
+  return result
+end
+
+local function get_content_line_index(lines)
+  for i, line in ipairs(lines) do
+    if line and line:match("<@%s*content%s*@>") then
+      return i
+    end
+  end
+
+  return nil
+end
+
 function M.get_template(bufnr, ft)
   local bufnr = bufnr or api.nvim_get_current_buf()
   local ft = ft or api.nvim_buf_get_option(bufnr, 'ft')
@@ -50,13 +72,14 @@ function M.get_template(bufnr, ft)
   return successful and template or nil
 end
 
-function M.execute_template(data, bufnr, ft)
+function M.execute_template(data, col, bufnr, ft)
   local templates = M.get_template(bufnr, ft)
 
   if not templates or not templates[data.kind] then return end
 
   local context = M.get_template_context(data)
   local lines = vim.split(templates[data.kind](context), "\n")
+  local content_line = get_content_line_index(lines)
 
   -- Trim leading/trailing blank lines
   if lines[1] == '' then
@@ -65,6 +88,18 @@ function M.execute_template(data, bufnr, ft)
 
   if lines[#lines] == '' then
     table.remove(lines, #lines)
+  end
+
+  if content_line then
+    table.remove(lines, content_line)
+    lines = indent_lines(lines, col)
+
+    for i, line in ipairs(data.__content) do
+      table.insert(lines, content_line + i - 1, line)
+    end
+  else
+    lines = indent_lines(lines, col)
+    vim.list_extend(lines, data.__content)
   end
 
   return lines
@@ -107,6 +142,7 @@ function M.compile(template)
     local __ = table.insert
     __(r, [=[]]
   .. template
+    -- :gsub("<%%@%s*content%s*%%>", "]=])\nvim.list_extend(r, ctx.__content)\n__(r, [=[\n")
     :gsub("<%%=", "]=])\n__(r, ")
     :gsub("<%?", "]=])\n")
     :gsub("%?>", "\n__(r, [=[")
