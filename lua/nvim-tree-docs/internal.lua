@@ -49,6 +49,8 @@ function M.get_docs_in_range(start_line, end_line)
   local doc_data = M.collect_docs(bufnr)
   local edits = {}
 
+  -- TODO: There's an issue when multiple docs overlap... not very common... yet
+
   for _, def in doc_data:iterate() do
     local start_row, _, _ = get_start_node(def):start()
     local end_row, _, _ = get_end_node(def):end_()
@@ -106,17 +108,29 @@ end
 function M.get_doc_data_for_node(node, bufnr)
   local doc_data = M.collect_docs(bufnr)
   local _, _, node_start = node:start()
+  local current
+  local last_start
+  local last_end
 
   for _, def in doc_data:iterate() do
     local _, _, start_point = get_start_node(def):start()
     local _, _, end_point = get_end_node(def):end_()
+    local is_in_range = node_start >= start_point and node_start < end_point
+    local is_more_specific = true
 
-    if node_start >= start_point and node_start < end_point then
-      return def
+    -- Find the most specific doc for docs that overlap in range
+    if last_start and last_end then
+      is_more_specific = start_point >= last_start and end_point <= last_end
+    end
+
+    if is_in_range and is_more_specific then
+      last_start = start_point
+      last_end = end_point
+      current = def
     end
   end
 
-  return nil
+  return current
 end
 
 function M.collect_docs(bufnr)

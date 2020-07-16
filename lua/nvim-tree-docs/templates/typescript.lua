@@ -18,17 +18,17 @@ end
 
 M['function'] = template.compile [[
 /**
- * The <%= ctx.text(ctx.name) %n> function
+ * The <%= ctx.text(ctx.name) %> function
 <? if ctx.has_any({ ctx.generics, ctx.parameters, ctx['return'] }) then ?>
  *
 <? end ?>
 <? for _, g in ctx.for_each(ctx.generics) do ?>
- * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %> type
+ * @template <%= ctx.text(g.name) %> - The <%= ctx.text(g.name) %> type
 <? end ?>
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
  * @param <%= ctx.get_param_name(p) %> - The <%= ctx.text(p.name) %> argument
 <? end ?>
-<? if ctx['return'] then ?>
+<? if ctx.has_any({ ctx['return'], ctx.return_type }) then ?>
  * @returns The result
 <? end ?>
  */
@@ -47,12 +47,12 @@ M.method = template.compile [[
  *
 <? end ?>
 <? for _, g in ctx.for_each(ctx.generics) do ?>
- * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %n> type
+ * @template <%= ctx.text(g.name) %> - The <%= ctx.text(g.name) %> type
 <? end ?>
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
- * @param <%= ctx.get_param_name(p) %> - The <%= ctx.text(p.name) %n> argument
+ * @param <%= ctx.get_param_name(p) %> - The <%= ctx.text(p.name) %> argument
 <? end ?>
-<? if ctx['return'] then ?>
+<? if ctx.has_any({ ctx['return'], ctx.return_type }) then ?>
  * @returns The result
 <? end ?>
  */
@@ -65,7 +65,7 @@ M.class = template.compile [[
  *
 <? end ?>
 <? for _, g in ctx.for_each(ctx.generics) do ?>
- * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %n> type
+ * @template <%= ctx.text(g.name) %> - The <%= ctx.text(g.name) %> type
 <? end ?>
  */
 ]]
@@ -83,7 +83,7 @@ M.interface = template.compile [[
  *
 <? end ?>
 <? for _, g in ctx.for_each(ctx.generics) do ?>
- * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %n> type
+ * @template <%= ctx.text(g.name) %> - The <%= ctx.text(g.name) %> type
 <? end ?>
  */
 ]]
@@ -97,7 +97,7 @@ M.type_alias = template.compile [[
  *
 <? end ?>
 <? for _, g in ctx.for_each(ctx.generics) do ?>
- * @template <%= ctx.text(g.name) %n> - The <%= ctx.text(g.name) %n> type
+ * @template <%= ctx.text(g.name) %> - The <%= ctx.text(g.name) %> type
 <? end ?>
  */
 ]]

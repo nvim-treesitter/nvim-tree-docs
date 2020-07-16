@@ -36,22 +36,26 @@
     (function_declaration) @function.definition)
 )
 
-; Required function params
+; Function param name
 (function_declaration
   parameters: (formal_parameters
-    (required_parameter
-      (identifier) @function.parameters.name @function.parameters.definition
-      (type_annotation
-        (_) @function.parameters.type)?
-      value: (_)? @function.parameters.default_value @function.parameters.optional))) @function.definition
+    (_
+      (identifier) @function.parameters.name @function.parameters.definition))) @function.definition
 
-; Optional function params
+; Function param types
 (function_declaration
   parameters: (formal_parameters
-    (optional_parameter
-      (identifier) @function.parameters.name @function.parameters.definition @function.parameters.optional
+    (_
+      (identifier) @function.parameters.definition
       (type_annotation
-        (_) @function.parameters.type)?))) @function.definition
+        (_) @function.parameters.type)))) @function.definition
+
+; Function param default value
+(function_declaration
+  parameters: (formal_parameters
+    (_
+      (identifier) @function.parameters.definition
+      value: (_) @function.parameters.default_value @function.parameters.optional))) @function.definition
 
 ; ----- Variables
 
@@ -120,40 +124,45 @@
 ; Required method params
 (method_definition
   parameters: (formal_parameters
-    (required_parameter
-      (identifier) @method.parameters.name @method.parameters.definition
-      (type_annotation (_) @method.parameters.type)?
-      value: (_)? @method.parameters.default_value @method.parameters.optional))) @method.definition
+    (_
+      (identifier) @method.parameters.name @method.parameters.definition))) @method.definition
 
-; Optional method params
+; Method param type
 (method_definition
   parameters: (formal_parameters
-    (optional_parameter
-      (identifier) @method.parameters.name @method.parameters.definition
-      (type_annotation (_) @method.parameters.type)?
-      value: (_)? @method.parameters.default_value @method.parameters.optional))) @method.definition
+    (_
+      (identifier) @method.parameters.definition
+      (type_annotation (_) @method.parameters.type)))) @method.definition
 
-; Method signatures (required params)
+; Method param default value
+(method_definition
+  parameters: (formal_parameters
+    (_
+      (identifier) @method.parameters.definition
+      value: (_) @method.parameters.default_value @method.parameters.optional))) @method.definition
+
+; Method signature name
 (method_signature
-  name: (property_identifier) @method.name
+  name: (property_identifier) @method.name) @method.definition
+
+; Method signatures params
+(method_signature
   parameters: (formal_parameters
     (required_parameter
-      (identifier) @method.parameters.name @method.parameters.definition
-      (type_annotation
-        (_) @method.parameters.type)?)?)
-  return_type: (type_annotation
-    (_) @method.return_type)? @method.end_point) @method.definition
+      (identifier) @method.parameters.name @method.parameters.definition) @method.end_point)) @method.definition
 
-; Method signatures (optional params)
+; Method signatures params type
 (method_signature
-  name: (property_identifier) @method.name
   parameters: (formal_parameters
-    (optional_parameter
-      (identifier) @method.parameters.name @method.parameters.definition
+    (_
+      (identifier) @method.parameters.definition
       (type_annotation
-        (_) @method.parameters.type)?)?)
+        (_) @method.parameters.type)) @method.end_point)) @method.definition
+
+; Method signatures return type
+(method_signature
   return_type: (type_annotation
-    (_) @method.return_type)? @method.end_point) @method.definition
+    (_) @method.return_type) @method.end_point) @method.definition
 
 ; ----- Classes
 
@@ -264,8 +273,12 @@
 (
   (comment) @interface.doc
   (export_statement
-    (interface_declaration) @interface.definition) @interface.start_point
+    (interface_declaration) @interface.definition)
 )
+
+; Exported interface
+(export_statement
+  (interface_declaration) @interface.definition) @interface.start_point
 
 ; Property signature name
 (property_signature
