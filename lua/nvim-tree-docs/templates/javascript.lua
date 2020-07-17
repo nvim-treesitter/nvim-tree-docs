@@ -16,8 +16,7 @@ end
 
 M['function'] = template.compile [[
 /**
- * <%= ctx.text(ctx.name) %n> description
- *
+ * <%= ctx.text(ctx.name) %> description
 <? if ctx.export then ?>
  * @export
 <? end ?>

@@ -19,7 +19,7 @@ end
 M['function'] = template.compile [[
 /**
  * The <%= ctx.text(ctx.name) %> function
-<? if ctx.has_any({ ctx.generics, ctx.parameters, ctx['return'] }) then ?>
+<? if ctx.has_any({ ctx.generics, ctx.parameters, ctx.return_statement }) then ?>
  *
 <? end ?>
 <? for _, g in ctx.for_each(ctx.generics) do ?>
@@ -28,7 +28,7 @@ M['function'] = template.compile [[
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
  * @param <%= ctx.get_param_name(p) %> - The <%= ctx.text(p.name) %> argument
 <? end ?>
-<? if ctx.has_any({ ctx['return'], ctx.return_type }) then ?>
+<? if ctx.has_any({ ctx.return_statement, ctx.return_type }) then ?>
  * @returns The result
 <? end ?>
  */
@@ -43,7 +43,7 @@ M.variable = template.compile [[
 M.method = template.compile [[
 /**
  * The <%= ctx.text(ctx.name) %> method
-<? if ctx.has_any({ ctx.parameters, ctx.generics, ctx['return'] }) then ?>
+<? if ctx.has_any({ ctx.parameters, ctx.generics, ctx.return_statement }) then ?>
  *
 <? end ?>
 <? for _, g in ctx.for_each(ctx.generics) do ?>
@@ -52,7 +52,7 @@ M.method = template.compile [[
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
  * @param <%= ctx.get_param_name(p) %> - The <%= ctx.text(p.name) %> argument
 <? end ?>
-<? if ctx.has_any({ ctx['return'], ctx.return_type }) then ?>
+<? if ctx.has_any({ ctx.return_statement, ctx.return_type }) then ?>
  * @returns The result
 <? end ?>
  */

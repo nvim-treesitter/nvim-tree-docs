@@ -1,114 +1,160 @@
+; Javascript
+
 ; ---- Functions
 
-(
-  (comment)+? @function.doc
-  (function_declaration
-    name: (identifier) @function.name
-    parameters: (formal_parameters) @function.end_point
-    body: (statement_block
-      (return_statement)? @function.return)) @function.definition
-)
+(function_declaration
+  name: (identifier) @function.name) @function.definition
 
-(
-  (comment)+? @function.doc
-  (export_statement
-    (function_declaration) @function.definition) @function.start_point @function.export
-)
+; Function doc
+; (
+;   (comment) @function.doc
+;   (function_declaration) @function.definition
+; )
 
-; Function params
+; Return statement
+(function_declaration
+  body: (statement_block
+    (return_statement) @function.return_statement)) @function.definition
+
+; Exported function
+(export_statement
+  (function_declaration) @function.definition) @function.start_point @function.export
+
+; Function export doc
+; (
+;   (comment) @function.doc
+;   (export_statement
+;     (function_declaration) @function.definition)
+; )
+
+; Function param name
 (function_declaration
   parameters: (formal_parameters
-    (identifier)? @function.parameters.name @function.parameters.definition)) @function.definition
+    (identifier) @function.parameters.name @function.parameters.definition)) @function.definition
 
-
-; Function params with default values `a = 123`
+; Function param default value
 (function_declaration
   parameters: (formal_parameters
     (assignment_pattern
-      left: (shorthand_property_identifier) @function.parameters.name @function.parameters.definition
-      right: (_) @function.parameters.default_value))) @function.definition
+      left: (identifier) @function.parameters.definition @function.parameters.name
+      value: (_) @function.parameters.default_value @function.parameters.optional))) @function.definition
 
 ; ----- Variables
 
-; Variables `const test = 123;`
-(
-  (comment)+? @variable.doc
-  (lexical_declaration
-    (variable_declarator
-      name: (identifier) @variable.name
-      value: (_)? @variable.initial_value) @variable.definition) @variable.start_point
-)
+; Variable name
+(lexical_declaration
+  (variable_declarator
+    name: (identifier) @variable.name) @variable.definition) @variable.start_point
 
-(
-  (comment)+? @variable.doc
-  (export_statement
-    (lexical_declaration
-      (variable_declarator) @variable.definition)) @variable.start_point @variable.export
-)
+; Variable initializer
+(lexical_declaration
+  (variable_declarator
+    value: (_) @variable.initial_value) @variable.definition)
+
+; Variable doc
+; (
+;   (comment) @variable.doc
+;   (lexical_declaration
+;     (variable_declarator) @variable.definition)
+; )
+
+; Exported variable
+(export_statement
+  (lexical_declaration
+    (variable_declarator) @variable.definition)) @variable.start_point @variable.export
+
+; Exported variable doc
+; (
+;   (comment) @variable.doc
+;   (export_statement
+;     (lexical_declaration
+;       (variable_declarator) @variable.definition))
+; )
 
 ; ----- Methods
 
-(
-  (identifier) @method.class
-  (class_body
-    ((comment)+? @method.doc
-    (method_definition
-      name: (property_identifier) @method.name
-      parameters: (formal_parameters) @method.end_point
-      body: (statement_block
-        (return_statement)? @method.return)) @method.definition))
-)
+(method_definition
+  name: (property_identifier) @method.name) @method.definition
+
+(method_definition
+  parameters: (formal_parameters) @method.end_point) @method.definition
+
+; Method class name
+(class_declaration
+  name: (_) @method.class
+  body: (class_body
+    (method_definition) @method.definition))
+
+; Method return statement
+(method_definition
+  body: (statement_block
+    (return_statement) @method.return_statement)) @method.definition
 
 ; Method params
 (method_definition
   parameters: (formal_parameters
     (identifier) @method.parameters.name @method.parameters.definition)) @method.definition
 
-; Method params with default values `a = 123`
+; Method param default value
 (method_definition
   parameters: (formal_parameters
+    (identifier) @method.parameters.definition
     (assignment_pattern
-      left: (shorthand_property_identifier) @method.parameters.name @method.parameters.definition
-      right: (_) @method.parameters.default_value))) @method.definition
+      left: (_) @method.parameters.name
+      right: (_) @method.parameters.default_value @method.parameters.optional))) @method.definition
 
-; ----- Classes
+; ; ----- Classes
 
 ; Classes
-(
-  (comment)+? @class.doc
-  (class_declaration
-    name: (identifier) @class.name @class.end_point
-    (class_heritage
-      (identifier) @class.extentions.name @class.extentions.definition)?) @class.definition
-)
+(class_declaration
+  name: (_) @class.name @class.end_point) @class.definition
 
-(
-  (comment)+? @class.doc
-  (class
-    name: (identifier)? @class.name
-    (class_heritage
-      (identifier) @class.extentions.name @class.extentions.definition @class.end_point)?) @class.definition
-)
+; Class doc
+; (
+;   (comment) @class.doc
+;   (class_declaration) @class.definition
+; )
 
-; Exported Classes `export class Test {}`
-(
-  (comment)+? @class.doc
-  (export_statement
-    declaration: (class_declaration) @class.definition) @class.export @class.start_point
-)
+(class_declaration
+  (class_heritage
+    (identifier) @class.extentions.name @class.extentions.definition)) @class.definition
 
-(
-  (comment)+? @class.doc
-  (export_statement
-    declaration: (class) @class.definition) @class.export @class.start_point
-)
+; Exported class doc
+; (
+;   (comment) @class.doc
+;   (export_statement
+;     declaration: (class_declaration) @class.definition)
+; )
 
-; Class members
-(
-  (identifier)? @member.class
-  (class_body
-    ((comment)+? @member.doc
-    (public_field_definition
-      (property_identifier) @member.name @member.end_point) @member.definition))
-)
+; Exported class
+(export_statement
+  declaration: (class_declaration) @class.definition) @class.export @class.start_point
 
+; Member class
+(class_declaration
+  name: (_) @member.class
+  body: (class_body
+    (public_field_definition) @member.definition))
+
+; Member name
+(public_field_definition
+  property: (property_identifier) @member.name @member.end_point) @member.definition
+
+; ; Member doc
+; (
+;   (comment) @member.doc
+;   (public_field_definition) @member.definition
+; )
+
+; ; Decorated member doc
+; (
+;   (comment) @member.doc
+;   (decorator)+
+;   (public_field_definition) @member.definition
+; )
+
+; ; Decorated member
+; (
+;   (decorator)+ @member.start_point
+;   (public_field_definition) @member.definition
+; )
