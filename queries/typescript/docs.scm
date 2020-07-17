@@ -287,7 +287,7 @@
 ; Property signature type
 (property_signature
   type: (type_annotation
-    (_) @property_signature.type) @proprety_signature.end_point) @property_signature.definition
+    (_) @property_signature.type) @property_signature.end_point) @property_signature.definition
 
 ; Property signature doc
 (

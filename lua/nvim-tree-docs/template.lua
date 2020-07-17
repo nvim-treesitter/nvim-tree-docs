@@ -74,12 +74,12 @@ end
 
 function M.execute_template(data, col, bufnr, ft)
   local templates = M.get_template(bufnr, ft)
+  local col = col or 0
 
   if not templates or not templates[data.kind] then return end
 
   local context = M.get_template_context(data)
   local lines = vim.split(templates[data.kind](context), "\n")
-  local content_line = get_content_line_index(lines)
 
   -- Trim leading/trailing blank lines
   if lines[1] == '' then
@@ -90,19 +90,18 @@ function M.execute_template(data, col, bufnr, ft)
     table.remove(lines, #lines)
   end
 
-  if content_line then
-    table.remove(lines, content_line)
-    lines = indent_lines(lines, col)
+  local content_line = get_content_line_index(lines)
+  local lines_above
+  local lines_below
 
-    for i, line in ipairs(data.__content) do
-      table.insert(lines, content_line + i - 1, line)
-    end
+  if content_line then
+    lines_above = indent_lines({ unpack(lines, 1, content_line - 1) }, col)
+    lines_below = indent_lines({ unpack(lines, content_line + 1) }, col)
   else
-    lines = indent_lines(lines, col)
-    vim.list_extend(lines, data.__content)
+    lines_above = indent_lines(lines, col)
   end
 
-  return lines
+  return lines_above, lines_below
 end
 
 function M.get_template_context(data, ft)

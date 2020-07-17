@@ -9,18 +9,6 @@ local M = {}
 
 M.doc_cache = {}
 
-local function indent_lines(lines, count)
-  if not count or count == 0 then return lines end
-
-  local result = {}
-
-  for _, line in ipairs(lines) do
-    table.insert(result, string.rep(' ', count) .. line)
-  end
-
-  return result
-end
-
 local function get_start_node(entry)
   return entry.start_point and entry.start_point.node or entry.definition.node
 end
@@ -49,8 +37,6 @@ function M.get_docs_in_range(start_line, end_line)
   local doc_data = M.collect_docs(bufnr)
   local edits = {}
 
-  -- TODO: There's an issue when multiple docs overlap... not very common... yet
-
   for _, def in doc_data:iterate() do
     local start_row, _, _ = get_start_node(def):start()
     local end_row, _, _ = get_end_node(def):end_()
@@ -75,21 +61,26 @@ function M.generate_docs(doc_data_list, bufnr)
     local node_start_row, node_start_col, _ = get_start_node(doc_data):start()
     local node_end_row, _, _ = get_end_node(doc_data):end_()
 
-    if not doc_data.__content then
-      doc_data.__content = api.nvim_buf_get_lines(bufnr, node_start_row, node_end_row + 1, false)
+    local doc_lines_above, doc_lines_below = templates.execute_template(doc_data, node_start_col)
+
+    if doc_lines_above then
+      table.insert(edits, {
+        range = {
+          start = {  line = node_start_row, character = 0 },
+          ['end'] = { line = node_start_row, character = 0 }
+        },
+        newText = table.concat(doc_lines_above, '\n') .. '\n'
+      })
     end
 
-    local doc_lines = templates.execute_template(doc_data, node_start_col)
-
-    if doc_lines then
-      local range = {
-        start = {  line = node_start_row, character = 0 },
-        ['end'] = { line = node_end_row + 1, character = 0 }
-      }
-
-      local new_text = doc_lines, node_start_col
-
-      table.insert(edits, { range = range, newText = table.concat(new_text, '\n') .. '\n' })
+    if doc_lines_below then
+      table.insert(edits, {
+        range = {
+          start = {  line = node_end_row + 1, character = 0 },
+          ['end'] = { line = node_end_row + 1, character = 0 }
+        },
+        newText = table.concat(doc_lines_below, '\n') .. '\n'
+      })
     end
   end
 
