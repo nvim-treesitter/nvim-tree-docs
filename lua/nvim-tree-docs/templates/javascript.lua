@@ -23,7 +23,7 @@ M['function'] = template.compile [[
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
  * @param <%= ctx.get_param_name(p) %> {any} - The <%= ctx.text(p.name) %> argument
 <? end ?>
-<? if ctx['return'] then ?>
+<? if ctx.return_statement then ?>
  * @returns {any} The result
 <? end ?>
  */
@@ -48,7 +48,7 @@ M.method = template.compile [[
 <? for _, p in ctx.for_each(ctx.parameters) do ?>
  * @param <%= ctx.get_param_name(p) %> {any} - The <%= ctx.text(p.name) %> argument
 <? end ?>
-<? if ctx['return'] then ?>
+<? if ctx.return_statement then ?>
  * @returns
 <? end ?>
  */

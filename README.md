@@ -5,7 +5,67 @@ Documentation generator using treesitter
 
 This plugin is experimental and may not work!
 
-TODO: add more docs!
+## Writing templates (WIP)
+
+Templates are by language and by `<kind>`, for example `function`. Templates are compiled into functions, meaning
+functions could be used in place of templating if desired for finer controller.
+
+### Template syntax
+
+The template syntax is very loosly based on erb templates. Here is an example:
+
+```
+/**
+ * <%= ctx.text(ctx.name) %> description
+<? if ctx.export then ?>
+ * @export
+<? end ?>
+<? for _, p in ctx.for_each(ctx.parameters) do ?>
+ * @param <%= ctx.get_param_name(p) %> {any} - The <%= ctx.text(p.name) %> argument
+<? end ?>
+<? if ctx['return'] then ?>
+ * @returns {any} The result
+<? end ?>
+ */
+]]
+```
+
+- `<%= expression %>` -> Evaluates a value.
+- `<%= expression %n>` -> Evaluates a value and inserts a newline after the expression.
+- `<? lua code ?>` -> Runs lua code. Useful for conditionals or loops.
+- `<@ content @>` -> Special case evaluation, in this case, inserts the content of the capture (I.E. function signature)
+
+#### <@ content @>
+
+You can control where docs are inserted in your template. For example, python docs are inserted below the document signature.
+
+```
+<@ content @>
+    """
+    Description
+    """
+```
+
+This will generate:
+
+```python
+def add(a, b):
+    """
+    Description
+    """
+    return a + b
+```
+
+### Template context
+
+The template context is a table that is passed to the template function. The keys are captures based on the query.
+The context also contains utility functions as well as custom functions for a specific language. Universal context methods are.
+
+`text(node | match)` -> Gets the text of a node
+`for_each(collector)` -> Iterator for a match like `parameters`
+`has_any(list_of_matches)` -> Checks if any matches exist in the list. Useful for nil checking matches.
+
+In templates, the context is available under `ctx`.
 
 ## Writing language queries
 
@@ -72,7 +132,7 @@ For example, that this javascript query.
 (function_declaration
   name: (identifier) @function.name
   body: (statement_block
-    (return_statement)? @function.return)) @function.definition
+    (return_statement)? @function.return_statement)) @function.definition
 
 (export_statement
   (function_declaration) @function.definition) @function.start_point @function.export
