@@ -1,126 +1,206 @@
---- A collector is a special type of "list" that
--- keeps track of node results and merges entries
--- that share the same definition.
--- This provides us with the ability to match multiple
--- queries against the same "node".
-local Collector = {}
-
-local collector_metatable = {
-  __index = function(tbl, key)
-    --- Allow list lookups `collector[1]`
-    if type(key) == 'number' then
-      local id = tbl.__order[key]
-
-      return id and tbl.__entries[id] or nil
-    end
-
-    -- Everything else falls to the collector table.
-    return Collector[key]
+local _0_0 = nil
+do
+  local name_0_ = "nvim-tree-docs.collector"
+  local loaded_0_ = package.loaded[name_0_]
+  local module_0_ = nil
+  if ("table" == type(loaded_0_)) then
+    module_0_ = loaded_0_
+  else
+    module_0_ = {}
   end
-}
-
-local function get_node_id(node)
-  local start_row, start_col, end_row, end_column = node:range()
-
-  return string.format([[%d_%d_%d_%d]], start_row, start_col, end_row, end_column)
+  module_0_["aniseed/module"] = name_0_
+  module_0_["aniseed/locals"] = (module_0_["aniseed/locals"] or {})
+  module_0_["aniseed/local-fns"] = (module_0_["aniseed/local-fns"] or {})
+  package.loaded[name_0_] = module_0_
+  _0_0 = module_0_
 end
-
-function Collector:add(kind, match)
-  if not match then return end
-
-  local def = match.definition
-
-  if not def then return end
-
-  local def_node = def.node
-  local node_id = get_node_id(def_node)
-
-  if not self.__entries[node_id] then
-    local order_index = 1
-    local _, _, def_start_byte = def_node:start()
-
-    for id, entry in pairs(self.__entries) do
-      local _, _, start_byte = entry.definition.node:start()
-
-      if def_start_byte < start_byte then
-        break
+local function _2_(...)
+  _0_0["aniseed/local-fns"] = {}
+  return {}
+end
+local _1_ = _2_(...)
+do local _ = ({nil, _0_0, {{}, nil}})[2] end
+local collector_metatable = nil
+local function _3_(tbl, key)
+  if (type(key) == "number") then
+    local id = tbl.__order[key]
+    if id then
+      return tbl.__entries[id]
+    else
+      return nil
+    end
+  else
+    return rawget(tbl, key)
+  end
+end
+collector_metatable = {__index = _3_}
+local new_collector = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function new_collector0()
+      return setmetatable({__entries = {}, __order = {}}, collector_metatable)
+    end
+    v_0_0 = new_collector0
+    _0_0["new-collector"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["new-collector"] = v_0_
+  new_collector = v_0_
+end
+local is_collector = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function is_collector0(value)
+      return ((type(value) == "table") and (type(value.__entries) == "table"))
+    end
+    v_0_0 = is_collector0
+    _0_0["is-collector"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["is-collector"] = v_0_
+  is_collector = v_0_
+end
+local is_collector_empty = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function is_collector_empty0(collector)
+      return (#collector.__order == 0)
+    end
+    v_0_0 = is_collector_empty0
+    _0_0["is-collector-empty"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["is-collector-empty"] = v_0_
+  is_collector_empty = v_0_
+end
+local iterate_collector = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function iterate_collector0(collector)
+      local i = 1
+      local function _4_()
+        local id = collector.__order[i]
+        if id then
+          i = (i + 1)
+          return {entry = collector.__entries[id], index = (i - 1)}
+        else
+          return nil
+        end
       end
-
-      order_index = order_index + 1
+      return _4_
     end
-
-    table.insert(self.__order, order_index, node_id)
-
-    self.__entries[node_id] = {
-      kind = kind,
-      definition = def
-    }
+    v_0_0 = iterate_collector0
+    _0_0["iterate-collector"] = v_0_0
+    v_0_ = v_0_0
   end
-
-  for key, submatch in pairs(match) do
-    if key ~= 'definition' then
-      self:collect(self.__entries[node_id], submatch, key)
+  _0_0["aniseed/locals"]["iterate-collector"] = v_0_
+  iterate_collector = v_0_
+end
+local get_node_id = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function get_node_id0(node)
+      local srow, scol, erow, ecol = node:range()
+      return string.format("%d_%d_%d_%d", srow, scol, erow, ecol)
     end
+    v_0_0 = get_node_id0
+    _0_0["get-node-id"] = v_0_0
+    v_0_ = v_0_0
   end
+  _0_0["aniseed/locals"]["get-node-id"] = v_0_
+  get_node_id = v_0_
 end
-
-function Collector:collect(entry, match, key)
-  if match.definition then
-    if not entry[key] then
-      entry[key] = Collector.new()
+local add_match = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function add_match0(collector, kind, _match)
+      if (_match and _match.definition) then
+        local _def = _match.definition
+        local def_node = _def.node
+        local node_id = get_node_id(def_node)
+        if not collector.__entries[node_id] then
+          local order_index = 1
+          local _, _0, def_start_byte = def_node:start()
+          local done = false
+          local i = 1
+          while not done do
+            local entry = collector.__entries[i]
+            if not entry then
+              done = true
+            else
+              local _1, _2, start_byte = (entry.defintion.node):start()
+              if (def_start_byte < start_byte) then
+                done = true
+              else
+                order_index = (order_index + 1)
+              end
+            end
+          end
+          table.insert(collector.__order, order_index, node_id)
+          collector.__entries[node_id] = {definition = _def, kind = kind}
+        end
+        for key, submatch in pairs(_match) do
+          if (key ~= "definition") then
+            collect(collector.__entries, submatch, key)
+          end
+        end
+        return nil
+      end
     end
-
-    entry[key]:add(key, match)
-  elseif not entry[key] then
-    entry[key] = match
-  elseif key == 'start_point' and match.node then
-    -- Always take the furthest start node
-    local _, _, current_start = entry[key].node:start()
-    local _, _, new_start = match.node:start()
-
-    if new_start < current_start then
-      entry[key] = match
-    end
-  elseif key == 'end_point' and match.node then
-    -- Always take the latest end node
-    local _, _, current_end = entry[key].node:end_()
-    local _, _, new_end = match.node:end_()
-
-    if new_end > current_end then
-      entry[key] = match
-    end
+    v_0_0 = add_match0
+    _0_0["add-match"] = v_0_0
+    v_0_ = v_0_0
   end
+  _0_0["aniseed/locals"]["add-match"] = v_0_
+  add_match = v_0_
 end
-
-function Collector:iterate()
-  local i = 1
-
-  return function()
-    local id = self.__order[i]
-
-    if not id then return nil end
-
-    i = i + 1
-
-    return i - 1, self.__entries[id]
+local collect = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function collect0(collector, entry, _match, key)
+      if _match.definition then
+        if not entry[key] then
+          entry[key] = new_collector()
+        end
+        return add_match(entry[key], key, _match)
+      elseif not entry[key] then
+        entry[key] = _match
+        return nil
+      elseif ((key == "start_point") and _match.node) then
+        local _, _0, current_start = (entry[key].node):start()
+        local _1, _2, new_start = (_match.node):start()
+        if (new_start < current_start) then
+          entry[key] = _match
+          return nil
+        end
+      elseif ((key == "end_point") and _match.node) then
+        local _, _0, current_end = (entry[key].node):end_()
+        local _1, _2, new_end = (_match.node):end_()
+        if (new_end > current_end) then
+          entry[key] = _match
+          return nil
+        end
+      end
+    end
+    v_0_0 = collect0
+    _0_0["collect"] = v_0_0
+    v_0_ = v_0_0
   end
+  _0_0["aniseed/locals"]["collect"] = v_0_
+  collect = v_0_
 end
-
-function Collector:is_empty()
-  return #self.__order == 0
-end
-
-function Collector.new()
-  local instance = {
-    __entries = {},
-    __order = {}
-  }
-
-  return setmetatable(instance, collector_metatable)
-end
-
-function Collector.is(value)
-  return type(value) == 'table' and type(value.__entries) == 'table'
-end
-
-return Collector
+return nil
