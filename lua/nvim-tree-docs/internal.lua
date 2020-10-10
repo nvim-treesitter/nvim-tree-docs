@@ -15,13 +15,24 @@ do
   _0_0 = module_0_
 end
 local function _2_(...)
-  _0_0["aniseed/local-fns"] = {require = {collectors = "nvim-tree-docs.collector", utils = "nvim-tree-docs.utils"}}
-  return {require("nvim-tree-docs.collector"), require("nvim-tree-docs.utils")}
+  local ok_3f_0_, val_0_ = nil, nil
+  local function _2_()
+    return {require("nvim-tree-docs.collector"), require("nvim-tree-docs.utils")}
+  end
+  ok_3f_0_, val_0_ = pcall(_2_)
+  if ok_3f_0_ then
+    _0_0["aniseed/local-fns"] = {require = {collectors = "nvim-tree-docs.collector", utils = "nvim-tree-docs.utils"}}
+    return val_0_
+  else
+    return print(val_0_)
+  end
 end
 local _1_ = _2_(...)
 local collectors = _1_[1]
 local utils = _1_[2]
-do local _ = ({nil, _0_0, {{}, nil}})[2] end
+local _2amodule_2a = _0_0
+local _2amodule_name_2a = "nvim-tree-docs.internal"
+do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
 local configs = require("nvim-treesitter.configs")
 local queries = require("nvim-treesitter.query")
 local ts_utils = require("nvim-treesitter.ts_utils")

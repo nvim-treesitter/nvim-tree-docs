@@ -1,6 +1,6 @@
 local _0_0 = nil
 do
-  local name_0_ = "aniseed.compile"
+  local name_0_ = "nvim-tree-docs.aniseed.compile"
   local loaded_0_ = package.loaded[name_0_]
   local module_0_ = nil
   if ("table" == type(loaded_0_)) then
@@ -15,15 +15,26 @@ do
   _0_0 = module_0_
 end
 local function _2_(...)
-  _0_0["aniseed/local-fns"] = {require = {a = "aniseed.core", fennel = "aniseed.fennel", fs = "aniseed.fs", nvim = "aniseed.nvim"}}
-  return {require("aniseed.core"), require("aniseed.fennel"), require("aniseed.fs"), require("aniseed.nvim")}
+  local ok_3f_0_, val_0_ = nil, nil
+  local function _2_()
+    return {require("nvim-tree-docs.aniseed.core"), require("nvim-tree-docs.aniseed.fennel"), require("nvim-tree-docs.aniseed.fs"), require("nvim-tree-docs.aniseed.nvim")}
+  end
+  ok_3f_0_, val_0_ = pcall(_2_)
+  if ok_3f_0_ then
+    _0_0["aniseed/local-fns"] = {require = {a = "nvim-tree-docs.aniseed.core", fennel = "nvim-tree-docs.aniseed.fennel", fs = "nvim-tree-docs.aniseed.fs", nvim = "nvim-tree-docs.aniseed.nvim"}}
+    return val_0_
+  else
+    return print(val_0_)
+  end
 end
 local _1_ = _2_(...)
 local a = _1_[1]
 local fennel = _1_[2]
 local fs = _1_[3]
 local nvim = _1_[4]
-do local _ = ({nil, _0_0, {{}, nil}})[2] end
+local _2amodule_2a = _0_0
+local _2amodule_name_2a = "nvim-tree-docs.aniseed.compile"
+do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
 do
   local fnl_suffixes = string.gsub(string.gsub(package.path, "%.lua;", ".fnl;"), "%.lua$", ".fnl")
   fennel.path = (string.gsub(fnl_suffixes, "/lua/", "/fnl/") .. ";" .. fnl_suffixes)
@@ -50,7 +61,7 @@ do
   do
     local v_0_0 = nil
     local function macros_prefix0(code)
-      local macros_module = "aniseed.macros"
+      local macros_module = "nvim-tree-docs.aniseed.macros"
       return ("(require-macros \"" .. macros_module .. "\")\n" .. code)
     end
     v_0_0 = macros_prefix0
@@ -67,7 +78,7 @@ do
     local v_0_0 = nil
     local function str0(code, opts)
       local function _3_()
-        return fennel.compileString(macros_prefix(code), opts)
+        return fennel.compileString(macros_prefix(code), a.merge({["compiler-env"] = _G}, opts))
       end
       return xpcall(_3_, fennel.traceback)
     end
@@ -117,7 +128,9 @@ do
       end
       src_paths = a.map(_3_, nvim.fn.globpath(src_dir, src_expr, true, true))
       for _, path in ipairs(src_paths) do
-        file((src_dir .. path), string.gsub((dest_dir .. path), ".fnl$", ".lua"), opts)
+        if (a.get(opts, "include-macros-suffix?") or not string.match(path, "macros.fnl$")) then
+          file((src_dir .. path), string.gsub((dest_dir .. path), ".fnl$", ".lua"), opts)
+        end
       end
       return nil
     end

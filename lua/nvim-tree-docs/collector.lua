@@ -15,11 +15,22 @@ do
   _0_0 = module_0_
 end
 local function _2_(...)
-  _0_0["aniseed/local-fns"] = {}
-  return {}
+  local ok_3f_0_, val_0_ = nil, nil
+  local function _2_()
+    return {}
+  end
+  ok_3f_0_, val_0_ = pcall(_2_)
+  if ok_3f_0_ then
+    _0_0["aniseed/local-fns"] = {}
+    return val_0_
+  else
+    return print(val_0_)
+  end
 end
 local _1_ = _2_(...)
-do local _ = ({nil, _0_0, {{}, nil}})[2] end
+local _2amodule_2a = _0_0
+local _2amodule_name_2a = "nvim-tree-docs.collector"
+do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
 local collector_metatable = nil
 local function _3_(tbl, key)
   if (type(key) == "number") then

@@ -1,6 +1,6 @@
 local _0_0 = nil
 do
-  local name_0_ = "aniseed.nvim.util"
+  local name_0_ = "nvim-tree-docs.aniseed.nvim.util"
   local loaded_0_ = package.loaded[name_0_]
   local module_0_ = nil
   if ("table" == type(loaded_0_)) then
@@ -15,12 +15,23 @@ do
   _0_0 = module_0_
 end
 local function _2_(...)
-  _0_0["aniseed/local-fns"] = {require = {nvim = "aniseed.nvim"}}
-  return {require("aniseed.nvim")}
+  local ok_3f_0_, val_0_ = nil, nil
+  local function _2_()
+    return {require("nvim-tree-docs.aniseed.nvim")}
+  end
+  ok_3f_0_, val_0_ = pcall(_2_)
+  if ok_3f_0_ then
+    _0_0["aniseed/local-fns"] = {require = {nvim = "nvim-tree-docs.aniseed.nvim"}}
+    return val_0_
+  else
+    return print(val_0_)
+  end
 end
 local _1_ = _2_(...)
 local nvim = _1_[1]
-do local _ = ({nil, _0_0, {{}, nil}})[2] end
+local _2amodule_2a = _0_0
+local _2amodule_name_2a = "nvim-tree-docs.aniseed.nvim.util"
+do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
 local normal = nil
 do
   local v_0_ = nil
@@ -53,7 +64,7 @@ do
         end
       end
       local function _5_()
-        if _return then
+        if (_return ~= false) then
           return "return"
         else
           return "call"

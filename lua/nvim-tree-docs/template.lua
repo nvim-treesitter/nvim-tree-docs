@@ -15,8 +15,97 @@ do
   _0_0 = module_0_
 end
 local function _2_(...)
-  _0_0["aniseed/local-fns"] = {}
-  return {}
+  local ok_3f_0_, val_0_ = nil, nil
+  local function _2_()
+    return {require("nvim-tree-docs.collector"), require("aniseed.core")}
+  end
+  ok_3f_0_, val_0_ = pcall(_2_)
+  if ok_3f_0_ then
+    _0_0["aniseed/local-fns"] = {require = {collectors = "nvim-tree-docs.collector", core = "aniseed.core"}}
+    return val_0_
+  else
+    return print(val_0_)
+  end
 end
 local _1_ = _2_(...)
-return ({nil, _0_0, {{}, nil}})[2]
+local collectors = _1_[1]
+local core = _1_[2]
+local _2amodule_2a = _0_0
+local _2amodule_name_2a = "nvim-tree-docs.template"
+do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
+local loaded_specs = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = {}
+    _0_0["loaded-specs"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["loaded-specs"] = v_0_
+  loaded_specs = v_0_
+end
+local eval_content = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function eval_content0(context, content)
+      local _type = type(content)
+      if (_type == "string") then
+        return content
+      elseif (_type == "table") then
+        local function _3_(_241, _242)
+          local function _4_()
+            if (_241 == "") then
+              return ""
+            else
+              return " "
+            end
+          end
+          return (_241 .. _4_() .. eval_content0(context, _242))
+        end
+        return core.reduce(_3_, "", content)
+      elseif (_type == "function") then
+        return eval_content0(context, content(context))
+      else
+        return ""
+      end
+    end
+    v_0_0 = eval_content0
+    _0_0["eval-content"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["eval-content"] = v_0_
+  eval_content = v_0_
+end
+local new_template_context = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function new_template_context0()
+      local context = {}
+      return context
+    end
+    v_0_0 = new_template_context0
+    _0_0["new-template-context"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["new-template-context"] = v_0_
+  new_template_context = v_0_
+end
+local get_spec = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function get_spec0()
+    end
+    v_0_0 = get_spec0
+    _0_0["get-spec"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-spec"] = v_0_
+  get_spec = v_0_
+end
+return nil
