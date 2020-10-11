@@ -1,4 +1,4 @@
-(require-macros "nvim-tree-docs.macros")
+(require-macros "fnl.nvim-tree-docs.macros")
 
 (doc-spec {:spec "jsdoc" :lang "javascript"})
 
@@ -14,10 +14,9 @@
   [" *" (%= name) "description"]
   #(when $.export
      " * @export")
-  #(each [i param $.parameters]
+  #(each [_ param ($.iter $.parameters)]
     [" * @param" #(get-param-name $ param) "{any} - The" (%= name param)])
-  #(when $.return_statement
-     " * returns {any} The result")
+  #(when $.return_statement " * returns {any} The result")
   " */")
 
 (template variable
@@ -25,4 +24,22 @@
   " * Description"
   #(when $.export " * @export")
   " * @type {any}"
+  " */")
+
+(template method
+  "/**"
+  [" *" (%= name)]
+  #(when $.class [" * @memberOf" (%= class)])
+  #(each [_ param ($.iter $.parameters)]
+     [" * @param" #(get-param-name $ param) "{any} - The" (%= name param) "argument"])
+  #(when $.return_statement " * @returns")
+  " */")
+
+(template class
+  "/**"
+  [" * The" (%= name) "class."]
+  [" * @class" (%= name)]
+  #(when $.export " * @export")
+  #(each [_ extention ($.iter $.extentions)]
+     [" * @extends" (%= name extention)])
   " */")

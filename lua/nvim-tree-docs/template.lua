@@ -14,12 +14,12 @@ do
   package.loaded[name_0_] = module_0_
   _0_0 = module_0_
 end
-local function _2_(...)
+local function _3_(...)
   local ok_3f_0_, val_0_ = nil, nil
-  local function _2_()
+  local function _3_()
     return {require("nvim-tree-docs.collector"), require("aniseed.core")}
   end
-  ok_3f_0_, val_0_ = pcall(_2_)
+  ok_3f_0_, val_0_ = pcall(_3_)
   if ok_3f_0_ then
     _0_0["aniseed/local-fns"] = {require = {collectors = "nvim-tree-docs.collector", core = "aniseed.core"}}
     return val_0_
@@ -27,9 +27,9 @@ local function _2_(...)
     return print(val_0_)
   end
 end
-local _1_ = _2_(...)
-local collectors = _1_[1]
-local core = _1_[2]
+local _2_ = _3_(...)
+local collectors = _2_[1]
+local core = _2_[2]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "nvim-tree-docs.template"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
@@ -54,17 +54,17 @@ do
       if (_type == "string") then
         return content
       elseif (_type == "table") then
-        local function _3_(_241, _242)
-          local function _4_()
+        local function _4_(_241, _242)
+          local function _5_()
             if (_241 == "") then
               return ""
             else
               return " "
             end
           end
-          return (_241 .. _4_() .. eval_content0(context, _242))
+          return (_241 .. _5_() .. eval_content0(context, _242))
         end
-        return core.reduce(_3_, "", content)
+        return core.reduce(_4_, "", content)
       elseif (_type == "function") then
         return eval_content0(context, content(context))
       else

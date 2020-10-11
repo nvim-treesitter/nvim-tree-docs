@@ -14,12 +14,12 @@ do
   package.loaded[name_0_] = module_0_
   _0_0 = module_0_
 end
-local function _2_(...)
+local function _3_(...)
   local ok_3f_0_, val_0_ = nil, nil
-  local function _2_()
+  local function _3_()
     return {require("aniseed.core")}
   end
-  ok_3f_0_, val_0_ = pcall(_2_)
+  ok_3f_0_, val_0_ = pcall(_3_)
   if ok_3f_0_ then
     _0_0["aniseed/local-fns"] = {require = {core = "aniseed.core"}}
     return val_0_
@@ -27,8 +27,8 @@ local function _2_(...)
     return print(val_0_)
   end
 end
-local _1_ = _2_(...)
-local core = _1_[1]
+local _2_ = _3_(...)
+local core = _2_[1]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "nvim-tree-docs.utils"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
