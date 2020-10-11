@@ -10,10 +10,12 @@
 (fn template [kind ...]
   `(tset (. ,modsym :templates) ,(tostring kind)
      (fn [context#]
-       (local output# [])
        (each [_# line# (ipairs ,[...])]
-         (table.insert output# (context#.eval-line line# context#)))
+         (context#.eval-content line# context#))
        output#)))
+
+(fn %^ [form]
+  `#($.eval-and-mark ,form))
 
 (fn %= [key tbl default]
   `#(or (ctx#.get-text (. ,(or tbl `$) ,(tostring key)) ,default)))
@@ -24,4 +26,5 @@
 {: template
  : %=
  : %?
+ : %^
  : doc-spec}

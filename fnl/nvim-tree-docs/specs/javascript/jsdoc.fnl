@@ -11,12 +11,14 @@
 
 (template function
   "/**"
-  [" *" (%= name) "description"]
-  #(when $.export
-     " * @export")
+  [" *" (%^ [(%= name) " description"])]
+  #(when $.export " * @export")
   #(each [_ param ($.iter $.parameters)]
-    [" * @param" #(get-param-name $ param) "{any} - The" (%= name param)])
-  #(when $.return_statement " * returns {any} The result")
+    [" * @param "
+     #(get-param-name $ param)
+     " {" (%^ "any")  "} - " (%^ ["The " (%= name param)])])
+  #(when $.return_statement
+     [" * returns {" (%^ "any") "} The result"])
   " */")
 
 (template variable
@@ -29,9 +31,9 @@
 (template method
   "/**"
   [" *" (%= name)]
-  #(when $.class [" * @memberOf" (%= class)])
+  #(when $.class [" * @memberOf " (%= class)])
   #(each [_ param ($.iter $.parameters)]
-     [" * @param" #(get-param-name $ param) "{any} - The" (%= name param) "argument"])
+     [" * @param " #(get-param-name $ param) " {any} - The " (%= name param) " argument"])
   #(when $.return_statement " * @returns")
   " */")
 
@@ -42,4 +44,11 @@
   #(when $.export " * @export")
   #(each [_ extention ($.iter $.extentions)]
      [" * @extends" (%= name extention)])
+  " */")
+
+(template member
+  "/**"
+  " * Description"
+  #(when $.class [ "* @memberOf" (%= class)])
+  " * @type {any}"
   " */")

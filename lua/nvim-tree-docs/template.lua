@@ -44,68 +44,56 @@ do
   _0_0["aniseed/locals"]["loaded-specs"] = v_0_
   loaded_specs = v_0_
 end
-local eval_content = nil
+local mark = nil
 do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function eval_content0(context, content)
-      local _type = type(content)
-      if (_type == "string") then
-        return content
-      elseif (_type == "table") then
-        local function _4_(_241, _242)
-          local function _5_()
-            if (_241 == "") then
-              return ""
-            else
-              return " "
-            end
-          end
-          return (_241 .. _5_() .. eval_content0(context, _242))
-        end
-        return core.reduce(_4_, "", content)
-      elseif (_type == "function") then
-        return eval_content0(context, content(context))
-      else
-        return ""
+    local function mark0(context, line, start_col, end_col)
+      return table.insert(context.marks, {["end-col"] = end_col, ["start-col"] = start_col, line = line})
+    end
+    v_0_0 = mark0
+    _0_0["mark"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["mark"] = v_0_
+  mark = v_0_
+end
+local add_token = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function add_token0(context, token)
+      if (type(context.tokens[context["head-ln"]]) ~= "table") then
+        context.tokens[context["head-ln"]] = {}
       end
+      table.insert(context.tokens[context["head-ln"]], {col = context["head-col"], value = token})
+      context["last-token"] = token
+      return nil
     end
-    v_0_0 = eval_content0
-    _0_0["eval-content"] = v_0_0
+    v_0_0 = add_token0
+    _0_0["add-token"] = v_0_0
     v_0_ = v_0_0
   end
-  _0_0["aniseed/locals"]["eval-content"] = v_0_
-  eval_content = v_0_
+  _0_0["aniseed/locals"]["add-token"] = v_0_
+  add_token = v_0_
 end
-local new_template_context = nil
+local next_line = nil
 do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function new_template_context0()
-      local context = {}
-      return context
+    local function next_line0(context)
+      context["head-col"] = 0
+      context["head-ln"] = (context["head-ln"] + 1)
+      return nil
     end
-    v_0_0 = new_template_context0
-    _0_0["new-template-context"] = v_0_0
+    v_0_0 = next_line0
+    _0_0["next-line"] = v_0_0
     v_0_ = v_0_0
   end
-  _0_0["aniseed/locals"]["new-template-context"] = v_0_
-  new_template_context = v_0_
-end
-local get_spec = nil
-do
-  local v_0_ = nil
-  do
-    local v_0_0 = nil
-    local function get_spec0()
-    end
-    v_0_0 = get_spec0
-    _0_0["get-spec"] = v_0_0
-    v_0_ = v_0_0
-  end
-  _0_0["aniseed/locals"]["get-spec"] = v_0_
-  get_spec = v_0_
+  _0_0["aniseed/locals"]["next-line"] = v_0_
+  next_line = v_0_
 end
 return nil
