@@ -38,13 +38,33 @@ do
   do
     local v_0_0 = nil
     local function get_start_node0(entry)
-      if (entry.start_point and entry.start_point.node) then
-        return entry.start_point.node
-      elseif (entry.definition and entry.definition.node) then
-        return entry.definition.node
-      else
-        return nil
+      local function _5_()
+        local _4_0 = entry
+        if _4_0 then
+          local _6_0 = _4_0.start_point
+          if _6_0 then
+            return _6_0.node
+          else
+            return _6_0
+          end
+        else
+          return _4_0
+        end
       end
+      local function _7_()
+        local _6_0 = entry
+        if _6_0 then
+          local _8_0 = _6_0.definition
+          if _8_0 then
+            return _8_0.node
+          else
+            return _8_0
+          end
+        else
+          return _6_0
+        end
+      end
+      return (_5_() or _7_())
     end
     v_0_0 = get_start_node0
     _0_0["get-start-node"] = v_0_0
@@ -59,13 +79,33 @@ do
   do
     local v_0_0 = nil
     local function get_end_node0(entry)
-      if (entry.end_point and entry.end_point.node) then
-        return entry.end_point.node
-      elseif (entry.definition and entry.definition.node) then
-        return entry.definition.node
-      else
-        return nil
+      local function _5_()
+        local _4_0 = entry
+        if _4_0 then
+          local _6_0 = _4_0.end_point
+          if _6_0 then
+            return _6_0.node
+          else
+            return _6_0
+          end
+        else
+          return _4_0
+        end
       end
+      local function _7_()
+        local _6_0 = endry
+        if _6_0 then
+          local _8_0 = _6_0.end_point
+          if _8_0 then
+            return _8_0.node
+          else
+            return _8_0
+          end
+        else
+          return _6_0
+        end
+      end
+      return (_5_() or _7_())
     end
     v_0_0 = get_end_node0
     _0_0["get-end-node"] = v_0_0
@@ -73,5 +113,20 @@ do
   end
   _0_0["aniseed/locals"]["get-end-node"] = v_0_
   get_end_node = v_0_
+end
+local get_bufnr = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function get_bufnr0(bufnr)
+      return (bufnr or vim.api.nvim_get_current_buf())
+    end
+    v_0_0 = get_bufnr0
+    _0_0["get-bufnr"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-bufnr"] = v_0_
+  get_bufnr = v_0_
 end
 return nil

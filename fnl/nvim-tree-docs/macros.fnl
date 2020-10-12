@@ -4,11 +4,16 @@
   "Defines a documentation specification"
   (assert config.lang "A language is required")
   (assert config.spec "A specification name is required")
-  `(do
-    (local ,modsym {:templates {} :utils {}})
-    (tset (. (require "nvim-tree-docs.template") :loaded-specs)
-           (.. ,(tostring config.lang) "_" ,(tostring config.spec))
-           ,modsym)))
+  `(local ,modsym
+     (let [mod-name# (.. ,(tostring config.lang) "_" ,(tostring config.spec))
+           module# {:templates {}
+                    :utils {}
+                    :spec ,(tostring config.spec)
+                    :lang ,(tostring config.lang)}]
+       (tset (. (require "nvim-tree-docs.template") :loaded-specs)
+             mod-name#
+             module#)
+       module#)))
 
 (fn util [name parameters ...]
   "Defines a util function as part of this specification.
@@ -31,11 +36,11 @@
          (context#.next-line))
        context#)))
 
-(fn %^ [form]
+(fn %^ [form tag?]
   "Marks an expression and it's position.
   These marks can be used to mark the positions in the
   resulting documentation."
-  `#($.eval-and-mark ,form))
+  `#($.eval-and-mark ,form ,tag?))
 
 (fn %= [key tbl default]
   "Get a nodes text content. A key is provided and will
@@ -47,9 +52,14 @@
   This will invoke any inherited utils as well."
   `((. (. ,modsym :utils) ,(tostring util-name)) ,...))
 
+(fn %content% []
+  "Marks the content point for content to be inserted in."
+  `(%^ "" "%content%"))
+
 {: template
  : util
  : %=
  : %^
  : %>
+ : %content%
  : doc-spec}

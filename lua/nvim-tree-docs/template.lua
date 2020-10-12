@@ -50,8 +50,8 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function mark0(context, line, start_col, end_col)
-      return table.insert(context.marks, {["end-col"] = end_col, ["start-col"] = start_col, line = line})
+    local function mark0(context, line, start_col, end_col, tag_3f)
+      return table.insert(context.marks, {["end-col"] = end_col, ["start-col"] = start_col, line = line, tag = tag_3f})
     end
     v_0_0 = mark0
     _0_0["mark"] = v_0_0
@@ -90,11 +90,11 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function eval_and_mark0(context, content)
+    local function eval_and_mark0(context, content, tag_3f)
       local line = context["head-ln"]
       local start_col = context["head-col"]
       eval_content(context, content)
-      return mark(context, line, start_col, context["head-col"])
+      return mark(context, line, start_col, context["head-col"], tag_3f)
     end
     v_0_0 = eval_and_mark0
     _0_0["eval-and-mark"] = v_0_0
@@ -282,7 +282,7 @@ do
         return next_line(context, ...)
       end
       context["next-line"] = _8_
-      return context
+      return vim.tbl_extend("keep", context, collector)
     end
     v_0_0 = new_template_context0
     _0_0["new-template-context"] = v_0_0
@@ -290,5 +290,24 @@ do
   end
   _0_0["aniseed/locals"]["new-template-context"] = v_0_
   new_template_context = v_0_
+end
+local get_spec = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function get_spec0(lang, spec)
+      local key = (lang .. "_" .. spec)
+      if not loaded_specs[key] then
+        require(string.format("nvim-tree-docs.specs.%s.%s", lang, spec))
+      end
+      return loaded_specs[key]
+    end
+    v_0_0 = get_spec0
+    _0_0["get-spec"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-spec"] = v_0_
+  get_spec = v_0_
 end
 return nil

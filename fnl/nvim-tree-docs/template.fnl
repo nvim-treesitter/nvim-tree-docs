@@ -6,10 +6,11 @@
 
 (def loaded-specs {})
 
-(defn mark [context line start-col end-col]
+(defn mark [context line start-col end-col tag?]
   (table.insert context.marks {: line
                                : start-col
-                               : end-col}))
+                               : end-col
+                               :tag tag?}))
 
 (defn eval-content [context content]
   "Recursively evaluates a template form. The result should always be a string."
@@ -22,11 +23,11 @@
       (= _type :function)
       (eval-content context (content context)))))
 
-(defn eval-and-mark [context content]
+(defn eval-and-mark [context content tag?]
   (let [line context.head-ln
         start-col context.head-col]
       (eval-content context content)
-      (mark context line start-col context.head-col)))
+      (mark context line start-col context.head-col tag?)))
 
 (defn get-text [context node default multi]
   (let [default-value (or default "")]
@@ -81,6 +82,15 @@
     (set context.eval-content (partial eval-content context))
     (set context.mark (partial mark context))
     (set context.next-line (partial next-line context))
-    context))
+    (vim.tbl_extend "keep" context collector)))
 
-; ; (defn get-spec [])
+(defn get-spec [lang spec]
+  (let [key (.. lang "_" spec)]
+    (when (not (. loaded-specs key))
+      (require (string.format "nvim-tree-docs.specs.%s.%s" lang spec)))
+    (. loaded-specs key)))
+
+; (defn execute-template [collector col? bufnr template-fn]
+;   (let [col (or col? 0)
+;         context (new-template-context collector)
+;         result (template-fn context)]))

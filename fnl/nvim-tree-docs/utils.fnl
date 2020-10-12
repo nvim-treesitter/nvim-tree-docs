@@ -2,15 +2,12 @@
   {require {core aniseed.core}})
 
 (defn get-start-node [entry]
-  (if (and entry.start_point entry.start_point.node)
-    entry.start_point.node
-    (and entry.definition entry.definition.node)
-    entry.definition.node
-    nil))
+  (or (-?> entry (. :start_point) (. :node))
+      (-?> entry (. :definition) (. :node))))
 
 (defn get-end-node [entry]
-  (if (and entry.end_point entry.end_point.node)
-    entry.end_point.node
-    (and entry.definition entry.definition.node)
-    entry.definition.node
-    nil))
+  (or (-?> entry (. :end_point) (. :node))
+      (-?> endry (. :end_point) (. :node))))
+
+(defn get-bufnr [bufnr]
+  (or bufnr (vim.api.nvim_get_current_buf)))
