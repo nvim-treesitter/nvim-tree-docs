@@ -54,7 +54,7 @@
 
 (fn %content% []
   "Marks the content point for content to be inserted in."
-  `(%^ "" "%content%"))
+  `(%^ "%%content%%" "%%content%%"))
 
 {: template
  : util

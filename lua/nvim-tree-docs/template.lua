@@ -310,4 +310,70 @@ do
   _0_0["aniseed/locals"]["get-spec"] = v_0_
   get_spec = v_0_
 end
+local get_content_mark = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function get_content_mark0(context)
+      local function _4_(_241, _242)
+        return (_242.tag == "%%content%%")
+      end
+      return core.some(_4_, context.marks)
+    end
+    v_0_0 = get_content_mark0
+    _0_0["get-content-mark"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-content-mark"] = v_0_
+  get_content_mark = v_0_
+end
+local execute_template = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function execute_template0(collector, template_fn)
+      local context = new_template_context(collector)
+      template_fn(context)
+      return context
+    end
+    v_0_0 = execute_template0
+    _0_0["execute-template"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["execute-template"] = v_0_
+  execute_template = v_0_
+end
+local context_to_lines = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function context_to_lines0(context, content_lines, col_3f)
+      local col = (col_3f or 0)
+      local content_mark_3f = get_content_mark(context)
+      local result = {}
+      for i, line_tokens in ipairs(context.tokens) do
+        if (content_mark_3f and (content_mark_3f.line == i)) then
+          vim.list_extend(result, content_lines)
+        else
+          local function _4_(_241, _242)
+            return (_242 .. _241)
+          end
+          table.insert(result, core.reduce(_4_, "", line_tokens))
+        end
+      end
+      if not content_mark_3f then
+        vim.list_extend(result, content_lines)
+      end
+      return result
+    end
+    v_0_0 = context_to_lines0
+    _0_0["context-to-lines"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["context-to-lines"] = v_0_
+  context_to_lines = v_0_
+end
 return nil

@@ -90,7 +90,23 @@
       (require (string.format "nvim-tree-docs.specs.%s.%s" lang spec)))
     (. loaded-specs key)))
 
-; (defn execute-template [collector col? bufnr template-fn]
-;   (let [col (or col? 0)
-;         context (new-template-context collector)
-;         result (template-fn context)]))
+(defn get-content-mark [context]
+  (core.some #(= $2.tag "%%content%%") context.marks))
+
+(defn execute-template [collector template-fn]
+  (let [context (new-template-context collector)]
+    (template-fn context)
+    context))
+
+(defn context-to-lines [context content-lines col?]
+  (let [col (or col? 0)
+        content-mark? (get-content-mark context)
+        result []]
+    (each [i line-tokens (ipairs context.tokens)]
+      (if (and content-mark? (= content-mark?.line i))
+        (vim.list_extend result content-lines)
+        (table.insert result (core.reduce #(.. $2 $1) "" line-tokens))))
+    (when (not content-mark?)
+      (vim.list_extend result content-lines))
+    result))
+
