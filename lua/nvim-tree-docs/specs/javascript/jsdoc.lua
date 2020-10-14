@@ -72,7 +72,7 @@ local function _6_(context_0_)
     end
     return _241["eval-and-mark"](_12_, "%content")
   end
-  for i_0_, line_0_ in ipairs({"/**", {" * ", _7_}, _8_, _9_, _10_, " */", _11_}) do
+  for i_0_, line_0_ in ipairs({"/**", {" * ", _7_}, _8_, _9_, _10_, " */", _11_, "// Blorg"}) do
     context_0_["eval-content"](line_0_, (i_0_ == 1))
     context_0_["next-line"]()
   end

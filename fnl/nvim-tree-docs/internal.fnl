@@ -32,8 +32,9 @@
         edits []
         marks []]
     (each [_ doc-data (ipairs data-list)]
-      (let [(node-sr node-sc) (-> (utils.get-start-node doc-data) (: :start))
-            (node-er node-ec) (-> (utils.get-end-node doc-data) (: :end_))
+      (print (vim.inspect doc-data))
+      (let [(node-sr node-sc) (utils.get-start-position doc-data)
+            (node-er node-ec) (utils.get-end-position doc-data)
             content-lines (utils.get-buf-content node-sr node-sc node-er node-ec bufnr)
             context (templates.execute-template
                       doc-data
@@ -76,8 +77,8 @@
     (each [iter-item (collectors.iterate-collector doc-data)]
       (var is-more-specific true)
       (let [{:entry doc-def} iter-item
-            (_ _ start) (-> (utils.get-start-node doc-def) (: :start))
-            (_ _ end) (-> (utils.get-end-node doc-def) (: :end_))
+            (_ _ start) (utils.get-start-position doc-def)
+            (_ _ end) (utils.get-end-position doc-def)
             is-in-range (and (>= node-start start)
                              (< node-start end))]
         (when (and last-start last-end)
@@ -102,8 +103,8 @@
         result []]
     (each [item (collectors.iterate-collector doc-data)]
       (let [{:entry _def} item
-            start-r (-> (utils.get-start-node _def) (: :start))
-            end-r (-> (utils.get-end-node _def) (: :end_))]
+            start-r (utils.get-start-position _def)
+            end-r (utils.get-end-position _def)]
         (when (and (>= start-r start-line) (<= end-r end-line))
           (table.insert result _def))))
     result))

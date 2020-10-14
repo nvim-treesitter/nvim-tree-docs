@@ -125,6 +125,66 @@ do
   _0_0["aniseed/locals"]["get-end-node"] = v_0_
   get_end_node = v_0_
 end
+local get_position = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function get_position0(key, default_position, entry)
+      local explicit_entry = entry[key]
+      local function _5_()
+        if ((type(explicit_entry) == "table") and explicit_entry.node) then
+          return {node = explicit_entry.node, position = (explicit_entry.position or default_position)}
+        else
+          return {node = entry.definition.node, position = default_position}
+        end
+      end
+      local _4_ = _5_()
+      local node = _4_["node"]
+      local position = _4_["position"]
+      if (position == "start") then
+        return node:start()
+      else
+        return node:end_()
+      end
+    end
+    v_0_0 = get_position0
+    _0_0["get-position"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-position"] = v_0_
+  get_position = v_0_
+end
+local get_start_position = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function _4_(...)
+      return get_position("start_point", "start", ...)
+    end
+    v_0_0 = _4_
+    _0_0["get-start-position"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-start-position"] = v_0_
+  get_start_position = v_0_
+end
+local get_end_position = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function _4_(...)
+      return get_position("end_point", "end", ...)
+    end
+    v_0_0 = _4_
+    _0_0["get-end-position"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-end-position"] = v_0_
+  get_end_position = v_0_
+end
 local get_bufnr = nil
 do
   local v_0_ = nil

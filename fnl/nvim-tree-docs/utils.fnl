@@ -11,6 +11,18 @@
   (or (-?> entry (. :end_point) (. :node))
       (-?> entry (. :definition) (. :node))))
 
+(defn get-position [key default-position entry]
+  (let [explicit-entry (. entry key)
+        {: node : position} (if (and (= (type explicit-entry) :table) explicit-entry.node)
+                              {:node explicit-entry.node
+                               :position (or explicit-entry.position default-position)}
+                              {:node entry.definition.node
+                               :position default-position})]
+    (if (= position :start) (node:start) (node:end_))))
+
+(def get-start-position (partial get-position :start_point :start))
+(def get-end-position (partial get-position :end_point :end))
+
 (defn get-bufnr [bufnr]
   (or bufnr (vim.api.nvim_get_current_buf)))
 

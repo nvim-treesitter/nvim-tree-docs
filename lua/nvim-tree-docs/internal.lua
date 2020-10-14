@@ -97,8 +97,9 @@ do
       local edits = {}
       local marks = {}
       for _, doc_data in ipairs(data_list) do
-        local node_sr, node_sc = utils["get-start-node"](doc_data):start()
-        local node_er, node_ec = utils["get-end-node"](doc_data):end_()
+        print(vim.inspect(doc_data))
+        local node_sr, node_sc = utils["get-start-position"](doc_data)
+        local node_er, node_ec = utils["get-end-position"](doc_data)
         local content_lines = utils["get-buf-content"](node_sr, node_sc, node_er, node_ec, bufnr)
         local context = nil
         local _4_
@@ -186,8 +187,8 @@ do
         local is_more_specific = true
         local _3_ = iter_item
         local doc_def = _3_["entry"]
-        local _1, _2, start = utils["get-start-node"](doc_def):start()
-        local _3, _4, _end = utils["get-end-node"](doc_def):end_()
+        local _1, _2, start = utils["get-start-position"](doc_def)
+        local _3, _4, _end = utils["get-end-position"](doc_def)
         local is_in_range = ((node_start >= start) and (node_start < _end))
         if (last_start and last_end) then
           is_more_specific = ((start >= last_start) and (_end <= last_end))
@@ -251,8 +252,8 @@ do
       for item in collectors["iterate-collector"](doc_data) do
         local _3_ = item
         local _def = _3_["entry"]
-        local start_r = utils["get-start-node"](_def):start()
-        local end_r = utils["get-end-node"](_def):end_()
+        local start_r = utils["get-start-position"](_def)
+        local end_r = utils["get-end-position"](_def)
         if ((start_r >= start_line) and (end_r <= end_line)) then
           table.insert(result, _def)
         end

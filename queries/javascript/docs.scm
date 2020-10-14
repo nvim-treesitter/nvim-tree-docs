@@ -11,6 +11,10 @@
 ;   (function_declaration) @function.definition
 ; )
 
+(function_declaration
+  body: ((statement_block) @function.end_point)
+         (#set! function.end_point.position "start")) @function.definition
+
 ; Return statement
 (function_declaration
   body: (statement_block

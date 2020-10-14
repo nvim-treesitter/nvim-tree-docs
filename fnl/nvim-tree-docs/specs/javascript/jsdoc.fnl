@@ -29,7 +29,8 @@
   #(%> get-parameter-lines $ $.parameters)
   #(when $.return_statement (%> get-return-line))
   " */"
-  (%content))
+  (%content)
+  "// Blorg")
 
 (template variable
   "/**"
