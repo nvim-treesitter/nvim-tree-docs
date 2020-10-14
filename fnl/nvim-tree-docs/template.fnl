@@ -1,33 +1,36 @@
 (module nvim-tree-docs.template
   {require {core aniseed.core
+            utils nvim-tree-docs.utils
             collectors nvim-tree-docs.collector}})
 
 (local ts-utils (require "nvim-treesitter.ts_utils"))
 
 (def loaded-specs {})
 
-(defn mark [context line start-col end-col tag?]
+(defn mark [context line start-col end-line end-col tag?]
   (table.insert context.marks {: line
+                               :line-offset context.start-line
                                : start-col
                                : end-col
+                               : end-line
                                :tag tag?}))
 
-(defn eval-content [context content]
-  "Recursively evaluates a template form. The result should always be a string."
+(defn eval-content [context content ignore-col?]
+  "Recursively evaluates a template form."
   (let [_type (type content)]
     (if (= _type :string)
-      (context.add-token content)
+      (context.add-token content ignore-col?)
       (= _type :table)
       (each [_ v (ipairs content)]
-        (eval-content context v))
+        (eval-content context v ignore-col?))
       (= _type :function)
-      (eval-content context (content context)))))
+      (eval-content context (content context) ignore-col?))))
 
 (defn eval-and-mark [context content tag?]
   (let [line context.head-ln
         start-col context.head-col]
       (eval-content context content)
-      (mark context line start-col context.head-col tag?)))
+      (mark context line start-col context.head-ln context.head-col tag?)))
 
 (defn get-text [context node default multi]
   (let [default-value (or default "")]
@@ -58,9 +61,11 @@
 (defn has-tokens-at-head [context]
   (has-tokens-at-line context context.head-ln))
 
-(defn add-token [context token]
+(defn add-token [context token ignore-col?]
   (when (not (has-tokens-at-head context))
-    (tset context.tokens context.head-ln []))
+    (if ignore-col?
+      (tset context.tokens context.head-ln [])
+      (add-token context (string.rep " " context.start-col) true)))
   (table.insert (. context.tokens context.head-ln) {:value token
                                                     :col context.head-col})
   (set context.head-col (+ context.head-col (length token)))
@@ -68,21 +73,40 @@
 
 (defn next-line [context]
   (when (has-tokens-at-head context)
-    (set context.head-col 0)
+    (set context.head-col context.start-col)
     (set context.head-ln (+ context.head-ln 1))))
 
-(defn new-template-context [collector]
-  (let [context {:tokens []
-                 :head-ln 1
-                 :head-col 0
-                 :marks []}]
+(defn expand-content-lines [context]
+  (let [head (core.first context.content)
+        rest (core.rest context.content)]
+    (when head
+      (eval-content context head))
+    (each [_ line (ipairs rest)]
+      (next-line context)
+      (eval-content context line true))))
+
+(defn new-template-context [collector options?]
+  (let [options (or options? {})
+        context (vim.tbl_extend
+                  "keep"
+                  {:tokens []
+                   :content (or options.content [])
+                   :head-ln 1
+                   :head-col 0
+                   :start-col (or options.start-col 0)
+                   :start-line (or options.start-line 1)
+                   :bufnr (utils.get-bufnr options.bufnr)
+                   :marks []}
+                  collector)]
     (set context.iter iter)
     (set context.get-text (partial get-text context))
     (set context.eval-and-mark (partial eval-and-mark context))
     (set context.eval-content (partial eval-content context))
     (set context.mark (partial mark context))
     (set context.next-line (partial next-line context))
-    (vim.tbl_extend "keep" context collector)))
+    (set context.expand-content-lines (partial expand-content-lines context))
+    (set context.add-token (partial add-token context))
+    context))
 
 (defn get-spec [lang spec]
   (let [key (.. lang "_" spec)]
@@ -91,22 +115,17 @@
     (. loaded-specs key)))
 
 (defn get-content-mark [context]
-  (core.some #(= $2.tag "%%content%%") context.marks))
+  (core.some #(= $2.tag "%content") context.marks))
 
-(defn execute-template [collector template-fn]
-  (let [context (new-template-context collector)]
+(defn execute-template [collector template-fn options?]
+  (let [context (new-template-context collector options?)]
     (template-fn context)
     context))
 
-(defn context-to-lines [context content-lines col?]
-  (let [col (or col? 0)
-        content-mark? (get-content-mark context)
-        result []]
-    (each [i line-tokens (ipairs context.tokens)]
-      (if (and content-mark? (= content-mark?.line i))
-        (vim.list_extend result content-lines)
-        (table.insert result (core.reduce #(.. $2 $1) "" line-tokens))))
-    (when (not content-mark?)
-      (vim.list_extend result content-lines))
-    result))
+(defn context-to-lines [context col?]
+  (let [col (or col? 0)]
+    (core.map
+      (fn [tokens]
+        (core.reduce #(.. $1 $2.value) "" tokens))
+      context.tokens)))
 

@@ -32,6 +32,17 @@ local core = _2_[1]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "nvim-tree-docs.utils"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
+local ns = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = vim.api.nvim_create_namespace("blorg")
+    _0_0["ns"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["ns"] = v_0_
+  ns = v_0_
+end
 local get_start_node = nil
 do
   local v_0_ = nil
@@ -93,9 +104,9 @@ do
         end
       end
       local function _7_()
-        local _6_0 = endry
+        local _6_0 = entry
         if _6_0 then
-          local _8_0 = _6_0.end_point
+          local _8_0 = _6_0.definition
           if _8_0 then
             return _8_0.node
           else
@@ -128,5 +139,49 @@ do
   end
   _0_0["aniseed/locals"]["get-bufnr"] = v_0_
   get_bufnr = v_0_
+end
+local get_buf_content = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function get_buf_content0(start_row, start_col, end_row, end_col, bufnr)
+      local result = vim.api.nvim_buf_get_lines(bufnr, start_row, (end_row + 1), false)
+      if (#result > 0) then
+        if (start_col ~= 0) then
+          result[1] = string.sub(result[1], (start_col + 1))
+        end
+        if (end_col ~= 0) then
+          result[#result] = string.sub(result[#result], 1, (end_col + 1))
+        end
+      end
+      return result
+    end
+    v_0_0 = get_buf_content0
+    _0_0["get-buf-content"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-buf-content"] = v_0_
+  get_buf_content = v_0_
+end
+local highlight_marks = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function highlight_marks0(marks, bufnr)
+      for _, mark in ipairs(marks) do
+        local start_line = ((mark.line - 1) + mark["line-offset"])
+        local end_line = ((mark["end-line"] - 1) + mark["line-offset"])
+        vim.highlight.range(bufnr, ns, "Visual", {start_line, mark["start-col"]}, {end_line, mark["end-col"]})
+      end
+      return nil
+    end
+    v_0_0 = highlight_marks0
+    _0_0["highlight-marks"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["highlight-marks"] = v_0_
+  highlight_marks = v_0_
 end
 return nil

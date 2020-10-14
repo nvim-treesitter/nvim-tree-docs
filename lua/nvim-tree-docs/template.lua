@@ -17,11 +17,11 @@ end
 local function _3_(...)
   local ok_3f_0_, val_0_ = nil, nil
   local function _3_()
-    return {require("nvim-tree-docs.collector"), require("aniseed.core")}
+    return {require("nvim-tree-docs.collector"), require("aniseed.core"), require("nvim-tree-docs.utils")}
   end
   ok_3f_0_, val_0_ = pcall(_3_)
   if ok_3f_0_ then
-    _0_0["aniseed/local-fns"] = {require = {collectors = "nvim-tree-docs.collector", core = "aniseed.core"}}
+    _0_0["aniseed/local-fns"] = {require = {collectors = "nvim-tree-docs.collector", core = "aniseed.core", utils = "nvim-tree-docs.utils"}}
     return val_0_
   else
     return print(val_0_)
@@ -30,6 +30,7 @@ end
 local _2_ = _3_(...)
 local collectors = _2_[1]
 local core = _2_[2]
+local utils = _2_[3]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "nvim-tree-docs.template"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
@@ -50,8 +51,8 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function mark0(context, line, start_col, end_col, tag_3f)
-      return table.insert(context.marks, {["end-col"] = end_col, ["start-col"] = start_col, line = line, tag = tag_3f})
+    local function mark0(context, line, start_col, end_line, end_col, tag_3f)
+      return table.insert(context.marks, {["end-col"] = end_col, ["end-line"] = end_line, ["line-offset"] = context["start-line"], ["start-col"] = start_col, line = line, tag = tag_3f})
     end
     v_0_0 = mark0
     _0_0["mark"] = v_0_0
@@ -65,17 +66,17 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function eval_content0(context, content)
+    local function eval_content0(context, content, ignore_col_3f)
       local _type = type(content)
       if (_type == "string") then
-        return context["add-token"](content)
+        return context["add-token"](content, ignore_col_3f)
       elseif (_type == "table") then
         for _, v in ipairs(content) do
-          eval_content0(context, v)
+          eval_content0(context, v, ignore_col_3f)
         end
         return nil
       elseif (_type == "function") then
-        return eval_content0(context, content(context))
+        return eval_content0(context, content(context), ignore_col_3f)
       end
     end
     v_0_0 = eval_content0
@@ -94,7 +95,7 @@ do
       local line = context["head-ln"]
       local start_col = context["head-col"]
       eval_content(context, content)
-      return mark(context, line, start_col, context["head-col"], tag_3f)
+      return mark(context, line, start_col, context["head-ln"], context["head-col"], tag_3f)
     end
     v_0_0 = eval_and_mark0
     _0_0["eval-and-mark"] = v_0_0
@@ -219,9 +220,13 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function add_token0(context, token)
+    local function add_token0(context, token, ignore_col_3f)
       if not has_tokens_at_head(context) then
-        context.tokens[context["head-ln"]] = {}
+        if ignore_col_3f then
+          context.tokens[context["head-ln"]] = {}
+        else
+          add_token0(context, string.rep(" ", context["start-col"]), true)
+        end
       end
       table.insert(context.tokens[context["head-ln"]], {col = context["head-col"], value = token})
       context["head-col"] = (context["head-col"] + #token)
@@ -242,7 +247,7 @@ do
     local v_0_0 = nil
     local function next_line0(context)
       if has_tokens_at_head(context) then
-        context["head-col"] = 0
+        context["head-col"] = context["start-col"]
         context["head-ln"] = (context["head-ln"] + 1)
         return nil
       end
@@ -254,13 +259,38 @@ do
   _0_0["aniseed/locals"]["next-line"] = v_0_
   next_line = v_0_
 end
+local expand_content_lines = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function expand_content_lines0(context)
+      local head = core.first(context.content)
+      local rest = core.rest(context.content)
+      if head then
+        eval_content(context, head)
+      end
+      for _, line in ipairs(rest) do
+        next_line(context)
+        eval_content(context, line, true)
+      end
+      return nil
+    end
+    v_0_0 = expand_content_lines0
+    _0_0["expand-content-lines"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["expand-content-lines"] = v_0_
+  expand_content_lines = v_0_
+end
 local new_template_context = nil
 do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function new_template_context0(collector)
-      local context = {["head-col"] = 0, ["head-ln"] = 1, marks = {}, tokens = {}}
+    local function new_template_context0(collector, options_3f)
+      local options = (options_3f or {})
+      local context = vim.tbl_extend("keep", {["head-col"] = 0, ["head-ln"] = 1, ["start-col"] = (options["start-col"] or 0), ["start-line"] = (options["start-line"] or 1), bufnr = utils["get-bufnr"](options.bufnr), content = (options.content or {}), marks = {}, tokens = {}}, collector)
       context.iter = iter
       local function _4_(...)
         return get_text(context, ...)
@@ -282,7 +312,15 @@ do
         return next_line(context, ...)
       end
       context["next-line"] = _8_
-      return vim.tbl_extend("keep", context, collector)
+      local function _9_(...)
+        return expand_content_lines(context, ...)
+      end
+      context["expand-content-lines"] = _9_
+      local function _10_(...)
+        return add_token(context, ...)
+      end
+      context["add-token"] = _10_
+      return context
     end
     v_0_0 = new_template_context0
     _0_0["new-template-context"] = v_0_0
@@ -317,7 +355,7 @@ do
     local v_0_0 = nil
     local function get_content_mark0(context)
       local function _4_(_241, _242)
-        return (_242.tag == "%%content%%")
+        return (_242.tag == "%content")
       end
       return core.some(_4_, context.marks)
     end
@@ -333,8 +371,8 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function execute_template0(collector, template_fn)
-      local context = new_template_context(collector)
+    local function execute_template0(collector, template_fn, options_3f)
+      local context = new_template_context(collector, options_3f)
       template_fn(context)
       return context
     end
@@ -350,24 +388,15 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function context_to_lines0(context, content_lines, col_3f)
+    local function context_to_lines0(context, col_3f)
       local col = (col_3f or 0)
-      local content_mark_3f = get_content_mark(context)
-      local result = {}
-      for i, line_tokens in ipairs(context.tokens) do
-        if (content_mark_3f and (content_mark_3f.line == i)) then
-          vim.list_extend(result, content_lines)
-        else
-          local function _4_(_241, _242)
-            return (_242 .. _241)
-          end
-          table.insert(result, core.reduce(_4_, "", line_tokens))
+      local function _4_(tokens)
+        local function _5_(_241, _242)
+          return (_241 .. _242.value)
         end
+        return core.reduce(_5_, "", tokens)
       end
-      if not content_mark_3f then
-        vim.list_extend(result, content_lines)
-      end
-      return result
+      return core.map(_4_, context.tokens)
     end
     v_0_0 = context_to_lines0
     _0_0["context-to-lines"] = v_0_0

@@ -34,6 +34,26 @@
   (let [(srow scol erow ecol) (node:range)]
     (string.format "%d_%d_%d_%d" srow scol erow ecol)))
 
+(defn collect [collector entry _match key add-fn]
+  (if _match.definition
+    (do
+      (when (not (. entry key))
+        (tset entry key (new-collector)))
+      (-> (. entry key)
+          (add-fn key _match collect)))
+    (not (. entry key))
+    (tset entry key _match)
+    (and (= key :start_point) _match.node)
+    (let [(_ _ current-start) (-> (. entry key) (. :node) (: :start))
+          (_ _ new-start) (-> (. _match :node) (: :start))]
+      (when (< new-start current-start)
+        (tset entry key _match)))
+    (and (= key :end_point) _match.node)
+    (let [(_ _ current-end) (-> (. entry key) (. :node) (: :end_))
+          (_ _ new-end) (-> (. _match :node) (: :end_))]
+      (when (> new-end current-end)
+        (tset entry key _match)))))
+
 (defn add-match [collector kind _match]
   (if (and _match _match.definition)
     (let [_def _match.definition
@@ -56,24 +76,5 @@
           (tset collector.__entries node-id {:kind kind :definition _def})))
       (each [key submatch (pairs _match)]
         (when (not= key :definition)
-          (collect (. collector.__entries) submatch key))))))
+          (collect collector (. collector.__entries node-id) submatch key add-match))))))
 
-(defn collect [collector entry _match key]
-  (if _match.definition
-    (do
-      (when (not (. entry key))
-        (tset entry key (new-collector)))
-      (-> (. entry key)
-          (add-match key _match)))
-    (not (. entry key))
-    (tset entry key _match)
-    (and (= key :start_point) _match.node)
-    (let [(_ _ current-start) (-> (. entry key) (. :node) (: :start))
-          (_ _ new-start) (-> (. _match :node) (: :start))]
-      (when (< new-start current-start)
-        (tset entry key _match)))
-    (and (= key :end_point) _match.node)
-    (let [(_ _ current-end) (-> (. entry key) (. :node) (: :end_))
-          (_ _ new-end) (-> (. _match :node) (: :end_))]
-      (when (> new-end current-end)
-        (tset entry key _match)))))

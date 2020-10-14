@@ -131,6 +131,43 @@ do
   _0_0["aniseed/locals"]["get-node-id"] = v_0_
   get_node_id = v_0_
 end
+local collect = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function collect0(collector, entry, _match, key, add_fn)
+      if _match.definition then
+        if not entry[key] then
+          entry[key] = new_collector()
+        end
+        return add_fn(entry[key], key, _match, collect0)
+      elseif not entry[key] then
+        entry[key] = _match
+        return nil
+      elseif ((key == "start_point") and _match.node) then
+        local _, _0, current_start = (entry[key].node):start()
+        local _1, _2, new_start = (_match.node):start()
+        if (new_start < current_start) then
+          entry[key] = _match
+          return nil
+        end
+      elseif ((key == "end_point") and _match.node) then
+        local _, _0, current_end = (entry[key].node):end_()
+        local _1, _2, new_end = (_match.node):end_()
+        if (new_end > current_end) then
+          entry[key] = _match
+          return nil
+        end
+      end
+    end
+    v_0_0 = collect0
+    _0_0["collect"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["collect"] = v_0_
+  collect = v_0_
+end
 local add_match = nil
 do
   local v_0_ = nil
@@ -164,7 +201,7 @@ do
         end
         for key, submatch in pairs(_match) do
           if (key ~= "definition") then
-            collect(collector.__entries, submatch, key)
+            collect(collector, collector.__entries[node_id], submatch, key, add_match0)
           end
         end
         return nil
@@ -176,42 +213,5 @@ do
   end
   _0_0["aniseed/locals"]["add-match"] = v_0_
   add_match = v_0_
-end
-local collect = nil
-do
-  local v_0_ = nil
-  do
-    local v_0_0 = nil
-    local function collect0(collector, entry, _match, key)
-      if _match.definition then
-        if not entry[key] then
-          entry[key] = new_collector()
-        end
-        return add_match(entry[key], key, _match)
-      elseif not entry[key] then
-        entry[key] = _match
-        return nil
-      elseif ((key == "start_point") and _match.node) then
-        local _, _0, current_start = (entry[key].node):start()
-        local _1, _2, new_start = (_match.node):start()
-        if (new_start < current_start) then
-          entry[key] = _match
-          return nil
-        end
-      elseif ((key == "end_point") and _match.node) then
-        local _, _0, current_end = (entry[key].node):end_()
-        local _1, _2, new_end = (_match.node):end_()
-        if (new_end > current_end) then
-          entry[key] = _match
-          return nil
-        end
-      end
-    end
-    v_0_0 = collect0
-    _0_0["collect"] = v_0_0
-    v_0_ = v_0_0
-  end
-  _0_0["aniseed/locals"]["collect"] = v_0_
-  collect = v_0_
 end
 return nil

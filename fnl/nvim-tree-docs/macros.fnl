@@ -31,8 +31,8 @@
   contains a function will get invoked and the result will be used."
   `(tset (. ,modsym :templates) ,(tostring kind)
      (fn [context#]
-       (each [_# line# (ipairs ,[...])]
-         (context#.eval-content line#)
+       (each [i# line# (ipairs ,[...])]
+         (context#.eval-content line# (= i# 1))
          (context#.next-line))
        context#)))
 
@@ -45,21 +45,34 @@
 (fn %= [key tbl default]
   "Get a nodes text content. A key is provided and will
   access the root context or the provided table."
-  `#(or (ctx#.get-text (. ,(or tbl `$) ,(tostring key)) ,default)))
+  `#($.get-text (. ,(or tbl `$) ,(tostring key)) ,default))
 
 (fn %> [util-name ...]
   "Invokes a util function on this specification.
   This will invoke any inherited utils as well."
   `((. (. ,modsym :utils) ,(tostring util-name)) ,...))
 
-(fn %content% []
+(fn %content []
   "Marks the content point for content to be inserted in."
-  `(%^ "%%content%%" "%%content%%"))
+  `(%^ #($.expand-content-lines) "%content"))
+
+(fn %each [vec ...]
+  "Generates a form for each iterated item.
+  Each item will be it's own line."
+  (let [[binding iter] vec]
+    `#(let [iterator# ,iter]
+        (var ,binding (iterator#))
+        (while ,binding
+          ($.eval-content ,...)
+          (set ,binding (iterator#))
+          (when ,binding
+            ($.next-line))))))
 
 {: template
  : util
  : %=
  : %^
  : %>
- : %content%
+ : %content
+ : %each
  : doc-spec}
