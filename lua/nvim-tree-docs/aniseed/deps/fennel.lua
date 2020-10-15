@@ -1,8 +1,8 @@
-package.preload["nvim-tree-docs.aniseed.fennel.repl"] = package.preload["nvim-tree-docs.aniseed.fennel.repl"] or function(...)
-  local utils = require("nvim-tree-docs.aniseed.fennel.utils")
-  local parser = require("nvim-tree-docs.aniseed.fennel.parser")
-  local compiler = require("nvim-tree-docs.aniseed.fennel.compiler")
-  local specials = require("nvim-tree-docs.aniseed.fennel.specials")
+package.preload["aniseed.fennel.repl"] = package.preload["aniseed.fennel.repl"] or function(...)
+  local utils = require("aniseed.fennel.utils")
+  local parser = require("aniseed.fennel.parser")
+  local compiler = require("aniseed.fennel.compiler")
+  local specials = require("aniseed.fennel.specials")
   local function default_read_chunk(parser_state)
     local function _0_()
       if (0 < parser_state["stack-size"]) then
@@ -194,10 +194,10 @@ package.preload["nvim-tree-docs.aniseed.fennel.repl"] = package.preload["nvim-tr
   end
   return repl
 end
-package.preload["nvim-tree-docs.aniseed.fennel.specials"] = package.preload["nvim-tree-docs.aniseed.fennel.specials"] or function(...)
-  local utils = require("nvim-tree-docs.aniseed.fennel.utils")
-  local parser = require("nvim-tree-docs.aniseed.fennel.parser")
-  local compiler = require("nvim-tree-docs.aniseed.fennel.compiler")
+package.preload["aniseed.fennel.specials"] = package.preload["aniseed.fennel.specials"] or function(...)
+  local utils = require("aniseed.fennel.utils")
+  local parser = require("aniseed.fennel.parser")
+  local compiler = require("aniseed.fennel.compiler")
   local unpack = (_G.unpack or table.unpack)
   local SPECIALS = compiler.scopes.global.specials
   local function wrap_env(env)
@@ -1065,7 +1065,7 @@ package.preload["nvim-tree-docs.aniseed.fennel.specials"] = package.preload["nvi
   end
   local macro_loaded = {}
   local function metadata_only_fennel(modname)
-    if ((modname == "nvim-tree-docs.aniseed.fennel.macros") or (package and package.loaded and ("table" == type(package.loaded[modname])) and (package.loaded[modname].metadata == compiler.metadata))) then
+    if ((modname == "aniseed.fennel.macros") or (package and package.loaded and ("table" == type(package.loaded[modname])) and (package.loaded[modname].metadata == compiler.metadata))) then
       return {metadata = compiler.metadata}
     end
   end
@@ -1212,10 +1212,10 @@ package.preload["nvim-tree-docs.aniseed.fennel.specials"] = package.preload["nvi
   doc_special("eval-compiler", {"..."}, "Evaluate the body at compile-time. Use the macro system instead if possible.")
   return {["current-global-names"] = current_global_names, ["load-code"] = load_code, ["macro-loaded"] = macro_loaded, ["make-compiler-env"] = make_compiler_env, ["make-searcher"] = make_searcher, ["search-module"] = search_module, ["wrap-env"] = wrap_env, doc = doc_2a}
 end
-package.preload["nvim-tree-docs.aniseed.fennel.compiler"] = package.preload["nvim-tree-docs.aniseed.fennel.compiler"] or function(...)
-  local utils = require("nvim-tree-docs.aniseed.fennel.utils")
-  local parser = require("nvim-tree-docs.aniseed.fennel.parser")
-  local friend = require("nvim-tree-docs.aniseed.fennel.friend")
+package.preload["aniseed.fennel.compiler"] = package.preload["aniseed.fennel.compiler"] or function(...)
+  local utils = require("aniseed.fennel.utils")
+  local parser = require("aniseed.fennel.parser")
+  local friend = require("aniseed.fennel.friend")
   local unpack = (_G.unpack or table.unpack)
   local scopes = {}
   local function make_scope(parent)
@@ -2142,7 +2142,7 @@ package.preload["nvim-tree-docs.aniseed.fennel.compiler"] = package.preload["nvi
   end
   return {["apply-manglings"] = apply_manglings, ["compile-stream"] = compile_stream, ["compile-string"] = compile_string, ["declare-local"] = declare_local, ["do-quote"] = do_quote, ["global-mangling"] = global_mangling, ["global-unmangling"] = global_unmangling, ["keep-side-effects"] = keep_side_effects, ["make-scope"] = make_scope, ["require-include"] = require_include, ["symbol-to-expression"] = symbol_to_expression, assert = assert_compile, autogensym = autogensym, compile = compile, compile1 = compile1, destructure = destructure, emit = emit, gensym = gensym, macroexpand = macroexpand_2a, metadata = make_metadata(), scopes = scopes, traceback = traceback}
 end
-package.preload["nvim-tree-docs.aniseed.fennel.friend"] = package.preload["nvim-tree-docs.aniseed.fennel.friend"] or function(...)
+package.preload["aniseed.fennel.friend"] = package.preload["aniseed.fennel.friend"] or function(...)
   local function ast_source(ast)
     local m = getmetatable(ast)
     if (m and m.line and m) then
@@ -2242,9 +2242,9 @@ package.preload["nvim-tree-docs.aniseed.fennel.friend"] = package.preload["nvim-
   end
   return {["assert-compile"] = assert_compile, ["parse-error"] = parse_error}
 end
-package.preload["nvim-tree-docs.aniseed.fennel.parser"] = package.preload["nvim-tree-docs.aniseed.fennel.parser"] or function(...)
-  local utils = require("nvim-tree-docs.aniseed.fennel.utils")
-  local friend = require("nvim-tree-docs.aniseed.fennel.friend")
+package.preload["aniseed.fennel.parser"] = package.preload["aniseed.fennel.parser"] or function(...)
+  local utils = require("aniseed.fennel.utils")
+  local friend = require("aniseed.fennel.friend")
   local unpack = (_G.unpack or table.unpack)
   local function granulate(getchunk)
     local c, index, done_3f = "", 1, false
@@ -2519,7 +2519,7 @@ package.preload["nvim-tree-docs.aniseed.fennel.parser"] = package.preload["nvim-
   return {["string-stream"] = string_stream, granulate = granulate, parser = parser}
 end
 local utils = nil
-package.preload["nvim-tree-docs.aniseed.fennel.utils"] = package.preload["nvim-tree-docs.aniseed.fennel.utils"] or function(...)
+package.preload["aniseed.fennel.utils"] = package.preload["aniseed.fennel.utils"] or function(...)
   local function stablepairs(t)
     local keys = {}
     local succ = {}
@@ -2776,11 +2776,11 @@ package.preload["nvim-tree-docs.aniseed.fennel.utils"] = package.preload["nvim-t
   end
   return {["debug-on?"] = debug_on_3f, ["expr?"] = expr_3f, ["list?"] = list_3f, ["lua-keywords"] = lua_keywords, ["member?"] = member_3f, ["multi-sym?"] = multi_sym_3f, ["propagate-options"] = propagate_options, ["quoted?"] = quoted_3f, ["sequence?"] = sequence_3f, ["sym?"] = sym_3f, ["table?"] = table_3f, ["valid-lua-identifier?"] = valid_lua_identifier_3f, ["varg?"] = varg_3f, ["walk-tree"] = walk_tree, allpairs = allpairs, copy = copy, deref = deref, expr = expr, hook = hook, kvmap = kvmap, list = list, map = map, path = table.concat({"./?.fnl", "./?/init.fnl", getenv("FENNEL_PATH")}, ";"), root = root, sequence = sequence, stablepairs = stablepairs, sym = sym, varg = varg}
 end
-utils = require("nvim-tree-docs.aniseed.fennel.utils")
-local parser = require("nvim-tree-docs.aniseed.fennel.parser")
-local compiler = require("nvim-tree-docs.aniseed.fennel.compiler")
-local specials = require("nvim-tree-docs.aniseed.fennel.specials")
-local repl = require("nvim-tree-docs.aniseed.fennel.repl")
+utils = require("aniseed.fennel.utils")
+local parser = require("aniseed.fennel.parser")
+local compiler = require("aniseed.fennel.compiler")
+local specials = require("aniseed.fennel.specials")
+local repl = require("aniseed.fennel.repl")
 local function eval(str, options, ...)
   local opts = utils.copy(options)
   local _ = nil
@@ -3136,7 +3136,7 @@ do
    : macro : macrodebug : import-macros
    : match}
   ]===]
-  local module_name = "nvim-tree-docs.aniseed.fennel.macros"
+  local module_name = "aniseed.fennel.macros"
   local _ = nil
   local function _0_()
     return mod

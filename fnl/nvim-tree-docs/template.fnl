@@ -109,7 +109,7 @@
     context))
 
 (defn get-spec [lang spec]
-  (let [key (.. lang "_" spec)]
+  (let [key (.. lang "." spec)]
     (when (not (. loaded-specs key))
       (require (string.format "nvim-tree-docs.specs.%s.%s" lang spec)))
     (. loaded-specs key)))
@@ -128,4 +128,15 @@
       (fn [tokens]
         (core.reduce #(.. $1 $2.value) "" tokens))
       context.tokens)))
+
+(defn extend-spec [mod spec]
+  (when spec
+    (do
+      (require (.. "nvim-tree-docs.specs." spec))
+      (tset mod :templates (vim.tbl_extend "force"
+                                       mod.templates
+                                       (. loaded-specs spec).templates))
+      (tset mod :utils (vim.tbl_extend "force"
+                                   mod.utils
+                                   (. loaded-specs spec).templates)))))
 

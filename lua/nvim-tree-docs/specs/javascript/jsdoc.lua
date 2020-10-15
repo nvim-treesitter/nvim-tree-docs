@@ -1,8 +1,10 @@
 local _1_0 = nil
 do
-  local mod_name_0_ = ("javascript" .. "_" .. "jsdoc")
+  local mod_name_0_ = ("javascript" .. "." .. "jsdoc")
+  local template_mod_0_ = require("nvim-tree-docs.template")
   local module_0_ = {lang = "javascript", spec = "jsdoc", templates = {}, utils = {}}
-  require("nvim-tree-docs.template")["loaded-specs"][mod_name_0_] = module_0_
+  template_mod_0_["extend-spec"](module_0_)
+  template_mod_0_["loaded-specs"][mod_name_0_] = module_0_
   _1_0 = module_0_
 end
 local function _2_(ctx, param)
@@ -72,7 +74,7 @@ local function _6_(context_0_)
     end
     return _241["eval-and-mark"](_12_, "%content")
   end
-  for i_0_, line_0_ in ipairs({"/**", {" * ", _7_}, _8_, _9_, _10_, " */", _11_, "// Blorg"}) do
+  for i_0_, line_0_ in ipairs({"/**", {" * ", _7_}, _8_, _9_, _10_, " */", _11_}) do
     context_0_["eval-content"](line_0_, (i_0_ == 1))
     context_0_["next-line"]()
   end
@@ -150,11 +152,17 @@ local function _9_(context_0_)
     end
   end
   local function _13_(_241)
-    for extention in _241.iter(_241.extentions) do
+    local iterator_0_ = _241.iter(_241.extentions)
+    local extention = iterator_0_()
+    while extention do
       local function _14_(_2410)
         return _2410["get-text"](extention.entry.name)
       end
-      do local _ = {" * @extends", _14_} end
+      _241["eval-content"]({" * @extends", _14_})
+      extention = iterator_0_()
+      if extention then
+        _241["next-line"]()
+      end
     end
     return nil
   end

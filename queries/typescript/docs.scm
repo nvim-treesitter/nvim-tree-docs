@@ -17,6 +17,11 @@
     (_
       (identifier) @function.parameters.name @function.parameters.definition))) @function.definition
 
+(function_declaration
+  body: ((statement_block) @function.end_point)
+         (#set! function.end_point.position "start")) @function.definition
+
+
 ; Function param types
 (function_declaration
   parameters: (formal_parameters
@@ -51,7 +56,7 @@
 ; Method return type
 (method_definition
   return_type: (type_annotation
-    (_) @method.return_type) @method.end_point) @method.definition
+    (_) @method.return_type)) @method.definition
 
 ; Method params
 (method_definition
@@ -72,6 +77,10 @@
     (_
       (identifier) @method.parameters.definition
       value: (_) @method.parameters.default_value @method.parameters.optional))) @method.definition
+
+(method_definition
+  body: ((statement_block) @method.end_point)
+         (#set! method.end_point.position "start")) @method.definition
 
 ; Method signature name
 (method_signature

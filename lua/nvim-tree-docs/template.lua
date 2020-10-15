@@ -335,7 +335,7 @@ do
   do
     local v_0_0 = nil
     local function get_spec0(lang, spec)
-      local key = (lang .. "_" .. spec)
+      local key = (lang .. "." .. spec)
       if not loaded_specs[key] then
         require(string.format("nvim-tree-docs.specs.%s.%s", lang, spec))
       end
@@ -404,5 +404,25 @@ do
   end
   _0_0["aniseed/locals"]["context-to-lines"] = v_0_
   context_to_lines = v_0_
+end
+local extend_spec = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function extend_spec0(mod, spec)
+      if spec then
+        require(("nvim-tree-docs.specs." .. spec))
+        mod["templates"] = vim.tbl_extend("force", mod.templates, loaded_specs[spec], __fnl_global___2etemplates)
+        mod["utils"] = vim.tbl_extend("force", mod.utils, loaded_specs[spec], __fnl_global___2etemplates)
+        return nil
+      end
+    end
+    v_0_0 = extend_spec0
+    _0_0["extend-spec"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["extend-spec"] = v_0_
+  extend_spec = v_0_
 end
 return nil

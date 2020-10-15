@@ -29,8 +29,7 @@
   #(%> get-parameter-lines $ $.parameters)
   #(when $.return_statement (%> get-return-line))
   " */"
-  (%content)
-  "// Blorg")
+  (%content))
 
 (template variable
   "/**"
@@ -54,7 +53,7 @@
   [" * The " (%= name) " class."]
   [" * @class " (%= name)]
   #(when $.export " * @export")
-  #(each [extention ($.iter $.extentions)]
+  (%each [extention ($.iter $.extentions)]
      [" * @extends" (%= name extention.entry)])
   " */"
   (%content))

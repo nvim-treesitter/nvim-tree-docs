@@ -40,7 +40,7 @@ local queries = require("nvim-treesitter.query")
 local ts_utils = require("nvim-treesitter.ts_utils")
 local language_specs = nil
 do
-  local v_0_ = {javascript = "jsdoc", lua = "lua", typescript = "jsdoc"}
+  local v_0_ = {javascript = "jsdoc", lua = "lua", typescript = "tsdoc"}
   _0_0["aniseed/locals"]["language-specs"] = v_0_
   language_specs = v_0_
 end
@@ -97,7 +97,6 @@ do
       local edits = {}
       local marks = {}
       for _, doc_data in ipairs(data_list) do
-        print(vim.inspect(doc_data))
         local node_sr, node_sc = utils["get-start-position"](doc_data)
         local node_er, node_ec = utils["get-end-position"](doc_data)
         local content_lines = utils["get-buf-content"](node_sr, node_sc, node_er, node_ec, bufnr)

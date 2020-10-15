@@ -5,12 +5,14 @@
   (assert config.lang "A language is required")
   (assert config.spec "A specification name is required")
   `(local ,modsym
-     (let [mod-name# (.. ,(tostring config.lang) "_" ,(tostring config.spec))
+     (let [mod-name# (.. ,(tostring config.lang) "." ,(tostring config.spec))
+           template-mod# (require "nvim-tree-docs.template")
            module# {:templates {}
                     :utils {}
                     :spec ,(tostring config.spec)
                     :lang ,(tostring config.lang)}]
-       (tset (. (require "nvim-tree-docs.template") :loaded-specs)
+       (template-mod#.extend-spec module# ,(if config.extends (tostring config.extends) nil))
+       (tset (. template-mod# :loaded-specs)
              mod-name#
              module#)
        module#)))

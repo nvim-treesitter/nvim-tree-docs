@@ -89,6 +89,10 @@
   body: (class_body
     (method_definition) @method.definition))
 
+(method_definition
+  body: ((statement_block) @method.end_point)
+         (#set! method.end_point.position "start")) @method.definition
+
 ; Method return statement
 (method_definition
   body: (statement_block
@@ -111,7 +115,11 @@
 
 ; Classes
 (class_declaration
-  name: (_) @class.name @class.end_point) @class.definition
+  name: (_) @class.name) @class.definition
+
+(class_declaration
+  body: ((class_body) @class.end_point)
+         (#set! class.end_point.position "start")) @class.definition
 
 ; Class doc
 ; (

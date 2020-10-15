@@ -10,7 +10,7 @@
 
 (def- language-specs {:javascript :jsdoc
                       :lua :lua
-                      :typescript :jsdoc})
+                      :typescript :tsdoc})
 
 (def- doc-cache {})
 
@@ -32,7 +32,6 @@
         edits []
         marks []]
     (each [_ doc-data (ipairs data-list)]
-      (print (vim.inspect doc-data))
       (let [(node-sr node-sc) (utils.get-start-position doc-data)
             (node-er node-ec) (utils.get-end-position doc-data)
             content-lines (utils.get-buf-content node-sr node-sc node-er node-ec bufnr)
@@ -44,6 +43,7 @@
                        :start-line node-sr
                        :start-col node-sc})
             lines (templates.context-to-lines context node-sc)]
+        ; (print (vim.inspect context))
         (table.insert edits {:newText (table.concat lines "\n")
                              :range
                               {:start {:line node-sr :character node-sc}
