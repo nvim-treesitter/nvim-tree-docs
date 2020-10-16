@@ -36,7 +36,7 @@
               (length result)
               (string.sub (. result (length result))
                           1
-                          (+ end-col 1)))))
+                          end-col))))
     result))
 
 (defn highlight-marks [marks bufnr]

@@ -212,7 +212,7 @@ do
           result[1] = string.sub(result[1], (start_col + 1))
         end
         if (end_col ~= 0) then
-          result[#result] = string.sub(result[#result], 1, (end_col + 1))
+          result[#result] = string.sub(result[#result], 1, end_col)
         end
       end
       return result

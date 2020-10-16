@@ -133,10 +133,12 @@
   (when spec
     (do
       (require (.. "nvim-tree-docs.specs." spec))
-      (tset mod :templates (vim.tbl_extend "force"
-                                       mod.templates
-                                       (. loaded-specs spec).templates))
-      (tset mod :utils (vim.tbl_extend "force"
-                                   mod.utils
-                                   (. loaded-specs spec).templates)))))
+      (let [inherited-spec (. loaded-specs spec)]
+        (tset mod :templates (vim.tbl_extend "force"
+                                         mod.templates
+                                         (-> loaded-specs (. spec) (. :templates))))
+        (tset mod :utils (vim.tbl_extend "force"
+                                     mod.utils
+                                     (-> loaded-specs (. spec) (. :utils))))
+        (tset mod :inherits inherited-spec)))))
 

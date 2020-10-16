@@ -2,7 +2,7 @@ local _1_0 = nil
 do
   local mod_name_0_ = ("javascript" .. "." .. "jsdoc")
   local template_mod_0_ = require("nvim-tree-docs.template")
-  local module_0_ = {lang = "javascript", spec = "jsdoc", templates = {}, utils = {}}
+  local module_0_ = {config = {}, inherits = nil, lang = "javascript", spec = "jsdoc", templates = {}, utils = {}}
   template_mod_0_["extend-spec"](module_0_)
   template_mod_0_["loaded-specs"][mod_name_0_] = module_0_
   _1_0 = module_0_

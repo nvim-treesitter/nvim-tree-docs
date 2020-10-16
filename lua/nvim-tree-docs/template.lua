@@ -413,8 +413,10 @@ do
     local function extend_spec0(mod, spec)
       if spec then
         require(("nvim-tree-docs.specs." .. spec))
-        mod["templates"] = vim.tbl_extend("force", mod.templates, loaded_specs[spec], __fnl_global___2etemplates)
-        mod["utils"] = vim.tbl_extend("force", mod.utils, loaded_specs[spec], __fnl_global___2etemplates)
+        local inherited_spec = loaded_specs[spec]
+        mod["templates"] = vim.tbl_extend("force", mod.templates, loaded_specs[spec].templates)
+        mod["utils"] = vim.tbl_extend("force", mod.utils, loaded_specs[spec].utils)
+        mod["inherits"] = inherited_spec
         return nil
       end
     end

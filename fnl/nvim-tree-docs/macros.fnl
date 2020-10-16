@@ -9,6 +9,8 @@
            template-mod# (require "nvim-tree-docs.template")
            module# {:templates {}
                     :utils {}
+                    :config {}
+                    :inherits nil
                     :spec ,(tostring config.spec)
                     :lang ,(tostring config.lang)}]
        (template-mod#.extend-spec module# ,(if config.extends (tostring config.extends) nil))
@@ -22,6 +24,14 @@
   These can be used in templates as well as any specification
   That extends this specification."
   `(tset (. ,modsym :utils) ,(tostring name) (fn ,parameters ,...)))
+
+(fn util-extend [name parameters ...]
+  `(let [inherited# (. ,modsym :inherits)]
+     (when inherited#
+       (do
+         (assert (. inherited#.utils ,name) ,(.. "No util method " name " to extend"))
+         (tset (. ,modsym :utils) ,name (let [,(. parameters 1)]
+                                          (fn ,parameters ,...)))))))
 
 (fn template [kind ...]
   "Defines a template for a given 'kind'.
