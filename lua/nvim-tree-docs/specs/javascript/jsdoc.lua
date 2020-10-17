@@ -1,39 +1,49 @@
-local _1_0 = nil
+local _3_ = nil
 do
   local mod_name_0_ = ("javascript" .. "." .. "jsdoc")
   local template_mod_0_ = require("nvim-tree-docs.template")
-  local module_0_ = {config = {}, inherits = nil, lang = "javascript", spec = "jsdoc", templates = {}, utils = {}}
+  local module_0_ = {config = {empty_line_after_description = true, include_types = true}, inherits = nil, lang = "javascript", spec = "jsdoc", templates = {}, utils = {}}
   template_mod_0_["extend-spec"](module_0_)
   template_mod_0_["loaded-specs"][mod_name_0_] = module_0_
-  _1_0 = module_0_
+  _3_ = module_0_
 end
-local function _2_(ctx, param)
+local function _1_(_24, param)
   if param.default_value then
-    return string.format("%s=%s", ctx["get-text"](param.name), ctx["get-text"](param.default_value))
+    return string.format("%s=%s", _24["get-text"](param.name), _24["get-text"](param.default_value))
   else
-    return ctx["get-text"](param.name)
+    return _24["get-text"](param.name)
   end
 end
-_1_0.utils["get-param-name"] = _2_
-local function _3_()
-  local function _4_(_241)
-    return _241["eval-and-mark"]("any")
+_3_.utils["get-param-name"] = _1_
+local function _2_(_24, not_found_3f)
+  if _24.conf("include_types") then
+    local function _4_(_241)
+      return _241["eval-and-mark"]("any")
+    end
+    return {" {", _4_, "} "}
+  else
+    return (not_found_3f or "")
   end
-  return {" {", _4_, "} "}
 end
-_1_0.utils["get-marked-type"] = _3_
-local function _4_(ctx, parameters)
+_3_.utils["get-marked-type"] = _2_
+local function _4_(_24, parameters)
   local function _5_(_241)
-    local iterator_0_ = ctx.iter(ctx.parameters)
+    local iterator_0_ = _241.iter(_241.parameters)
     local param = iterator_0_()
     while param do
       local function _6_(_2410)
-        local function _7_(_2411)
+        return _3_.utils["get-param-name"](_2410, param.entry)
+      end
+      local function _7_(_2410)
+        return _3_.utils["get-marked-type"](_2410, " ")
+      end
+      local function _8_(_2410)
+        local function _9_(_2411)
           return _2411["get-text"](param.entry.name)
         end
-        return _2410["eval-and-mark"]({"The ", _7_})
+        return _2410["eval-and-mark"]({"The ", _9_})
       end
-      _241["eval-content"]({" * @param ", _1_0.utils["get-param-name"](ctx, param.entry), _1_0.utils["get-marked-type"](), "- ", _6_})
+      _241["eval-content"]({" * @param ", _6_, _7_, "- ", _8_})
       param = iterator_0_()
       if param then
         _241["next-line"]()
@@ -43,11 +53,14 @@ local function _4_(ctx, parameters)
   end
   return _5_
 end
-_1_0.utils["get-parameter-lines"] = _4_
-local function _5_()
-  return {" * returns", _1_0.utils["get-marked-type"](), "The result"}
+_3_.utils["get-parameter-lines"] = _4_
+local function _5_(_24)
+  local function _6_(_241)
+    return _3_.utils["get-marked-type"](_241, " ")
+  end
+  return {" * @returns", _6_, "The result"}
 end
-_1_0.utils["get-return-line"] = _5_
+_3_.utils["get-return-line"] = _5_
 local function _6_(context_0_)
   local function _7_(_241)
     local function _8_(_2410)
@@ -56,31 +69,39 @@ local function _6_(context_0_)
     return _241["eval-and-mark"]({_8_, " description"})
   end
   local function _8_(_241)
+    if _241.conf("empty_line_after_description") then
+      return " *"
+    end
+  end
+  local function _9_(_241)
     if _241.export then
       return " * @export"
     end
   end
-  local function _9_(_241)
-    return _1_0.utils["get-parameter-lines"](_241, _241.parameters)
-  end
   local function _10_(_241)
-    if _241.return_statement then
-      return _1_0.utils["get-return-line"]()
-    end
+    return _3_.utils["get-parameter-lines"](_241, _241.parameters)
   end
   local function _11_(_241)
-    local function _12_(_2410)
+    if _241.return_statement then
+      local function _12_(_2410)
+        return _3_.utils["get-return-line"](_2410)
+      end
+      return _12_
+    end
+  end
+  local function _12_(_241)
+    local function _13_(_2410)
       return _2410["expand-content-lines"]()
     end
-    return _241["eval-and-mark"](_12_, "%content")
+    return _241["eval-and-mark"](_13_, "%content")
   end
-  for i_0_, line_0_ in ipairs({"/**", {" * ", _7_}, _8_, _9_, _10_, " */", _11_}) do
+  for i_0_, line_0_ in ipairs({"/**", {" * ", _7_}, _8_, _9_, _10_, _11_, " */", _12_}) do
     context_0_["eval-content"](line_0_, (i_0_ == 1))
     context_0_["next-line"]()
   end
   return context_0_
 end
-_1_0.templates["function"] = _6_
+_3_.templates["function"] = _6_
 local function _7_(context_0_)
   local function _8_(_241)
     return _241["get-text"](_241.name)
@@ -91,18 +112,26 @@ local function _7_(context_0_)
     end
   end
   local function _10_(_241)
-    local function _11_(_2410)
+    if _241.conf("include_types") then
+      local function _11_(_2410)
+        return _3_.utils["get-marked-type"](_2410)
+      end
+      return {" * @type", _11_}
+    end
+  end
+  local function _11_(_241)
+    local function _12_(_2410)
       return _2410["expand-content-lines"]()
     end
-    return _241["eval-and-mark"](_11_, "%content")
+    return _241["eval-and-mark"](_12_, "%content")
   end
-  for i_0_, line_0_ in ipairs({"/**", {" * ", _8_, " Description"}, _9_, " * @type {any}", " */", _10_}) do
+  for i_0_, line_0_ in ipairs({"/**", {" * ", _8_, " Description"}, _9_, _10_, " */", _11_}) do
     context_0_["eval-content"](line_0_, (i_0_ == 1))
     context_0_["next-line"]()
   end
   return context_0_
 end
-_1_0.templates["variable"] = _7_
+_3_.templates["variable"] = _7_
 local function _8_(context_0_)
   local function _9_(_241)
     local function _10_(_2410)
@@ -111,34 +140,42 @@ local function _8_(context_0_)
     return _241["eval-and-mark"](_10_)
   end
   local function _10_(_241)
-    if _241.class then
-      local function _11_(_2410)
-        return _2410["get-text"](_2410.class)
-      end
-      return {" * @memberOf ", _11_}
+    if _241.conf("empty_line_after_description") then
+      return " *"
     end
   end
   local function _11_(_241)
-    return _1_0.utils["get-parameter-lines"](_241, _241.parameters)
+    if _241.class then
+      local function _12_(_2410)
+        return _2410["get-text"](_2410.class)
+      end
+      return {" * @memberOf ", _12_}
+    end
   end
   local function _12_(_241)
-    if _241.return_statement then
-      return _1_0.utils["get-return-line"]()
-    end
+    return _3_.utils["get-parameter-lines"](_241, _241.parameters)
   end
   local function _13_(_241)
-    local function _14_(_2410)
+    if _241.return_statement then
+      local function _14_()
+        return _3_.utils["get-return-line"]()
+      end
+      return _14_
+    end
+  end
+  local function _14_(_241)
+    local function _15_(_2410)
       return _2410["expand-content-lines"]()
     end
-    return _241["eval-and-mark"](_14_, "%content")
+    return _241["eval-and-mark"](_15_, "%content")
   end
-  for i_0_, line_0_ in ipairs({"/**", {" * ", _9_}, _10_, _11_, _12_, " */", _13_}) do
+  for i_0_, line_0_ in ipairs({"/**", {" * ", _9_}, _10_, _11_, _12_, _13_, " */", _14_}) do
     context_0_["eval-content"](line_0_, (i_0_ == 1))
     context_0_["next-line"]()
   end
   return context_0_
 end
-_1_0.templates["method"] = _8_
+_3_.templates["method"] = _8_
 local function _9_(context_0_)
   local function _10_(_241)
     return _241["get-text"](_241.name)
@@ -178,7 +215,7 @@ local function _9_(context_0_)
   end
   return context_0_
 end
-_1_0.templates["class"] = _9_
+_3_.templates["class"] = _9_
 local function _10_(context_0_)
   local function _11_(_241)
     if _241.class then
@@ -189,16 +226,24 @@ local function _10_(context_0_)
     end
   end
   local function _12_(_241)
-    local function _13_(_2410)
+    if _241.conf("include_types") then
+      local function _13_(_2410)
+        return _3_.utils["get-marked-type"](_2410)
+      end
+      return {" * @type", _13_}
+    end
+  end
+  local function _13_(_241)
+    local function _14_(_2410)
       return _2410["expand-content-lines"]()
     end
-    return _241["eval-and-mark"](_13_, "%content")
+    return _241["eval-and-mark"](_14_, "%content")
   end
-  for i_0_, line_0_ in ipairs({"/**", " * Description", _11_, {" * @type", _1_0.utils["get-marked-type"]()}, " */", _12_}) do
+  for i_0_, line_0_ in ipairs({"/**", " * Description", _11_, _12_, " */", _13_}) do
     context_0_["eval-content"](line_0_, (i_0_ == 1))
     context_0_["next-line"]()
   end
   return context_0_
 end
-_1_0.templates["member"] = _10_
+_3_.templates["member"] = _10_
 return nil

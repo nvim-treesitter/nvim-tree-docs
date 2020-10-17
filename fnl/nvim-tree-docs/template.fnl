@@ -85,7 +85,10 @@
       (next-line context)
       (eval-content context line true))))
 
-(defn new-template-context [collector options?]
+(defn conf [context path default?]
+  (utils.get path context.config default?))
+
+(defn new-template-context [collector config options?]
   (let [options (or options? {})
         context (vim.tbl_extend
                   "keep"
@@ -93,6 +96,7 @@
                    :content (or options.content [])
                    :head-ln 1
                    :head-col 0
+                   : config
                    :start-col (or options.start-col 0)
                    :start-line (or options.start-line 1)
                    :bufnr (utils.get-bufnr options.bufnr)
@@ -106,6 +110,7 @@
     (set context.next-line (partial next-line context))
     (set context.expand-content-lines (partial expand-content-lines context))
     (set context.add-token (partial add-token context))
+    (set context.conf (partial conf context))
     context))
 
 (defn get-spec [lang spec]
@@ -117,8 +122,8 @@
 (defn get-content-mark [context]
   (core.some #(= $2.tag "%content") context.marks))
 
-(defn execute-template [collector template-fn options?]
-  (let [context (new-template-context collector options?)]
+(defn execute-template [collector template-fn config options?]
+  (let [context (new-template-context collector config options?)]
     (template-fn context)
     context))
 
@@ -140,5 +145,6 @@
         (tset mod :utils (vim.tbl_extend "force"
                                      mod.utils
                                      (-> loaded-specs (. spec) (. :utils))))
-        (tset mod :inherits inherited-spec)))))
+        (tset mod :inherits inherited-spec)
+        (tset mod :config (utils.merge-tbl inherited-spec.config mod.config))))))
 

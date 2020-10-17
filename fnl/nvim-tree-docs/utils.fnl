@@ -1,6 +1,8 @@
 (module nvim-tree-docs.utils
   {require {core aniseed.core}})
 
+(import-macros {: log} "fnl.nvim-tree-docs.macros")
+
 (def ns (vim.api.nvim_create_namespace "blorg"))
 
 (defn get-start-node [entry]
@@ -44,3 +46,27 @@
     (let [start-line (+ (- mark.line 1) mark.line-offset)
           end-line (+ (- mark.end-line 1) mark.line-offset)]
       (vim.highlight.range bufnr ns "Visual" [start-line mark.start-col] [end-line mark.end-col]))))
+
+(defn is-table [tbl]
+  (and (= (type tbl) :table) (not (vim.tbl_islist tbl))))
+
+(defn merge-tbl [...]
+  (let [result {}]
+    (each [_ tbl (ipairs [...])]
+      (when (= (type tbl) :table)
+        (each [key value (pairs tbl)]
+          (if (and (is-table value) (is-table (. result key)))
+            (tset result key (merge (. result key) value))
+            (tset result key value)))))
+    result))
+
+(defn get [path tbl default?]
+  (let [segments (if (= (type path) :string)
+                   (vim.split path "%.")
+                   path)]
+    (var result tbl)
+    (each [_ segment (ipairs segments)]
+      (if (= (type result) :table)
+        (set result (. result segment))
+        (set result nil)))
+    (if (= result nil) default? result)))

@@ -3,4 +3,5 @@
 (doc-spec
   {:spec tsdoc
    :lang typescript
-   :extends javascript.jsdoc})
+   :extends javascript.jsdoc
+   :config {:include_types false}})

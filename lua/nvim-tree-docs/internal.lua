@@ -69,6 +69,26 @@ do
   _0_0["aniseed/locals"]["get-spec-for-lang"] = v_0_
   get_spec_for_lang = v_0_
 end
+local get_spec_config = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function get_spec_config0(lang, spec)
+      local spec_def = templates["get-spec"](lang, spec)
+      local module_config = configs.get_module("tree_docs")
+      local spec_default_config = spec_def.config
+      local lang_config = utils.get({"lang_config", lang, spec}, module_config, {})
+      local spec_config = utils.get({"spec_config", spec}, module_config, {})
+      return utils["merge-tbl"](spec_default_config, lang_config, spec_config)
+    end
+    v_0_0 = get_spec_config0
+    _0_0["get-spec-config"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-spec-config"] = v_0_
+  get_spec_config = v_0_
+end
 local get_spec_for_buf = nil
 do
   local v_0_ = nil
@@ -93,29 +113,15 @@ do
     local function generate_docs0(data_list, bufnr_3f, lang_3f)
       local bufnr = utils["get-bufnr"](bufnr_3f)
       local lang = (lang_3f or vim.api.nvim_buf_get_option(bufnr, "ft"))
-      local spec = templates["get-spec"](lang, get_spec_for_lang(lang))
+      local spec_name = get_spec_for_lang(lang)
+      local spec = templates["get-spec"](lang, spec_name)
       local edits = {}
       local marks = {}
       for _, doc_data in ipairs(data_list) do
         local node_sr, node_sc = utils["get-start-position"](doc_data)
         local node_er, node_ec = utils["get-end-position"](doc_data)
         local content_lines = utils["get-buf-content"](node_sr, node_sc, node_er, node_ec, bufnr)
-        local context = nil
-        local _4_
-        do
-          local _3_0 = spec
-          if _3_0 then
-            local _5_0 = _3_0.templates
-            if _5_0 then
-              _4_ = _5_0[doc_data.kind]
-            else
-              _4_ = _5_0
-            end
-          else
-            _4_ = _3_0
-          end
-        end
-        context = templates["execute-template"](doc_data, _4_, {["start-col"] = node_sc, ["start-line"] = node_sr, bufnr = bufnr, content = content_lines})
+        local context = templates["execute-template"](doc_data, utils.get({"templates", doc_data.kind}, spec), get_spec_config(lang, spec_name), {["start-col"] = node_sc, ["start-line"] = node_sr, bufnr = bufnr, content = content_lines})
         local lines = templates["context-to-lines"](context, node_sc)
         table.insert(edits, {newText = table.concat(lines, "\n"), range = {["end"] = {character = node_ec, line = node_er}, start = {character = node_sc, line = node_sr}}})
         vim.list_extend(marks, context.marks)
@@ -136,22 +142,8 @@ do
     local v_0_0 = nil
     local function collect_docs0(bufnr_3f)
       local bufnr = utils["get-bufnr"](bufnr_3f)
-      local _4_
-      do
-        local _3_0 = doc_cache
-        if _3_0 then
-          local _5_0 = _3_0[bufnr]
-          if _5_0 then
-            _4_ = _5_0.tick
-          else
-            _4_ = _5_0
-          end
-        else
-          _4_ = _3_0
-        end
-      end
-      if (_4_ == vim.api.nvim_buf_get_changedtick(bufnr)) then
-        return doc_cache[bufnr].docs
+      if (utils.get({bufnr, "tick"}, doc_cache) == vim.api.nvim_buf_get_changedtick(bufnr)) then
+        return utils.get({bufnr, "docs"}, doc_cache)
       else
         local collector = collectors["new-collector"]()
         local doc_matches = queries.collect_group_results(bufnr, "docs")
@@ -184,8 +176,8 @@ do
       local _, _0, node_start = node:start()
       for iter_item in collectors["iterate-collector"](doc_data) do
         local is_more_specific = true
-        local _3_ = iter_item
-        local doc_def = _3_["entry"]
+        local _4_ = iter_item
+        local doc_def = _4_["entry"]
         local _1, _2, start = utils["get-start-position"](doc_def)
         local _3, _4, _end = utils["get-end-position"](doc_def)
         local is_in_range = ((node_start >= start) and (node_start < _end))
@@ -249,8 +241,8 @@ do
       local doc_data = collect_docs(bufnr_3f)
       local result = {}
       for item in collectors["iterate-collector"](doc_data) do
-        local _3_ = item
-        local _def = _3_["entry"]
+        local _4_ = item
+        local _def = _4_["entry"]
         local start_r = utils["get-start-position"](_def)
         local end_r = utils["get-end-position"](_def)
         if ((start_r >= start_line) and (end_r <= end_line)) then

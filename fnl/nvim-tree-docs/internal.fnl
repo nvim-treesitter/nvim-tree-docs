@@ -4,6 +4,8 @@
             templates nvim-tree-docs.template
             collectors nvim-tree-docs.collector}})
 
+(import-macros {: log} "fnl.nvim-tree-docs.macros")
+
 (local configs (require "nvim-treesitter.configs"))
 (local queries (require "nvim-treesitter.query"))
 (local ts-utils (require "nvim-treesitter.ts_utils"))
@@ -20,15 +22,23 @@
       (error (string.format "No language spec configured for %s" lang)))
     spec))
 
+(defn get-spec-config [lang spec]
+  (let [spec-def (templates.get-spec lang spec)
+        module-config (configs.get_module :tree_docs)
+        spec-default-config spec-def.config
+        lang-config (utils.get [:lang_config lang spec] module-config {})
+        spec-config (utils.get [:spec_config spec] module-config {})]
+    (utils.merge-tbl spec-default-config lang-config spec-config)))
+
 (defn get-spec-for-buf [bufnr?]
   (let [bufnr (or bufnr? (vim.api.nvim_get_current_buf))]
     (get-spec-for-lang (vim.api.nvim_buf_get_option bufnr :ft))))
 
-
 (defn generate-docs [data-list bufnr? lang?]
   (let [bufnr (utils.get-bufnr bufnr?)
         lang (or lang? (vim.api.nvim_buf_get_option bufnr :ft))
-        spec (templates.get-spec lang (get-spec-for-lang lang))
+        spec-name (get-spec-for-lang lang)
+        spec (templates.get-spec lang spec-name)
         edits []
         marks []]
     (each [_ doc-data (ipairs data-list)]
@@ -37,7 +47,8 @@
             content-lines (utils.get-buf-content node-sr node-sc node-er node-ec bufnr)
             context (templates.execute-template
                       doc-data
-                      (-?> spec (. :templates) (. doc-data.kind))
+                      (utils.get [:templates doc-data.kind] spec)
+                      (get-spec-config lang spec-name)
                       {:content content-lines
                        : bufnr
                        :start-line node-sr
@@ -56,9 +67,9 @@
 
 (defn collect-docs [bufnr?]
   (let [bufnr (utils.get-bufnr bufnr?)]
-    (if (= (-?> doc-cache (. bufnr) (. :tick))
+    (if (= (utils.get [bufnr :tick] doc-cache)
            (vim.api.nvim_buf_get_changedtick bufnr))
-      (-> doc-cache (. bufnr) (. :docs))
+      (utils.get [bufnr :docs] doc-cache)
       (let [collector (collectors.new-collector)
             doc-matches (queries.collect_group_results bufnr :docs)]
         (each [_ item (ipairs doc-matches)]

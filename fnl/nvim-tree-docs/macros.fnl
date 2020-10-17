@@ -9,7 +9,7 @@
            template-mod# (require "nvim-tree-docs.template")
            module# {:templates {}
                     :utils {}
-                    :config {}
+                    :config ,(or config.config {})
                     :inherits nil
                     :spec ,(tostring config.spec)
                     :lang ,(tostring config.lang)}]
@@ -24,14 +24,6 @@
   These can be used in templates as well as any specification
   That extends this specification."
   `(tset (. ,modsym :utils) ,(tostring name) (fn ,parameters ,...)))
-
-(fn util-extend [name parameters ...]
-  `(let [inherited# (. ,modsym :inherits)]
-     (when inherited#
-       (do
-         (assert (. inherited#.utils ,name) ,(.. "No util method " name " to extend"))
-         (tset (. ,modsym :utils) ,name (let [,(. parameters 1)]
-                                          (fn ,parameters ,...)))))))
 
 (fn template [kind ...]
   "Defines a template for a given 'kind'.
@@ -62,7 +54,7 @@
 (fn %> [util-name ...]
   "Invokes a util function on this specification.
   This will invoke any inherited utils as well."
-  `((. (. ,modsym :utils) ,(tostring util-name)) ,...))
+  `#((. (. ,modsym :utils) ,(tostring util-name)) ,...))
 
 (fn %content []
   "Marks the content point for content to be inserted in."
@@ -80,6 +72,25 @@
           (when ,binding
             ($.next-line))))))
 
+(fn %conf [context path default?]
+  `((. ,context :conf) ,(if (sequence? path)
+                    path
+                    (tostring path)) ,default?))
+
+(fn %when [condition consequence]
+  `#(when ,condition ,consequence))
+
+(fn %run [...]
+  `#(do ,...  nil))
+
+(fn %run [...]
+  `#(do ,...  nil))
+
+(fn log [...]
+  `(let [result# ,...]
+     (print (vim.inspect result#))
+     result#))
+
 {: template
  : util
  : %=
@@ -87,4 +98,8 @@
  : %>
  : %content
  : %each
+ : %conf
+ : %when
+ : %run
+ : log
  : doc-spec}

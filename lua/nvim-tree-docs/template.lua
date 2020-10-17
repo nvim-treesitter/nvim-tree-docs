@@ -14,12 +14,12 @@ do
   package.loaded[name_0_] = module_0_
   _0_0 = module_0_
 end
-local function _3_(...)
+local function _2_(...)
   local ok_3f_0_, val_0_ = nil, nil
-  local function _3_()
+  local function _2_()
     return {require("nvim-tree-docs.collector"), require("aniseed.core"), require("nvim-tree-docs.utils")}
   end
-  ok_3f_0_, val_0_ = pcall(_3_)
+  ok_3f_0_, val_0_ = pcall(_2_)
   if ok_3f_0_ then
     _0_0["aniseed/local-fns"] = {require = {collectors = "nvim-tree-docs.collector", core = "aniseed.core", utils = "nvim-tree-docs.utils"}}
     return val_0_
@@ -27,10 +27,10 @@ local function _3_(...)
     return print(val_0_)
   end
 end
-local _2_ = _3_(...)
-local collectors = _2_[1]
-local core = _2_[2]
-local utils = _2_[3]
+local _1_ = _2_(...)
+local collectors = _1_[1]
+local core = _1_[2]
+local utils = _1_[3]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "nvim-tree-docs.template"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
@@ -149,10 +149,10 @@ do
       if collector then
         return collectors["iterate-collector"](collector)
       else
-        local function _4_()
+        local function _3_()
           return nil
         end
-        return _4_
+        return _3_
       end
     end
     v_0_0 = iter0
@@ -168,7 +168,7 @@ do
   do
     local v_0_0 = nil
     local function any0(matches)
-      local function _4_(_241, _242)
+      local function _3_(_241, _242)
         if _241 then
           return true
         else
@@ -176,7 +176,7 @@ do
           return ((is_collector and not collectors["is-collector-empty"](_242)) or (not is_collector and _242))
         end
       end
-      return core.reduce(_4_, false, matches)
+      return core.reduce(_3_, false, matches)
     end
     v_0_0 = any0
     _0_0["any"] = v_0_0
@@ -283,43 +283,62 @@ do
   _0_0["aniseed/locals"]["expand-content-lines"] = v_0_
   expand_content_lines = v_0_
 end
+local conf = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function conf0(context, path, default_3f)
+      return utils.get(path, context.config, default_3f)
+    end
+    v_0_0 = conf0
+    _0_0["conf"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["conf"] = v_0_
+  conf = v_0_
+end
 local new_template_context = nil
 do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function new_template_context0(collector, options_3f)
+    local function new_template_context0(collector, config, options_3f)
       local options = (options_3f or {})
-      local context = vim.tbl_extend("keep", {["head-col"] = 0, ["head-ln"] = 1, ["start-col"] = (options["start-col"] or 0), ["start-line"] = (options["start-line"] or 1), bufnr = utils["get-bufnr"](options.bufnr), content = (options.content or {}), marks = {}, tokens = {}}, collector)
+      local context = vim.tbl_extend("keep", {["head-col"] = 0, ["head-ln"] = 1, ["start-col"] = (options["start-col"] or 0), ["start-line"] = (options["start-line"] or 1), bufnr = utils["get-bufnr"](options.bufnr), config = config, content = (options.content or {}), marks = {}, tokens = {}}, collector)
       context.iter = iter
-      local function _4_(...)
+      local function _3_(...)
         return get_text(context, ...)
       end
-      context["get-text"] = _4_
-      local function _5_(...)
+      context["get-text"] = _3_
+      local function _4_(...)
         return eval_and_mark(context, ...)
       end
-      context["eval-and-mark"] = _5_
-      local function _6_(...)
+      context["eval-and-mark"] = _4_
+      local function _5_(...)
         return eval_content(context, ...)
       end
-      context["eval-content"] = _6_
-      local function _7_(...)
+      context["eval-content"] = _5_
+      local function _6_(...)
         return mark(context, ...)
       end
-      context.mark = _7_
-      local function _8_(...)
+      context.mark = _6_
+      local function _7_(...)
         return next_line(context, ...)
       end
-      context["next-line"] = _8_
-      local function _9_(...)
+      context["next-line"] = _7_
+      local function _8_(...)
         return expand_content_lines(context, ...)
       end
-      context["expand-content-lines"] = _9_
-      local function _10_(...)
+      context["expand-content-lines"] = _8_
+      local function _9_(...)
         return add_token(context, ...)
       end
-      context["add-token"] = _10_
+      context["add-token"] = _9_
+      local function _10_(...)
+        return conf(context, ...)
+      end
+      context.conf = _10_
       return context
     end
     v_0_0 = new_template_context0
@@ -354,10 +373,10 @@ do
   do
     local v_0_0 = nil
     local function get_content_mark0(context)
-      local function _4_(_241, _242)
+      local function _3_(_241, _242)
         return (_242.tag == "%content")
       end
-      return core.some(_4_, context.marks)
+      return core.some(_3_, context.marks)
     end
     v_0_0 = get_content_mark0
     _0_0["get-content-mark"] = v_0_0
@@ -371,8 +390,8 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function execute_template0(collector, template_fn, options_3f)
-      local context = new_template_context(collector, options_3f)
+    local function execute_template0(collector, template_fn, config, options_3f)
+      local context = new_template_context(collector, config, options_3f)
       template_fn(context)
       return context
     end
@@ -390,13 +409,13 @@ do
     local v_0_0 = nil
     local function context_to_lines0(context, col_3f)
       local col = (col_3f or 0)
-      local function _4_(tokens)
-        local function _5_(_241, _242)
+      local function _3_(tokens)
+        local function _4_(_241, _242)
           return (_241 .. _242.value)
         end
-        return core.reduce(_5_, "", tokens)
+        return core.reduce(_4_, "", tokens)
       end
-      return core.map(_4_, context.tokens)
+      return core.map(_3_, context.tokens)
     end
     v_0_0 = context_to_lines0
     _0_0["context-to-lines"] = v_0_0
@@ -417,6 +436,7 @@ do
         mod["templates"] = vim.tbl_extend("force", mod.templates, loaded_specs[spec].templates)
         mod["utils"] = vim.tbl_extend("force", mod.utils, loaded_specs[spec].utils)
         mod["inherits"] = inherited_spec
+        mod["config"] = utils["merge-tbl"](inherited_spec.config, mod.config)
         return nil
       end
     end
