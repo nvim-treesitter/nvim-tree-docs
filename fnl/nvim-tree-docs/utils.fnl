@@ -56,7 +56,7 @@
       (when (= (type tbl) :table)
         (each [key value (pairs tbl)]
           (if (and (is-table value) (is-table (. result key)))
-            (tset result key (merge (. result key) value))
+            (tset result key (merge-tbl (. result key) value))
             (tset result key value)))))
     result))
 

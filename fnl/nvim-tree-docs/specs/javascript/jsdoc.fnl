@@ -6,7 +6,25 @@
   {:spec jsdoc
    :lang javascript
    :config {:include_types true
-            :empty_line_after_description true}})
+            :empty_line_after_description true
+            :author ""
+            :tags {:function {:param true
+                              :returns true
+                              :export true}
+                   :variable {:type true
+                              :export true}
+                   :class {:class true
+                           :export true
+                           :extends true}
+                   :member {:memberOf true
+                            :type true}
+                   :method {:memberOf true
+                            :param true
+                            :returns true}}
+            :tag_processors {}}}
+
+(local tag-processors
+  {})
 
 (util get-param-name [$ param]
   (if param.default_value
@@ -27,6 +45,19 @@
      (%> get-marked-type $ " ")
      "- "
      (%^ ["The " (%= name param.entry)])]))
+
+(util include-tag? [$ kind tag implicit]
+  (let [include-tags (or (%conf $ ["include_tags" kind]))
+        exclude-tags (or (%conf $ ["excluded_tags" kind]))]
+    (and (not (vim.tbl_contains exclude-tags tag))
+         (if (not implicit)
+           (vim.tbl_contains include-tags tag)
+           true))))
+
+(util get-tag-list [$ kind]
+  (let [include-tags (or (%conf $ ["include_tags" kind]))
+        exclude-tags (or (%conf $ ["excluded_tags" kind]))
+        implicit-tags ()]))
 
 (util get-return-line [$]
   [" * @returns" (%> get-marked-type $ " ") "The result"])

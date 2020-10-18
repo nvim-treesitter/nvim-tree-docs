@@ -83,8 +83,15 @@
 (fn %run [...]
   `#(do ,...  nil))
 
-(fn %run [...]
-  `#(do ,...  nil))
+(fn %expand [...]
+  `#(let [lines# ,...
+          iter# (ipairs lines)]
+      (var v# (iter#))
+      (while v#
+        ($.eval-content v#)
+        (set v# (iter#))
+        (when v#
+          ($.next-line)))))
 
 (fn log [...]
   `(let [result# ,...]
@@ -101,5 +108,6 @@
  : %conf
  : %when
  : %run
+ : %expand
  : log
  : doc-spec}
