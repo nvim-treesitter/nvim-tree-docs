@@ -270,7 +270,7 @@ do
         if (type(tbl) == "table") then
           for key, value in pairs(tbl) do
             if (is_table(value) and is_table(result[key])) then
-              result[key] = merge(result[key], value)
+              result[key] = merge_tbl0(result[key], value)
             else
               result[key] = value
             end

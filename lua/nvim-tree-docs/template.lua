@@ -298,6 +298,21 @@ do
   _0_0["aniseed/locals"]["conf"] = v_0_
   conf = v_0_
 end
+local is_empty = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function is_empty0(collector)
+      return collectors["is-collector-empty"](collector)
+    end
+    v_0_0 = is_empty0
+    _0_0["is-empty"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["is-empty"] = v_0_
+  is_empty = v_0_
+end
 local new_template_context = nil
 do
   local v_0_ = nil
@@ -305,8 +320,7 @@ do
     local v_0_0 = nil
     local function new_template_context0(collector, config, options_3f)
       local options = (options_3f or {})
-      local context = vim.tbl_extend("keep", {["head-col"] = 0, ["head-ln"] = 1, ["start-col"] = (options["start-col"] or 0), ["start-line"] = (options["start-line"] or 1), bufnr = utils["get-bufnr"](options.bufnr), config = config, content = (options.content or {}), marks = {}, tokens = {}}, collector)
-      context.iter = iter
+      local context = vim.tbl_extend("keep", {["head-col"] = 0, ["head-ln"] = 1, ["is-empty"] = is_empty, ["start-col"] = (options["start-col"] or 0), ["start-line"] = (options["start-line"] or 1), bufnr = utils["get-bufnr"](options.bufnr), config = config, content = (options.content or {}), iter = iter, marks = {}, tokens = {}}, collector)
       local function _3_(...)
         return get_text(context, ...)
       end

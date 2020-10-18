@@ -88,6 +88,9 @@
 (defn conf [context path default?]
   (utils.get path context.config default?))
 
+(defn is-empty [collector]
+  (collectors.is-collector-empty collector))
+
 (defn new-template-context [collector config options?]
   (let [options (or options? {})
         context (vim.tbl_extend
@@ -97,12 +100,13 @@
                    :head-ln 1
                    :head-col 0
                    : config
+                   : iter
+                   : is-empty
                    :start-col (or options.start-col 0)
                    :start-line (or options.start-line 1)
                    :bufnr (utils.get-bufnr options.bufnr)
                    :marks []}
                   collector)]
-    (set context.iter iter)
     (set context.get-text (partial get-text context))
     (set context.eval-and-mark (partial eval-and-mark context))
     (set context.eval-content (partial eval-content context))

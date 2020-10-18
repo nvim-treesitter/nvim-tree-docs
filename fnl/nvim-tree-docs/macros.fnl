@@ -54,11 +54,33 @@
 (fn %> [util-name ...]
   "Invokes a util function on this specification.
   This will invoke any inherited utils as well."
-  `#((. (. ,modsym :utils) ,(tostring util-name)) ,...))
+  `((. (. ,modsym :utils) ,(tostring util-name)) ,...))
 
 (fn %content []
   "Marks the content point for content to be inserted in."
   `(%^ #($.expand-content-lines) "%content"))
+
+(fn processor [...]
+  (let [processor {}
+        forms [...]
+        has-name (not= (% (length forms) 2) 0)]
+    (var hook nil)
+    (var callback nil)
+    (var name :__default)
+    (when has-name
+      (do
+        (set name (. forms 1))
+        (table.remove forms 1)))
+    (each [_ form (ipairs forms)]
+      (if hook
+        (set callback form)
+        (set hook (tostring form)))
+      (if (and hook callback)
+        (do
+          (tset processor hook form)
+          (set hook nil)
+          (set callback nil))))
+    `(tset (. ,modsym :processors) ,(tostring name) ,processor)))
 
 (fn %each [vec ...]
   "Generates a form for each iterated item.
@@ -110,4 +132,5 @@
  : %run
  : %expand
  : log
+ : processor
  : doc-spec}

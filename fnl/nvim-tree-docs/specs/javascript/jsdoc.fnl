@@ -1,7 +1,5 @@
 (require-macros "fnl.nvim-tree-docs.macros")
 
-; TODO: Make wrapper for inserting empty lines... maybe another macro
-
 (doc-spec
   {:spec jsdoc
    :lang javascript
@@ -21,89 +19,120 @@
                    :method {:memberOf true
                             :param true
                             :returns true}}
-            :tag_processors {}}}
+            :processors {}}})
 
-(local tag-processors
-  {})
+; (local tag-processor (require "nvim-tree-docs.tag-processor"))
+; (local tag-processors
+  ; {:param #(when $.parameters
+  ;            (let [result []]
+  ;              (each [param ($.iter $.parameters)]
+  ;                (let [param-name (%> get-param-name $ param.entry)
+  ;                      type-str (%> get-marked-type $ " ")
+  ;                      name (%= name param.entry)]
+  ;                  (table.insert
+  ;                    result
+  ;                    (.. " * @param " param-name type-str "- The " name))))))
+;    :returns #(when $.returns
+;                (let [type-str (%> get-marked-type $ " ")]
+;                  (.. " * @returns" type-str  "The result")))
+;    :type #(when $.type
+;             (let [type-str (%> get-marked-type $ " ")]
+;               (.. " * @type" type-str)))
+;    :description #(.. " * " $.name " description")
+;    :__default #(.. " * @" $2)})
 
-(util get-param-name [$ param]
-  (if param.default_value
-    (string.format "%s=%s"
-                   ($.get-text param.name)
-                   ($.get-text param.default_value))
-    ($.get-text param.name)))
+(processor returns
+  when #($.returns)
+  build #(let [type-str (%> get-marked-type $ " ")]
+           (.. " * @returns" type-str  "The result")))
 
-(util get-marked-type [$ not-found?]
-  (if (%conf $ include_types)
-    [" {" (%^ "any") "} "]
-    (or not-found? "")))
+(processor description
+  configurable false
+  build #(.. " * " $.name " description"))
 
-(util get-parameter-lines [$ parameters]
-  (%each [param ($.iter $.parameters)]
-    [" * @param "
-     (%> get-param-name $ param.entry)
-     (%> get-marked-type $ " ")
-     "- "
-     (%^ ["The " (%= name param.entry)])]))
+(processor type
+  when #($.type)
+  build #(let [type-str (%> get-marked-type $ " ")]
+           (.. " * @type" type-str)))
 
-(util include-tag? [$ kind tag implicit]
-  (let [include-tags (or (%conf $ ["include_tags" kind]))
-        exclude-tags (or (%conf $ ["excluded_tags" kind]))]
-    (and (not (vim.tbl_contains exclude-tags tag))
-         (if (not implicit)
-           (vim.tbl_contains include-tags tag)
-           true))))
+(processor param
+  when #(and $.parameters
+             (not ($.is-empty $.parameters)))
+  build #(let [result []]
+           (each [param ($.iter $.parameters)]
+             (let [param-name (%> get-param-name $ param.entry)
+                   type-str (%> get-marked-type $ " ")
+                   name (%= name param.entry)]
+               (table.insert
+                 result
+                 (.. " * @param " param-name type-str "- The " name))))))
 
-(util get-tag-list [$ kind]
-  (let [include-tags (or (%conf $ ["include_tags" kind]))
-        exclude-tags (or (%conf $ ["excluded_tags" kind]))
-        implicit-tags ()]))
+(processor
+  build #(.. " * @" $2))
 
-(util get-return-line [$]
-  [" * @returns" (%> get-marked-type $ " ") "The result"])
+; (util get-param-name [$ param]
+;   (if param.default_value
+;     (string.format "%s=%s"
+;                    ($.get-text param.name)
+;                    ($.get-text param.default_value))
+;     ($.get-text param.name)))
 
-(template function
-  "/**"
-  [" * " (%^ [(%= name) " description"])]
-  (%when (%conf $ empty_line_after_description) " *")
-  (%when $.export " * @export")
-  (%> get-parameter-lines $ $.parameters)
-  (%when $.return_statement (%> get-return-line $))
-  " */"
-  (%content))
+; (util get-marked-type [$ not-found?]
+;   (if (%conf $ include_types)
+;     [" {" (%^ "any") "} "]
+;     (or not-found? "")))
 
-(template variable
-  "/**"
-  [" * " (%= name) " Description"]
-  (%when $.export " * @export")
-  (%when (%conf $ include_types) [" * @type" (%> get-marked-type $)])
-  " */"
-  (%content))
+; (template function
+;   "/**"
+;   (%- description)
+;   (%-%)
+;   (%- param)
+;   (%- returns)
+;   " */"
+;   (%content))
 
-(template method
-  "/**"
-  [" * " (%^ (%= name))]
-  (%when (%conf $ empty_line_after_description) " *")
-  (%when $.class [" * @memberOf " (%= class)])
-  (%> get-parameter-lines $ $.parameters)
-  (%when $.return_statement (%> get-return-line))
-  " */"
-  (%content))
+; (template function
+;   "/**"
+;   [" * " (%^ [(%= name) " description"])]
+;   (%when (%conf $ empty_line_after_description) " *")
+;   (%when $.export " * @export")
+;   (%> get-parameter-lines $ $.parameters)
+;   (%when $.return_statement (%> get-return-line $))
+;   " */"
+;   (%content))
 
-(template class
-  "/**"
-  [" * The " (%= name) " class."]
-  [" * @class " (%= name)]
-  (%when $.export " * @export")
-  (%each [extention ($.iter $.extentions)]
-     [" * @extends" (%= name extention.entry)])
-  " */"
-  (%content))
+; (template variable
+;   "/**"
+;   [" * " (%= name) " Description"]
+;   (%when $.export " * @export")
+;   (%when (%conf $ include_types) [" * @type" (%> get-marked-type $)])
+;   " */"
+;   (%content))
 
-(template member
-  "/**"
-  " * Description"
-  (%when $.class [ " * @memberOf " (%= class)])
-  (%when (%conf $ include_types) [" * @type" (%> get-marked-type $)])
-  " */"
-  (%content))
+; (template method
+;   "/**"
+;   [" * " (%^ (%= name))]
+;   (%when (%conf $ empty_line_after_description) " *")
+;   (%when $.class [" * @memberOf " (%= class)])
+;   (%> get-parameter-lines $ $.parameters)
+;   (%when $.return_statement (%> get-return-line))
+;   " */"
+;   (%content))
+
+; (template class
+;   "/**"
+;   [" * The " (%= name) " class."]
+;   [" * @class " (%= name)]
+;   (%when $.export " * @export")
+;   (%each [extention ($.iter $.extentions)]
+;      [" * @extends" (%= name extention.entry)])
+;   " */"
+;   (%content))
+
+; (template member
+;   "/**"
+;   " * Description"
+;   (%when $.class [ " * @memberOf " (%= class)])
+;   (%when (%conf $ include_types) [" * @type" (%> get-marked-type $)])
+;   " */"
+;   (%content))
