@@ -9,6 +9,7 @@
            template-mod# (require "nvim-tree-docs.template")
            module# {:templates {}
                     :utils {}
+                    :processors {}
                     :config ,(or config.config {})
                     :inherits nil
                     :spec ,(tostring config.spec)

@@ -95,17 +95,12 @@
   (let [options (or options? {})
         context (vim.tbl_extend
                   "keep"
-                  {:tokens []
-                   :content (or options.content [])
-                   :head-ln 1
-                   :head-col 0
-                   : config
+                  {:content (or options.content [])
                    : iter
                    : is-empty
                    :start-col (or options.start-col 0)
                    :start-line (or options.start-line 1)
-                   :bufnr (utils.get-bufnr options.bufnr)
-                   :marks []}
+                   :bufnr (utils.get-bufnr options.bufnr)}
                   collector)]
     (set context.get-text (partial get-text context))
     (set context.eval-and-mark (partial eval-and-mark context))
@@ -116,6 +111,33 @@
     (set context.add-token (partial add-token context))
     (set context.conf (partial conf context))
     context))
+
+; (defn new-template-context [collector config options?]
+;   (let [options (or options? {})
+;         context (vim.tbl_extend
+;                   "keep"
+;                   {:tokens []
+;                    :content (or options.content [])
+;                    :head-ln 1
+;                    :head-col 0
+;                    :processors options.processors
+;                    : config
+;                    : iter
+;                    : is-empty
+;                    :start-col (or options.start-col 0)
+;                    :start-line (or options.start-line 1)
+;                    :bufnr (utils.get-bufnr options.bufnr)
+;                    :marks []}
+;                   collector)]
+;     (set context.get-text (partial get-text context))
+;     (set context.eval-and-mark (partial eval-and-mark context))
+;     (set context.eval-content (partial eval-content context))
+;     (set context.mark (partial mark context))
+;     (set context.next-line (partial next-line context))
+;     (set context.expand-content-lines (partial expand-content-lines context))
+;     (set context.add-token (partial add-token context))
+;     (set context.conf (partial conf context))
+;     context))
 
 (defn get-spec [lang spec]
   (let [key (.. lang "." spec)]
@@ -130,6 +152,47 @@
   (let [context (new-template-context collector config options?)]
     (template-fn context)
     context))
+
+;expand all processors (expand hook)
+; get all processors from the configuration that are true
+; filter the template list by these processors that aren't set to implicit true
+; invoke the expand hook for each of these with a ps-index-list and the configuration
+; create a template context
+; filter the list by the when hook using the context
+; loop over the resulting list of processor names and run the build hook
+; flatten all resulting lines into a single list
+
+(defn process-template [collector spec kind config]
+  (var ps-list (. spec.templates kind))
+  (let [processors (. spec.processors)
+        slot-config (or (-?> config.slots (. kind)) {})]
+    (each [_ ps-name (ipairs ps-list)]
+      (let []))
+    context))
+
+(defn- get-processor [processors name]
+  (or (. processors name) processors.__default))
+
+
+(defn get-expanded-slots [ps-list slot-config processors]
+  (let [filter-from-conf (core.filter
+                           #(let [ps (get-processor processors $)]
+                             (and ps (or ps.implicit (. slot-config $))))
+                           ps-list)
+        result [(unpack filter-from-conf)]]
+    (var i 1)
+    (while (<= i (length result))
+      (let [ps-name (. result i)
+            processor (get-processor processors ps-name)]
+        (if (and processor processor.expand)
+          (let [expanded (processor.expand
+                           (utils.make-inverse-list result)
+                           slot-config)]
+            (table.remove result i)
+            (each [j expanded-ps (ipairs expanded)]
+              (table.insert result (- (+ i j) 1) expanded-ps))))
+        (set i (+ i 1))))
+    result))
 
 (defn context-to-lines [context col?]
   (let [col (or col? 0)]
@@ -150,5 +213,6 @@
                                      mod.utils
                                      (-> loaded-specs (. spec) (. :utils))))
         (tset mod :inherits inherited-spec)
-        (tset mod :config (utils.merge-tbl inherited-spec.config mod.config))))))
+        (tset mod :processors (vim.tbl_extend "force" mod.processors inherited-spec.processors))
+        (tset mod :config (vim.tbl_deep_extend "force" inherited-spec.config mod.config))))))
 

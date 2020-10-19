@@ -47,19 +47,6 @@
           end-line (+ (- mark.end-line 1) mark.line-offset)]
       (vim.highlight.range bufnr ns "Visual" [start-line mark.start-col] [end-line mark.end-col]))))
 
-(defn is-table [tbl]
-  (and (= (type tbl) :table) (not (vim.tbl_islist tbl))))
-
-(defn merge-tbl [...]
-  (let [result {}]
-    (each [_ tbl (ipairs [...])]
-      (when (= (type tbl) :table)
-        (each [key value (pairs tbl)]
-          (if (and (is-table value) (is-table (. result key)))
-            (tset result key (merge-tbl (. result key) value))
-            (tset result key value)))))
-    result))
-
 (defn get [path tbl default?]
   (let [segments (if (= (type path) :string)
                    (vim.split path "%.")
@@ -70,3 +57,15 @@
         (set result (. result segment))
         (set result nil)))
     (if (= result nil) default? result)))
+
+(defn make-inverse-list [tbl]
+  (let [result {}]
+    (each [i v (ipairs tbl)]
+      (tset result v i))
+    result))
+
+(defn get-all-truthy-keys [tbl]
+  (let [result []]
+    (each [k v (pairs tbl)]
+      (when v (table.insert result k)))
+    result))

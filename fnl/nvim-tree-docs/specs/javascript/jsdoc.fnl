@@ -4,42 +4,28 @@
   {:spec jsdoc
    :lang javascript
    :config {:include_types true
-            :empty_line_after_description true
-            :author ""
-            :tags {:function {:param true
-                              :returns true
-                              :export true}
-                   :variable {:type true
-                              :export true}
-                   :class {:class true
-                           :export true
-                           :extends true}
-                   :member {:memberOf true
-                            :type true}
-                   :method {:memberOf true
-                            :param true
-                            :returns true}}
+            :slots {:function {:param true
+                               :returns true
+                               :export true}
+                    :variable {:type true
+                               :export true}
+                    :class {:class true
+                            :export true
+                            :extends true}
+                    :member {:memberOf true
+                             :type true}
+                    :method {:memberOf true
+                             :param true
+                             :returns true}}
             :processors {}}})
 
-; (local tag-processor (require "nvim-tree-docs.tag-processor"))
-; (local tag-processors
-  ; {:param #(when $.parameters
-  ;            (let [result []]
-  ;              (each [param ($.iter $.parameters)]
-  ;                (let [param-name (%> get-param-name $ param.entry)
-  ;                      type-str (%> get-marked-type $ " ")
-  ;                      name (%= name param.entry)]
-  ;                  (table.insert
-  ;                    result
-  ;                    (.. " * @param " param-name type-str "- The " name))))))
-;    :returns #(when $.returns
-;                (let [type-str (%> get-marked-type $ " ")]
-;                  (.. " * @returns" type-str  "The result")))
-;    :type #(when $.type
-;             (let [type-str (%> get-marked-type $ " ")]
-;               (.. " * @type" type-str)))
-;    :description #(.. " * " $.name " description")
-;    :__default #(.. " * @" $2)})
+(processor doc-start
+  implicit true
+  build #(-> "/**"))
+
+(processor doc-end
+  implicit true
+  build #(-> " */"))
 
 (processor returns
   when #($.returns)
@@ -47,7 +33,7 @@
            (.. " * @returns" type-str  "The result")))
 
 (processor description
-  configurable false
+  implicit true
   build #(.. " * " $.name " description"))
 
 (processor type
@@ -67,6 +53,15 @@
                  result
                  (.. " * @param " param-name type-str "- The " name))))))
 
+(processor %...
+  implicit true
+  expand (fn [slot-indexes slot-config]
+           (let [expanded []]
+             (each [ps-name enabled (pairs slot-config)]
+               (when (not (. slot-indexes ps-name))
+                 (table.insert expanded ps-name)))
+             expanded)))
+
 (processor
   build #(.. " * @" $2))
 
@@ -83,12 +78,12 @@
 ;     (or not-found? "")))
 
 ; (template function
-;   "/**"
+;   (%- doc-start)
 ;   (%- description)
 ;   (%-%)
 ;   (%- param)
 ;   (%- returns)
-;   " */"
+;   (%- doc-end)
 ;   (%content))
 
 ; (template function
