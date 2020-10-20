@@ -10,10 +10,16 @@
            module# {:templates {}
                     :utils {}
                     :processors {}
-                    :config ,(or config.config {})
+                    :config (vim.tbl_deep_extend
+                              "force"
+                              {:slots {}
+                               :processors {}}
+                              ,(or config.config {}))
                     :inherits nil
                     :spec ,(tostring config.spec)
-                    :lang ,(tostring config.lang)}]
+                    :lang ,(tostring config.lang)
+                    :module mod-name#}]
+       (template-mod#.extend-spec module# :base.base)
        (template-mod#.extend-spec module# ,(if config.extends (tostring config.extends) nil))
        (tset (. template-mod# :loaded-specs)
              mod-name#
@@ -28,38 +34,32 @@
 
 (fn template [kind ...]
   "Defines a template for a given 'kind'.
-  The kind correlates with the query matches.
-  All other forms are considered a single line in the resulting documentation.
-  A vector can be given to evaluate multiple expressions in a single line.
-  If a function is given, it will be called with the context object.
-  These expressions are evaluated recursively. For example, a vector that
-  contains a function will get invoked and the result will be used."
-  `(tset (. ,modsym :templates) ,(tostring kind)
-     (fn [context#]
-       (each [i# line# (ipairs ,[...])]
-         (context#.eval-content line# (= i# 1))
-         (context#.next-line))
-       context#)))
+  The kind correlates with the query matches."
+  (let [slots (let [results []]
+                (each [_ slot (ipairs [...])]
+                  (table.insert results (tostring slot)))
+                results)]
+    `(tset (. ,modsym :templates) ,(tostring kind) ,slots)))
 
-(fn %^ [form tag?]
-  "Marks an expression and it's position.
-  These marks can be used to mark the positions in the
-  resulting documentation."
-  `#($.eval-and-mark ,form ,tag?))
+; (fn %^ [form tag?]
+;   "Marks an expression and it's position.
+;   These marks can be used to mark the positions in the
+;   resulting documentation."
+;   `#($.eval-and-mark ,form ,tag?))
 
 (fn %= [key tbl default]
   "Get a nodes text content. A key is provided and will
   access the root context or the provided table."
-  `#($.get-text (. ,(or tbl `$) ,(tostring key)) ,default))
+  `($.get-text (. ,(or tbl `$) ,(tostring key)) ,default))
 
 (fn %> [util-name ...]
   "Invokes a util function on this specification.
   This will invoke any inherited utils as well."
   `((. (. ,modsym :utils) ,(tostring util-name)) ,...))
 
-(fn %content []
-  "Marks the content point for content to be inserted in."
-  `(%^ #($.expand-content-lines) "%content"))
+; (fn %content []
+;   "Marks the content point for content to be inserted in."
+;   `(%^ #($.expand-content-lines) "%content"))
 
 (fn processor [...]
   (let [processor {}
@@ -83,38 +83,8 @@
           (set callback nil))))
     `(tset (. ,modsym :processors) ,(tostring name) ,processor)))
 
-(fn %each [vec ...]
-  "Generates a form for each iterated item.
-  Each item will be it's own line."
-  (let [[binding iter] vec]
-    `#(let [iterator# ,iter]
-        (var ,binding (iterator#))
-        (while ,binding
-          ($.eval-content ,...)
-          (set ,binding (iterator#))
-          (when ,binding
-            ($.next-line))))))
-
-(fn %conf [context path default?]
-  `((. ,context :conf) ,(if (sequence? path)
-                    path
-                    (tostring path)) ,default?))
-
-(fn %when [condition consequence]
-  `#(when ,condition ,consequence))
-
-(fn %run [...]
-  `#(do ,...  nil))
-
-(fn %expand [...]
-  `#(let [lines# ,...
-          iter# (ipairs lines)]
-      (var v# (iter#))
-      (while v#
-        ($.eval-content v#)
-        (set v# (iter#))
-        (when v#
-          ($.next-line)))))
+(fn post-processor [name bindings ...]
+  `(tset (. ,modsym :post-processors) ,name (fn ,bindings ,...)))
 
 (fn log [...]
   `(let [result# ,...]
@@ -124,14 +94,15 @@
 {: template
  : util
  : %=
- : %^
+ ; : %^
  : %>
- : %content
- : %each
- : %conf
- : %when
- : %run
- : %expand
+ ; : %content
+ ; : %each
+ ; : %conf
+ ; : %when
+ ; : %run
+ ; : %expand
  : log
+ : post-processor
  : processor
  : doc-spec}

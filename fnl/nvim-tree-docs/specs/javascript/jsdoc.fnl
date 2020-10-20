@@ -16,34 +16,58 @@
                              :type true}
                     :method {:memberOf true
                              :param true
-                             :returns true}}
-            :processors {}}})
+                             :returns true}}}})
+
+(template function
+  doc-start
+  description
+  %rest%
+  param
+  returns
+  doc-end
+  %content%)
+
+(template variable
+  doc-start
+  description
+  %rest%
+  doc-end
+  %content%)
 
 (processor doc-start
   implicit true
-  build #(-> "/**"))
+  build #(do "/**"))
 
 (processor doc-end
   implicit true
-  build #(-> " */"))
+  build #(do " */"))
 
 (processor returns
-  when #($.returns)
+  when #$.return_statement
   build #(let [type-str (%> get-marked-type $ " ")]
            (.. " * @returns" type-str  "The result")))
 
 (processor description
   implicit true
-  build #(.. " * " $.name " description"))
+  build #(let [description (.. " * " (%= name) " description")
+               {: processors : index} $2
+               next-ps (. processors (+ index 1))]
+           (if (= next-ps :doc-end)
+             description
+             [description " *"])))
 
 (processor type
-  when #($.type)
+  when #$.type
   build #(let [type-str (%> get-marked-type $ " ")]
            (.. " * @type" type-str)))
 
+(processor export
+  when #$.export
+  build #(do " * @export"))
+
 (processor param
   when #(and $.parameters
-             (not ($.is-empty $.parameters)))
+             (not ($.empty? $.parameters)))
   build #(let [result []]
            (each [param ($.iter $.parameters)]
              (let [param-name (%> get-param-name $ param.entry)
@@ -51,31 +75,27 @@
                    name (%= name param.entry)]
                (table.insert
                  result
-                 (.. " * @param " param-name type-str "- The " name))))))
+                 (.. " * @param " param-name type-str "- The " name))))
+           result))
 
-(processor %...
-  implicit true
-  expand (fn [slot-indexes slot-config]
-           (let [expanded []]
-             (each [ps-name enabled (pairs slot-config)]
-               (when (not (. slot-indexes ps-name))
-                 (table.insert expanded ps-name)))
-             expanded)))
+(processor memberOf
+  when #$.class
+  build #(.. " * @memberOf " (%= class)))
 
 (processor
-  build #(.. " * @" $2))
+  build #(.. " * @" $2.name))
 
-; (util get-param-name [$ param]
-;   (if param.default_value
-;     (string.format "%s=%s"
-;                    ($.get-text param.name)
-;                    ($.get-text param.default_value))
-;     ($.get-text param.name)))
+(util get-param-name [$ param]
+  (if param.default_value
+    (string.format "%s=%s"
+                   ($.get-text param.name)
+                   ($.get-text param.default_value))
+    ($.get-text param.name)))
 
-; (util get-marked-type [$ not-found?]
-;   (if (%conf $ include_types)
-;     [" {" (%^ "any") "} "]
-;     (or not-found? "")))
+(util get-marked-type [$ not-found?]
+  (if ($.conf :include_types)
+    [" {any} "]
+    (or not-found? "")))
 
 ; (template function
 ;   (%- doc-start)
@@ -121,7 +141,7 @@
 ;   (%when $.export " * @export")
 ;   (%each [extention ($.iter $.extentions)]
 ;      [" * @extends" (%= name extention.entry)])
-;   " */"
+;   " */.name"
 ;   (%content))
 
 ; (template member

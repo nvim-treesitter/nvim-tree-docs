@@ -28,7 +28,7 @@
         spec-default-config spec-def.config
         lang-config (utils.get [:lang_config lang spec] module-config {})
         spec-config (utils.get [:spec_config spec] module-config {})]
-    (utils.merge-tbl spec-default-config lang-config spec-config)))
+    (vim.tbl_deep_extend :force spec-default-config spec-config lang-config)))
 
 (defn get-spec-for-buf [bufnr?]
   (let [bufnr (or bufnr? (vim.api.nvim_get_current_buf))]
@@ -39,31 +39,28 @@
         lang (or lang? (vim.api.nvim_buf_get_option bufnr :ft))
         spec-name (get-spec-for-lang lang)
         spec (templates.get-spec lang spec-name)
+        spec-config (get-spec-config lang spec-name)
         edits []
         marks []]
     (each [_ doc-data (ipairs data-list)]
       (let [(node-sr node-sc) (utils.get-start-position doc-data)
             (node-er node-ec) (utils.get-end-position doc-data)
+
             content-lines (utils.get-buf-content node-sr node-sc node-er node-ec bufnr)
-            context (templates.execute-template
+            result (templates.process-template
                       doc-data
-                      (utils.get [:templates doc-data.kind] spec)
-                      (get-spec-config lang spec-name)
-                      {:content content-lines
+                      {: spec
                        : bufnr
+                       :config spec-config
                        :start-line node-sr
-                       :start-col node-sc})
-            lines (templates.context-to-lines context node-sc)]
-        ; (print (vim.inspect context))
-        (table.insert edits {:newText (table.concat lines "\n")
+                       :start-col node-sc
+                       :kind doc-data.kind
+                       :content content-lines})]
+        (table.insert edits {:newText (.. (table.concat result.lines "\n") "\n")
                              :range
-                              {:start {:line node-sr :character node-sc}
-                               :end {:line node-er :character node-ec}}})
-        (vim.list_extend marks context.marks)))
-    (vim.lsp.util.apply_text_edits edits bufnr)
-    ; Uncomment to test mark positions.
-    ; (utils.highlight-marks marks bufnr)
-    ))
+                              {:start {:line node-sr :character 0}
+                               :end {:line (+ node-er 1) :character 0}}})))
+    (vim.lsp.util.apply_text_edits edits bufnr)))
 
 (defn collect-docs [bufnr?]
   (let [bufnr (utils.get-bufnr bufnr?)]

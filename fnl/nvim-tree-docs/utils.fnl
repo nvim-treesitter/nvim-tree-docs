@@ -28,18 +28,21 @@
 (defn get-bufnr [bufnr]
   (or bufnr (vim.api.nvim_get_current_buf)))
 
+; (defn get-buf-content [start-row start-col end-row end-col bufnr]
+;   (let [result (vim.api.nvim_buf_get_lines bufnr start-row (+ end-row 1) false)]
+;     (when (> (length result) 0)
+;       (when (not= start-col 0)
+;         (tset result 1 (string.sub (. result 1) (+ start-col 1))))
+;       (when (not= end-col 0)
+;         (tset result
+;               (length result)
+;               (string.sub (. result (length result))
+;                           1
+;                           end-col))))
+;     result))
+
 (defn get-buf-content [start-row start-col end-row end-col bufnr]
-  (let [result (vim.api.nvim_buf_get_lines bufnr start-row (+ end-row 1) false)]
-    (when (> (length result) 0)
-      (when (not= start-col 0)
-        (tset result 1 (string.sub (. result 1) (+ start-col 1))))
-      (when (not= end-col 0)
-        (tset result
-              (length result)
-              (string.sub (. result (length result))
-                          1
-                          end-col))))
-    result))
+  (vim.api.nvim_buf_get_lines bufnr start-row (+ end-row 1) false))
 
 (defn highlight-marks [marks bufnr]
   (each [_ mark (ipairs marks)]
@@ -69,3 +72,7 @@
     (each [k v (pairs tbl)]
       (when v (table.insert result k)))
     result))
+
+(defn func? [v] (= (type v) :function))
+(defn method? [v key] (and (= (type v) :table)
+                           (= (type (. v key)) :function)))

@@ -206,16 +206,7 @@ do
   do
     local v_0_0 = nil
     local function get_buf_content0(start_row, start_col, end_row, end_col, bufnr)
-      local result = vim.api.nvim_buf_get_lines(bufnr, start_row, (end_row + 1), false)
-      if (#result > 0) then
-        if (start_col ~= 0) then
-          result[1] = string.sub(result[1], (start_col + 1))
-        end
-        if (end_col ~= 0) then
-          result[#result] = string.sub(result[#result], 1, end_col)
-        end
-      end
-      return result
+      return vim.api.nvim_buf_get_lines(bufnr, start_row, (end_row + 1), false)
     end
     v_0_0 = get_buf_content0
     _0_0["get-buf-content"] = v_0_0
@@ -243,48 +234,6 @@ do
   end
   _0_0["aniseed/locals"]["highlight-marks"] = v_0_
   highlight_marks = v_0_
-end
-local is_table = nil
-do
-  local v_0_ = nil
-  do
-    local v_0_0 = nil
-    local function is_table0(tbl)
-      return ((type(tbl) == "table") and not vim.tbl_islist(tbl))
-    end
-    v_0_0 = is_table0
-    _0_0["is-table"] = v_0_0
-    v_0_ = v_0_0
-  end
-  _0_0["aniseed/locals"]["is-table"] = v_0_
-  is_table = v_0_
-end
-local merge_tbl = nil
-do
-  local v_0_ = nil
-  do
-    local v_0_0 = nil
-    local function merge_tbl0(...)
-      local result = {}
-      for _, tbl in ipairs({...}) do
-        if (type(tbl) == "table") then
-          for key, value in pairs(tbl) do
-            if (is_table(value) and is_table(result[key])) then
-              result[key] = merge_tbl0(result[key], value)
-            else
-              result[key] = value
-            end
-          end
-        end
-      end
-      return result
-    end
-    v_0_0 = merge_tbl0
-    _0_0["merge-tbl"] = v_0_0
-    v_0_ = v_0_0
-  end
-  _0_0["aniseed/locals"]["merge-tbl"] = v_0_
-  merge_tbl = v_0_
 end
 local get = nil
 do
@@ -318,5 +267,75 @@ do
   end
   _0_0["aniseed/locals"]["get"] = v_0_
   get = v_0_
+end
+local make_inverse_list = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function make_inverse_list0(tbl)
+      local result = {}
+      for i, v in ipairs(tbl) do
+        result[v] = i
+      end
+      return result
+    end
+    v_0_0 = make_inverse_list0
+    _0_0["make-inverse-list"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["make-inverse-list"] = v_0_
+  make_inverse_list = v_0_
+end
+local get_all_truthy_keys = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function get_all_truthy_keys0(tbl)
+      local result = {}
+      for k, v in pairs(tbl) do
+        if v then
+          table.insert(result, k)
+        end
+      end
+      return result
+    end
+    v_0_0 = get_all_truthy_keys0
+    _0_0["get-all-truthy-keys"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-all-truthy-keys"] = v_0_
+  get_all_truthy_keys = v_0_
+end
+local func_3f = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function func_3f0(v)
+      return (type(v) == "function")
+    end
+    v_0_0 = func_3f0
+    _0_0["func?"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["func?"] = v_0_
+  func_3f = v_0_
+end
+local method_3f = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function method_3f0(v, key)
+      return ((type(v) == "table") and (type(v[key]) == "function"))
+    end
+    v_0_0 = method_3f0
+    _0_0["method?"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["method?"] = v_0_
+  method_3f = v_0_
 end
 return nil

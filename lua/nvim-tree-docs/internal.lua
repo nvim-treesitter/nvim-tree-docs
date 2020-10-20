@@ -80,7 +80,7 @@ do
       local spec_default_config = spec_def.config
       local lang_config = utils.get({"lang_config", lang, spec}, module_config, {})
       local spec_config = utils.get({"spec_config", spec}, module_config, {})
-      return utils["merge-tbl"](spec_default_config, lang_config, spec_config)
+      return vim.tbl_deep_extend("force", spec_default_config, spec_config, lang_config)
     end
     v_0_0 = get_spec_config0
     _0_0["get-spec-config"] = v_0_0
@@ -115,16 +115,15 @@ do
       local lang = (lang_3f or vim.api.nvim_buf_get_option(bufnr, "ft"))
       local spec_name = get_spec_for_lang(lang)
       local spec = templates["get-spec"](lang, spec_name)
+      local spec_config = get_spec_config(lang, spec_name)
       local edits = {}
       local marks = {}
       for _, doc_data in ipairs(data_list) do
         local node_sr, node_sc = utils["get-start-position"](doc_data)
         local node_er, node_ec = utils["get-end-position"](doc_data)
         local content_lines = utils["get-buf-content"](node_sr, node_sc, node_er, node_ec, bufnr)
-        local context = templates["execute-template"](doc_data, utils.get({"templates", doc_data.kind}, spec), get_spec_config(lang, spec_name), {["start-col"] = node_sc, ["start-line"] = node_sr, bufnr = bufnr, content = content_lines})
-        local lines = templates["context-to-lines"](context, node_sc)
-        table.insert(edits, {newText = table.concat(lines, "\n"), range = {["end"] = {character = node_ec, line = node_er}, start = {character = node_sc, line = node_sr}}})
-        vim.list_extend(marks, context.marks)
+        local result = templates["process-template"](doc_data, {["start-col"] = node_sc, ["start-line"] = node_sr, bufnr = bufnr, config = spec_config, content = content_lines, kind = doc_data.kind, spec = spec})
+        table.insert(edits, {newText = (table.concat(result.lines, "\n") .. "\n"), range = {["end"] = {character = 0, line = (node_er + 1)}, start = {character = 0, line = node_sr}}})
       end
       return vim.lsp.util.apply_text_edits(edits, bufnr)
     end
