@@ -11,7 +11,7 @@ end
 local function _1_(slot_indexes, slot_config)
   local expanded = {}
   for ps_name, enabled in pairs(slot_config) do
-    if not slot_indexes[ps_name] then
+    if (enabled and not slot_indexes[ps_name]) then
       table.insert(expanded, ps_name)
     end
   end

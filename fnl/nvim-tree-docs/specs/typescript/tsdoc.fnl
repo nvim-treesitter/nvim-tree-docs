@@ -5,7 +5,10 @@
    :lang typescript
    :extends javascript.jsdoc
    :config {:include_types false
-            :slots {:function {:export false}
+            :empty_line_after_description true
+            :slots {:function {:export false
+                               :generator false
+                               :function false}
                     :variable {:type false
                                :export false}
                     :class {:class false

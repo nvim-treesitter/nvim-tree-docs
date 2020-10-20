@@ -97,6 +97,7 @@
                   "keep"
                   {: iter
                    : empty?
+                   :config options.config
                    :kind options.kind
                    :start-line (or options.start-line 0)
                    :start-col (or options.start-col 0)
@@ -200,13 +201,16 @@
 (defn build-slots [ps-list processors context]
   (let [result []]
     (each [i ps-name (ipairs ps-list)]
-      (let [processor (get-processor processors ps-name)]
+      (let [processor (get-processor processors ps-name)
+            default-processor processors.__default
+            build-fn (or (-?> processor (. :build))
+                         (-?> default-processor (. :build)))]
         (table.insert
           result
-          (if (utils.method? processor :build)
-            (-> (processor.build context {:processors ps-list
-                                          :index i
-                                          :name ps-name})
+          (if (utils.func? build-fn)
+            (-> (build-fn context {:processors ps-list
+                                   :index i
+                                   :name ps-name})
                 (normalize-build-output)
                 (indent-with-processor processor context false))
             []))))

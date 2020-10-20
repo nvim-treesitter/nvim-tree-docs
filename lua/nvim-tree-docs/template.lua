@@ -141,7 +141,7 @@ do
     local v_0_0 = nil
     local function new_template_context0(collector, options_3f)
       local options = (options_3f or {})
-      local context = vim.tbl_extend("keep", {["empty?"] = empty_3f, ["start-col"] = (options["start-col"] or 0), ["start-line"] = (options["start-line"] or 0), bufnr = utils["get-bufnr"](options.bufnr), content = (options.content or {}), iter = iter, kind = options.kind}, collector)
+      local context = vim.tbl_extend("keep", {["empty?"] = empty_3f, ["start-col"] = (options["start-col"] or 0), ["start-line"] = (options["start-line"] or 0), bufnr = utils["get-bufnr"](options.bufnr), config = options.config, content = (options.content or {}), iter = iter, kind = options.kind}, collector)
       local function _3_(...)
         return get_text(context, ...)
       end
@@ -306,14 +306,33 @@ do
       local result = {}
       for i, ps_name in ipairs(ps_list) do
         local processor = get_processor(processors, ps_name)
-        local function _3_()
-          if utils["method?"](processor, "build") then
-            return indent_with_processor(normalize_build_output(processor.build(context, {index = i, name = ps_name, processors = ps_list})), processor, context, false)
+        local default_processor = processors.__default
+        local build_fn = nil
+        local function _4_()
+          local _3_0 = processor
+          if _3_0 then
+            return _3_0.build
+          else
+            return _3_0
+          end
+        end
+        local function _6_()
+          local _5_0 = default_processor
+          if _5_0 then
+            return _5_0.build
+          else
+            return _5_0
+          end
+        end
+        build_fn = (_4_() or _6_())
+        local function _7_()
+          if utils["func?"](build_fn) then
+            return indent_with_processor(normalize_build_output(build_fn(context, {index = i, name = ps_name, processors = ps_list})), processor, context, false)
           else
             return {}
           end
         end
-        table.insert(result, _3_())
+        table.insert(result, _7_())
       end
       return result
     end

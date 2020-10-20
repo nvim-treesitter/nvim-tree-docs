@@ -2,8 +2,20 @@
 
 ; ---- Functions
 
-(function_declaration
-  name: (identifier) @function.name) @function.definition
+[
+  (function_declaration name: (identifier) @function.name)
+  (generator_function_declaration name: (identifier) @function.name)
+] @function.definition
+
+(generator_function_declaration) @function.definition @function.generator
+
+; Generator yields
+(generator_function_declaration
+  body: (statement_block
+    (expression_statement
+      (yield_expression
+        (identifier) @function.yields)))) @function.definition
+
 
 ; Function doc
 ; (
@@ -11,18 +23,31 @@
 ;   (function_declaration) @function.definition
 ; )
 
-(function_declaration
-  body: ((statement_block) @function.end_point)
-         (#set! function.end_point.position "start")) @function.definition
+[
+  (function_declaration
+    body: ((statement_block) @function.end_point)
+           (#set! function.end_point.position "start"))
+  (generator_function_declaration
+    body: ((statement_block) @function.end_point)
+           (#set! function.end_point.position "start"))
+] @function.definition
 
 ; Return statement
-(function_declaration
-  body: (statement_block
-    (return_statement) @function.return_statement)) @function.definition
+[
+  (function_declaration
+    body: (statement_block
+      (return_statement) @function.return_statement))
+  (generator_function_declaration
+    body: (statement_block
+      (return_statement) @function.return_statement))
+] @function.definition
 
 ; Exported function
-(export_statement
-  (function_declaration) @function.definition) @function.start_point @function.export
+
+[
+  (export_statement (function_declaration) @function.definition)
+  (export_statement (generator_function_declaration) @function.definition)
+] @function.export @function.start_point
 
 ; Function export doc
 ; (
@@ -32,16 +57,28 @@
 ; )
 
 ; Function param name
-(function_declaration
-  parameters: (formal_parameters
-    (identifier) @function.parameters.name @function.parameters.definition)) @function.definition
+[
+  (function_declaration
+    parameters: (formal_parameters
+      (identifier) @function.parameters.name @function.parameters.definition))
+  (generator_function_declaration
+    parameters: (formal_parameters
+      (identifier) @function.parameters.name @function.parameters.definition))
+] @function.definition
 
 ; Function param default value
-(function_declaration
-  parameters: (formal_parameters
-    (assignment_pattern
-      left: (identifier) @function.parameters.definition @function.parameters.name
-      value: (_) @function.parameters.default_value @function.parameters.optional))) @function.definition
+[
+  (function_declaration
+    parameters: (formal_parameters
+      (assignment_pattern
+        left: (identifier) @function.parameters.definition @function.parameters.name
+        value: (_) @function.parameters.default_value @function.parameters.optional)))
+  (generator_function_declaration
+    parameters: (formal_parameters
+      (assignment_pattern
+        left: (identifier) @function.parameters.definition @function.parameters.name
+        value: (_) @function.parameters.default_value @function.parameters.optional)))
+] @function.definition
 
 ; ----- Variables
 

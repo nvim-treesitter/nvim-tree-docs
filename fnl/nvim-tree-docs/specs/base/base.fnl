@@ -9,7 +9,7 @@
   expand (fn [slot-indexes slot-config]
            (let [expanded []]
              (each [ps-name enabled (pairs slot-config)]
-               (when (not (. slot-indexes ps-name))
+               (when (and enabled (not (. slot-indexes ps-name)))
                  (table.insert expanded ps-name)))
              expanded)))
 

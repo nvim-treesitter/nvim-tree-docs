@@ -4,26 +4,37 @@
   {:spec jsdoc
    :lang javascript
    :config {:include_types true
+            :empty_line_after_description false
             :slots {:function {:param true
+                               :example false
                                :returns true
+                               :function true
+                               :generator true
+                               :yields true
                                :export true}
                     :variable {:type true
                                :export true}
                     :class {:class true
+                            :example false
                             :export true
                             :extends true}
                     :member {:memberOf true
                              :type true}
                     :method {:memberOf true
+                             :example false
                              :param true
-                             :returns true}}}})
+                             :returns true}
+                    :module {:module true}}}})
 
 (template function
   doc-start
   description
   %rest%
+  generator
+  yields
   param
   returns
+  example
   doc-end
   %content%)
 
@@ -33,6 +44,43 @@
   %rest%
   doc-end
   %content%)
+
+(template method
+  doc-start
+  description
+  %rest%
+  memberOf
+  param
+  returns
+  example
+  doc-end
+  %content%)
+
+(template class
+  doc-start
+  description
+  %rest%
+  class
+  extends
+  example
+  doc-end
+  %content%)
+
+(template member
+  doc-start
+  description
+  %rest%
+  class
+  extends
+  doc-end
+  %content%)
+
+(template module
+  doc-start
+  description
+  module
+  %rest%
+  doc-end)
 
 (processor doc-start
   implicit true
@@ -47,12 +95,26 @@
   build #(let [type-str (%> get-marked-type $ " ")]
            (.. " * @returns" type-str  "The result")))
 
+(processor function
+  when #(not $.generator))
+
+(processor module
+  build #(do " * @module <moduleName>"))
+
+(processor generator
+  when #$.generator)
+
+(processor yields
+  when #$.yields
+  build #(.. " * @yields" (%> get-marked-type $ "")))
+
 (processor description
   implicit true
-  build #(let [description (.. " * " (%= name) " description")
+  build #(let [description (.. " * The " (%= name) " " $2.name)
                {: processors : index} $2
                next-ps (. processors (+ index 1))]
-           (if (= next-ps :doc-end)
+           (if (or (= next-ps :doc-end)
+                   (not ($.conf :empty_line_after_description)))
              description
              [description " *"])))
 
@@ -62,8 +124,7 @@
            (.. " * @type" type-str)))
 
 (processor export
-  when #$.export
-  build #(do " * @export"))
+  when #$.export)
 
 (processor param
   when #(and $.parameters
@@ -94,60 +155,5 @@
 
 (util get-marked-type [$ not-found?]
   (if ($.conf :include_types)
-    [" {any} "]
+    " {any} "
     (or not-found? "")))
-
-; (template function
-;   (%- doc-start)
-;   (%- description)
-;   (%-%)
-;   (%- param)
-;   (%- returns)
-;   (%- doc-end)
-;   (%content))
-
-; (template function
-;   "/**"
-;   [" * " (%^ [(%= name) " description"])]
-;   (%when (%conf $ empty_line_after_description) " *")
-;   (%when $.export " * @export")
-;   (%> get-parameter-lines $ $.parameters)
-;   (%when $.return_statement (%> get-return-line $))
-;   " */"
-;   (%content))
-
-; (template variable
-;   "/**"
-;   [" * " (%= name) " Description"]
-;   (%when $.export " * @export")
-;   (%when (%conf $ include_types) [" * @type" (%> get-marked-type $)])
-;   " */"
-;   (%content))
-
-; (template method
-;   "/**"
-;   [" * " (%^ (%= name))]
-;   (%when (%conf $ empty_line_after_description) " *")
-;   (%when $.class [" * @memberOf " (%= class)])
-;   (%> get-parameter-lines $ $.parameters)
-;   (%when $.return_statement (%> get-return-line))
-;   " */"
-;   (%content))
-
-; (template class
-;   "/**"
-;   [" * The " (%= name) " class."]
-;   [" * @class " (%= name)]
-;   (%when $.export " * @export")
-;   (%each [extention ($.iter $.extentions)]
-;      [" * @extends" (%= name extention.entry)])
-;   " */.name"
-;   (%content))
-
-; (template member
-;   "/**"
-;   " * Description"
-;   (%when $.class [ " * @memberOf " (%= class)])
-;   (%when (%conf $ include_types) [" * @type" (%> get-marked-type $)])
-;   " */"
-;   (%content))
