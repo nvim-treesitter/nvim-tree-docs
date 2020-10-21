@@ -46,6 +46,10 @@
   access the root context or the provided table."
   `($.get-text (. ,(or tbl `$) ,(tostring key)) ,default))
 
+(fn %- [...]
+  "Shorthand for `string.format`"
+  `(string.format ,...))
+
 (fn %> [util-name ...]
   "Invokes a util function on this specification.
   This will invoke any inherited utils as well."
@@ -85,6 +89,7 @@
  : util
  : %=
  : %>
+ : %-
  : log
  : post-processor
  : processor

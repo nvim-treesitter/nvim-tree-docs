@@ -17,17 +17,18 @@ end
 local function _2_(...)
   local ok_3f_0_, val_0_ = nil, nil
   local function _2_()
-    return {}
+    return {require("aniseed.core")}
   end
   ok_3f_0_, val_0_ = pcall(_2_)
   if ok_3f_0_ then
-    _0_0["aniseed/local-fns"] = {}
+    _0_0["aniseed/local-fns"] = {require = {core = "aniseed.core"}}
     return val_0_
   else
     return print(val_0_)
   end
 end
 local _1_ = _2_(...)
+local core = _1_[1]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "nvim-tree-docs.collector"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
@@ -181,18 +182,28 @@ do
         if not collector.__entries[node_id] then
           local order_index = 1
           local _, _0, def_start_byte = def_node:start()
+          local entry_keys = core.keys(collector.__entries)
           local done = false
           local i = 1
           while not done do
-            local entry = collector.__entries[i]
+            local entry = nil
+            do
+              local _4_0 = entry_keys[i]
+              if _4_0 then
+                entry = collector.__entries[_4_0]
+              else
+                entry = _4_0
+              end
+            end
             if not entry then
               done = true
             else
-              local _1, _2, start_byte = (entry.defintion.node):start()
+              local _1, _2, start_byte = (entry.definition.node):start()
               if (def_start_byte < start_byte) then
                 done = true
               else
                 order_index = (order_index + 1)
+                i = (i + 1)
               end
             end
           end

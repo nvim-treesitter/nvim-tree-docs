@@ -10,6 +10,7 @@
                                :returns true
                                :function true
                                :generator true
+                               :template true
                                :yields true
                                :export true}
                     :variable {:type true
@@ -18,10 +19,12 @@
                             :example false
                             :export true
                             :extends true}
-                    :member {:memberOf true
+                    :member {:memberof true
                              :type true}
-                    :method {:memberOf true
+                    :method {:memberof true
                              :example false
+                             :yields true
+                             :generator true
                              :param true
                              :returns true}
                     :module {:module true}}}})
@@ -29,9 +32,10 @@
 (template function
   doc-start
   description
-  %rest%
+  function
   generator
   yields
+  %rest%
   param
   returns
   example
@@ -48,8 +52,8 @@
 (template method
   doc-start
   description
+  memberof
   %rest%
-  memberOf
   param
   returns
   example
@@ -59,9 +63,9 @@
 (template class
   doc-start
   description
-  %rest%
   class
   extends
+  %rest%
   example
   doc-end
   %content%)
@@ -69,9 +73,8 @@
 (template member
   doc-start
   description
+  memberof
   %rest%
-  class
-  extends
   doc-end
   %content%)
 
@@ -93,25 +96,42 @@
 (processor returns
   when #$.return_statement
   build #(let [type-str (%> get-marked-type $ " ")]
-           (.. " * @returns" type-str  "The result")))
+           (%- " * @returns%sThe result" type-str)))
 
 (processor function
-  when #(not $.generator))
+  when #(not $.generator)
+  build #(%- " * @function %s" (%= name)))
 
 (processor module
   build #(let [filename (vim.fn.expand "%:t:r")]
-           (.. " * @module " filename)))
+           (%- " * @module %s" filename)))
+
+(processor template
+  when #$.generics
+  build #(let [result []]
+           (each [generic ($.iter $.generics)]
+             (let [name (%= name generic.entry)]
+               (table.insert result
+                             (string.format " * @template %s The %s type" name name))))
+           result))
+
+(processor extends
+  when #$.extends
+  build #(%- " * @extends %s" (%= extends)))
+
+(processor class
+  build #(%- " * @class %s" (%= name)))
 
 (processor generator
   when #$.generator)
 
 (processor yields
   when #$.yields
-  build #(.. " * @yields" (%> get-marked-type $ "")))
+  build #(%- " * @yields%s" (%> get-marked-type $ "")))
 
 (processor description
   implicit true
-  build #(let [description (.. " * The " (%= name) " " $2.name)
+  build #(let [description (%- " * The %s %s" (%= name) $2.name)
                {: processors : index} $2
                next-ps (. processors (+ index 1))]
            (if (or (= next-ps :doc-end)
@@ -122,7 +142,7 @@
 (processor type
   when #$.type
   build #(let [type-str (%> get-marked-type $ " ")]
-           (.. " * @type" type-str)))
+           (%- " * @type%s" type-str)))
 
 (processor export
   when #$.export)
@@ -137,15 +157,15 @@
                    name (%= name param.entry)]
                (table.insert
                  result
-                 (.. " * @param " param-name type-str "- The " name))))
+                 (%- " * @param %s%s- The %s param" param-name type-str name))))
            result))
 
-(processor memberOf
+(processor memberof
   when #$.class
-  build #(.. " * @memberOf " (%= class)))
+  build #(%-  " * @memberof %s" (%= class)))
 
 (processor
-  build #(.. " * @" $2.name))
+  build #(%- " * @%s" $2.name))
 
 (util get-param-name [$ param]
   (if param.default_value

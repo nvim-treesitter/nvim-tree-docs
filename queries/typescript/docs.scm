@@ -99,8 +99,6 @@
   return_type: (type_annotation
     (_) @method.return_type) @method.end_point) @method.definition
 
-; ; ----- Classes
-
 ; Classes
 
 (class_declaration
@@ -142,11 +140,10 @@
     (_) @interface.extentions.name @interface.extentions.definition) @interface.end_point) @interface.definition
 
 ; Exported interface doc
-; (
-;   (comment) @interface.doc
-;   (export_statement
-;     (interface_declaration) @interface.definition)
-; )
+((comment) @interface.doc
+ .
+ (export_statement
+   (interface_declaration) @interface.definition))
 
 ; Exported interface
 (export_statement
@@ -161,19 +158,17 @@
   type: (type_annotation
     (_) @property_signature.type) @property_signature.end_point) @property_signature.definition
 
-; ; Property signature doc
-; (
-;   (comment) @interface.doc
-;   (property_signature) @property_signature.definition
-; )
+; Property signature doc
+((comment) @property_signature.doc
+ .
+ (property_signature) @property_signature.definition)
 
-; ; ---- Type aliases
+; ---- Type aliases
 
-; ; Type alias doc
-; (
-;   (comment) @interface.doc
-;   (type_alias_declaration) @type_alias.definition
-; )
+; Type alias doc
+((comment) @type_alias.doc
+ .
+ (type_alias_declaration) @type_alias.definition)
 
 ; Type alias name
 (type_alias_declaration
@@ -185,12 +180,11 @@
     (type_parameter
       (type_identifier) @type_alias.generics.name @type_alias.generics.definition)) @type_alias.end_point) @type_alias.definition
 
-; ; Type alias export doc
-; (
-;   (comment) @type_alias.doc
-;   (export_statement
-;     (type_alias_declaration) @type_alias.definition)
-; )
+; Type alias export doc
+((comment) @type_alias.doc
+ .
+ (export_statement
+   (type_alias_declaration) @type_alias.definition))
 
 ; Type alias export
 (export_statement

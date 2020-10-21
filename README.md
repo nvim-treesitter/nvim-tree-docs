@@ -362,3 +362,11 @@ You should always have an end_point defined in order to avoid unwanted document 
 
 The doc references the current doc that is preceding the definition node. This gives access to existing
 documentation to either parse, update, or remove with updated information.
+
+# Roadmap
+
+- Filetype aliases
+- Template marks
+- More doc specs
+- Doc commands that don't require a treesitter node (jsdoc modules)
+- Predifined processors that can be swapped in... (think promptable descriptions?)

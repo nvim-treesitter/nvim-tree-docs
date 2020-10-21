@@ -1,4 +1,5 @@
-(module nvim-tree-docs.collector)
+(module nvim-tree-docs.collector
+  {require {core aniseed.core}})
 
 (local collector-metatable
   {:__index (fn [tbl key]
@@ -61,17 +62,21 @@
           node-id (get-node-id def-node)]
       (when (not (. collector.__entries node-id))
         (var order-index 1)
-        (let [(_ _ def-start-byte) (def-node:start)]
+        (let [(_ _ def-start-byte) (def-node:start)
+              entry-keys (core.keys collector.__entries)]
           (var done false)
           (var i 1)
           (while (not done)
-            (local entry (. collector.__entries i))
+            (local entry (-?>> (. entry-keys i)
+                               (. collector.__entries)))
             (if (not entry)
               (set done true)
-              (let [(_ _ start-byte) (entry.defintion.node:start)]
+              (let [(_ _ start-byte) (entry.definition.node:start)]
                 (if (< def-start-byte start-byte)
                   (set done true)
-                  (set order-index (+ order-index 1))))))
+                  (do
+                    (set order-index (+ order-index 1))
+                    (set i (+ i 1)))))))
           (table.insert collector.__order order-index node-id)
           (tset collector.__entries node-id {:kind kind :definition _def})))
       (each [key submatch (pairs _match)]

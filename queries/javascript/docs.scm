@@ -16,12 +16,10 @@
       (yield_expression
         (identifier) @function.yields)))) @function.definition
 
-
 ; Function doc
-; (
-;   (comment) @function.doc
-;   (function_declaration) @function.definition
-; )
+((comment) @function.doc
+ .
+ (function_declaration) @function.definition)
 
 [
   (function_declaration
@@ -50,11 +48,10 @@
 ] @function.export @function.start_point
 
 ; Function export doc
-; (
-;   (comment) @function.doc
-;   (export_statement
-;     (function_declaration) @function.definition)
-; )
+((comment) @function.doc
+ .
+ (export_statement
+   (function_declaration) @function.definition))
 
 ; Function param name
 [
@@ -93,11 +90,10 @@
     value: (_) @variable.initial_value) @variable.definition)
 
 ; Variable doc
-; (
-;   (comment) @variable.doc
-;   (lexical_declaration
-;     (variable_declarator) @variable.definition)
-; )
+((comment) @variable.doc
+ .
+ (lexical_declaration
+   (variable_declarator) @variable.definition))
 
 ; Exported variable
 (export_statement
@@ -105,12 +101,11 @@
     (variable_declarator) @variable.definition)) @variable.start_point @variable.export
 
 ; Exported variable doc
-; (
-;   (comment) @variable.doc
-;   (export_statement
-;     (lexical_declaration
-;       (variable_declarator) @variable.definition))
-; )
+((comment) @variable.doc
+ .
+ (export_statement
+   (lexical_declaration
+     (variable_declarator) @variable.definition)))
 
 ; ----- Methods
 
@@ -148,7 +143,7 @@
       left: (_) @method.parameters.name
       right: (_) @method.parameters.default_value @method.parameters.optional))) @method.definition
 
-; ; ----- Classes
+; ----- Classes
 
 ; Classes
 (class_declaration
@@ -159,21 +154,19 @@
          (#set! class.end_point.position "start")) @class.definition
 
 ; Class doc
-; (
-;   (comment) @class.doc
-;   (class_declaration) @class.definition
-; )
+((comment) @class.doc
+ .
+ (class_declaration) @class.definition)
 
 (class_declaration
   (class_heritage
-    (identifier) @class.extentions.name @class.extentions.definition)) @class.definition
+    (identifier) @class.extends)) @class.definition
 
 ; Exported class doc
-; (
-;   (comment) @class.doc
-;   (export_statement
-;     declaration: (class_declaration) @class.definition)
-; )
+((comment) @class.doc
+ .
+ (export_statement
+   declaration: (class_declaration) @class.definition))
 
 ; Exported class
 (export_statement
@@ -189,21 +182,7 @@
 (public_field_definition
   property: (property_identifier) @member.name @member.end_point) @member.definition
 
-; ; Member doc
-; (
-;   (comment) @member.doc
-;   (public_field_definition) @member.definition
-; )
-
-; ; Decorated member doc
-; (
-;   (comment) @member.doc
-;   (decorator)+
-;   (public_field_definition) @member.definition
-; )
-
-; ; Decorated member
-; (
-;   (decorator)+ @member.start_point
-;   (public_field_definition) @member.definition
-; )
+; Member doc
+((comment) @member.doc
+ .
+ (public_field_definition) @member.definition)
