@@ -41,12 +41,6 @@
                 results)]
     `(tset (. ,modsym :templates) ,(tostring kind) ,slots)))
 
-; (fn %^ [form tag?]
-;   "Marks an expression and it's position.
-;   These marks can be used to mark the positions in the
-;   resulting documentation."
-;   `#($.eval-and-mark ,form ,tag?))
-
 (fn %= [key tbl default]
   "Get a nodes text content. A key is provided and will
   access the root context or the provided table."
@@ -56,10 +50,6 @@
   "Invokes a util function on this specification.
   This will invoke any inherited utils as well."
   `((. (. ,modsym :utils) ,(tostring util-name)) ,...))
-
-; (fn %content []
-;   "Marks the content point for content to be inserted in."
-;   `(%^ #($.expand-content-lines) "%content"))
 
 (fn processor [...]
   (let [processor {}
@@ -94,14 +84,7 @@
 {: template
  : util
  : %=
- ; : %^
  : %>
- ; : %content
- ; : %each
- ; : %conf
- ; : %when
- ; : %run
- ; : %expand
  : log
  : post-processor
  : processor

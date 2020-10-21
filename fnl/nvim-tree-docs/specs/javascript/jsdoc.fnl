@@ -84,11 +84,11 @@
 
 (processor doc-start
   implicit true
-  build #(do "/**"))
+  build #"/**")
 
 (processor doc-end
   implicit true
-  build #(do " */"))
+  build #" */")
 
 (processor returns
   when #$.return_statement
@@ -99,7 +99,8 @@
   when #(not $.generator))
 
 (processor module
-  build #(do " * @module <moduleName>"))
+  build #(let [filename (vim.fn.expand "%:t:r")]
+           (.. " * @module " filename)))
 
 (processor generator
   when #$.generator)

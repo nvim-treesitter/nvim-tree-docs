@@ -4,14 +4,12 @@
             templates nvim-tree-docs.template
             collectors nvim-tree-docs.collector}})
 
-(import-macros {: log} "fnl.nvim-tree-docs.macros")
-
 (local configs (require "nvim-treesitter.configs"))
 (local queries (require "nvim-treesitter.query"))
 (local ts-utils (require "nvim-treesitter.ts_utils"))
 
 (def- language-specs {:javascript :jsdoc
-                      :lua :lua
+                      :lua :luadoc
                       :typescript :tsdoc})
 
 (def- doc-cache {})
@@ -45,7 +43,6 @@
     (each [_ doc-data (ipairs data-list)]
       (let [(node-sr node-sc) (utils.get-start-position doc-data)
             (node-er node-ec) (utils.get-end-position doc-data)
-
             content-lines (utils.get-buf-content node-sr node-sc node-er node-ec bufnr)
             result (templates.process-template
                       doc-data

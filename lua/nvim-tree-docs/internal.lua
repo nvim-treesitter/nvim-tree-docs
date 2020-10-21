@@ -40,7 +40,7 @@ local queries = require("nvim-treesitter.query")
 local ts_utils = require("nvim-treesitter.ts_utils")
 local language_specs = nil
 do
-  local v_0_ = {javascript = "jsdoc", lua = "lua", typescript = "tsdoc"}
+  local v_0_ = {javascript = "jsdoc", lua = "luadoc", typescript = "tsdoc"}
   _0_0["aniseed/locals"]["language-specs"] = v_0_
   language_specs = v_0_
 end
@@ -175,8 +175,8 @@ do
       local _, _0, node_start = node:start()
       for iter_item in collectors["iterate-collector"](doc_data) do
         local is_more_specific = true
-        local _4_ = iter_item
-        local doc_def = _4_["entry"]
+        local _3_ = iter_item
+        local doc_def = _3_["entry"]
         local _1, _2, start = utils["get-start-position"](doc_def)
         local _3, _4, _end = utils["get-end-position"](doc_def)
         local is_in_range = ((node_start >= start) and (node_start < _end))
@@ -240,8 +240,8 @@ do
       local doc_data = collect_docs(bufnr_3f)
       local result = {}
       for item in collectors["iterate-collector"](doc_data) do
-        local _4_ = item
-        local _def = _4_["entry"]
+        local _3_ = item
+        local _def = _3_["entry"]
         local start_r = utils["get-start-position"](_def)
         local end_r = utils["get-end-position"](_def)
         if ((start_r >= start_line) and (end_r <= end_line)) then
