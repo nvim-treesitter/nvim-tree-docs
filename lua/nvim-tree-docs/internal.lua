@@ -118,12 +118,22 @@ do
       local spec_config = get_spec_config(lang, spec_name)
       local edits = {}
       local marks = {}
+      local function _3_(_241, _242)
+        local _, _0, start_byte_a = utils["get-start-position"](_241)
+        local _1, _2, start_byte_b = utils["get-start-position"](_242)
+        return (start_byte_a < start_byte_b)
+      end
+      table.sort(data_list, _3_)
+      local line_offset = 0
       for _, doc_data in ipairs(data_list) do
         local node_sr, node_sc = utils["get-start-position"](doc_data)
         local node_er, node_ec = utils["get-end-position"](doc_data)
         local content_lines = utils["get-buf-content"](node_sr, node_sc, node_er, node_ec, bufnr)
-        local result = templates["process-template"](doc_data, {["start-col"] = node_sc, ["start-line"] = node_sr, bufnr = bufnr, config = spec_config, content = content_lines, kind = doc_data.kind, spec = spec})
-        table.insert(edits, {newText = (table.concat(result.lines, "\n") .. "\n"), range = {["end"] = {character = 0, line = (node_er + 1)}, start = {character = 0, line = node_sr}}})
+        local replaced_count = ((node_er + 1) - node_sr)
+        local result = templates["process-template"](doc_data, {["start-col"] = node_sc, ["start-line"] = (node_sr + line_offset), bufnr = bufnr, config = spec_config, content = content_lines, kind = doc_data.kind, spec = spec})
+        table.insert(edits, {newText = (table.concat(result.content, "\n") .. "\n"), range = {["end"] = {character = 0, line = (node_er + 1)}, start = {character = 0, line = node_sr}}})
+        vim.list_extend(marks, result.marks)
+        line_offset = ((line_offset + #result.content) - replaced_count)
       end
       return vim.lsp.util.apply_text_edits(edits, bufnr)
     end

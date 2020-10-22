@@ -40,24 +40,34 @@
         spec-config (get-spec-config lang spec-name)
         edits []
         marks []]
+    ; Guarantee that docs are from the top down.
+    (table.sort data-list #(let [(_ _ start-byte-a) (utils.get-start-position $1)
+                                  (_ _ start-byte-b) (utils.get-start-position $2)]
+                                 (< start-byte-a start-byte-b)))
+    (var line-offset 0)
     (each [_ doc-data (ipairs data-list)]
       (let [(node-sr node-sc) (utils.get-start-position doc-data)
             (node-er node-ec) (utils.get-end-position doc-data)
             content-lines (utils.get-buf-content node-sr node-sc node-er node-ec bufnr)
+            replaced-count (- (+ node-er 1) node-sr)
             result (templates.process-template
                       doc-data
                       {: spec
                        : bufnr
                        :config spec-config
-                       :start-line node-sr
+                       :start-line (+ node-sr line-offset)
                        :start-col node-sc
                        :kind doc-data.kind
                        :content content-lines})]
-        (table.insert edits {:newText (.. (table.concat result.lines "\n") "\n")
+        (table.insert edits {:newText (.. (table.concat result.content "\n") "\n")
                              :range
                               {:start {:line node-sr :character 0}
-                               :end {:line (+ node-er 1) :character 0}}})))
+                               :end {:line (+ node-er 1) :character 0}}})
+        (vim.list_extend marks result.marks)
+        (set line-offset (- (+ line-offset (length result.content)) replaced-count))))
     (vim.lsp.util.apply_text_edits edits bufnr)))
+    ; Uncomment to test marks
+    ;(utils.highlight-marks marks bufnr)))
 
 (defn collect-docs [bufnr?]
   (let [bufnr (utils.get-bufnr bufnr?)]

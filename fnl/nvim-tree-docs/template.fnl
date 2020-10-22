@@ -27,12 +27,30 @@
 (defn empty? [collector]
   (collectors.is-collector-empty collector))
 
+(defn build-line [...]
+  "Builds a line of content while capturing any marks that are defined"
+  (let [result {:content "" :marks []}
+        add-content #(set result.content (.. result.content $))]
+    (each [_ value (ipairs [...])]
+      (if (core.string? value)
+        (add-content value)
+        (and (core.table? value) (core.string? value.content))
+        (if value.mark
+          (let [start (length result.content)]
+            (add-content value.content)
+            (table.insert result.marks {:kind value.mark
+                                        :stop (+ (length value.content) start)
+                                        : start}))
+          (add-content value.content))))
+    result))
+
 (defn new-template-context [collector options?]
   (let [options (or options? {})
         context (vim.tbl_extend
                   "keep"
                   {: iter
                    : empty?
+                   :build build-line
                    :config options.config
                    :kind options.kind
                    :start-line (or options.start-line 0)
@@ -88,22 +106,31 @@
 
 (defn normalize-build-output [output]
   (if (core.string? output)
-    [output]
+    [{:content output :marks []}]
     (core.table? output)
-    output
-    []))
+    (if (core.string? output.content)
+      [output]
+      (core.map #(if (core.string? $)
+                   {:content $ :marks []}
+                   $)
+                output))))
 
-(defn indent-with-processor [lines processor context ignore-first?]
+(defn indent-with-processor [lines processor context]
   (if (utils.method? processor :indent)
     (processor.indent lines context)
-    (let [result []]
-      (each [i line (ipairs lines)]
-        (table.insert
-          result
-          (if (and (= i 1) ignore-first?)
-              line
-              (.. (string.rep " " context.start-col) line))))
-      result)))
+    (core.map (fn [line]
+                (vim.tbl_extend
+                 "force"
+                 {}
+                 {:content (.. (string.rep " " context.start-col) line.content)
+                  :marks (core.map
+                           #(vim.tbl_extend
+                              "force"
+                              $
+                              {:start (+ $.start context.start-col)
+                               :stop (+ $.stop context.start-col)})
+                           line.marks)}))
+              lines)))
 
 (defn build-slots [ps-list processors context]
   (let [result []]
@@ -119,16 +146,27 @@
                                    :index i
                                    :name ps-name})
                 (normalize-build-output)
-                (indent-with-processor processor context false))
+                (indent-with-processor processor context))
             []))))
     result))
 
 (defn output-to-lines [output]
   (core.reduce #(vim.list_extend $1 $2) [] output))
 
-(defn post-process-output [output processors context]
-  {:lines (output-to-lines output)
-   :marks []})
+(defn package-build-output [output context]
+  (let [result {:content [] :marks []}]
+    (each [i entry (ipairs output)]
+      (each [j line (ipairs entry)]
+        (let [lnum (+ (length result.content) 1)]
+          (table.insert result.content line.content)
+          (vim.list_extend result.marks (core.map #(vim.tbl_extend
+                                                     "force"
+                                                     {}
+                                                     $
+                                                     {:line (+ lnum
+                                                               (or context.start-line 0))})
+                                                  line.marks)))))
+    result))
 
 (defn process-template [collector config]
   (let [{: spec : kind :config spec-conf} config
@@ -144,7 +182,7 @@
         (get-expanded-slots slot-config processors)
         (get-filtered-slots processors context)
         (build-slots processors context)
-        (post-process-output processors context))))
+        (package-build-output context))))
 
 (defn extend-spec [mod spec]
   (when (and spec (not= mod.module spec))

@@ -55,3 +55,8 @@
 (defn func? [v] (= (type v) :function))
 (defn method? [v key] (and (= (type v) :table)
                            (= (type (. v key)) :function)))
+
+(defn highlight-marks [marks bufnr]
+  (each [_ mark (ipairs marks)]
+    (let [line (- mark.line 1)]
+      (vim.highlight.range bufnr ns "Visual" [line mark.start] [line mark.stop]))))

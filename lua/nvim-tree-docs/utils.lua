@@ -318,4 +318,23 @@ do
   _0_0["aniseed/locals"]["method?"] = v_0_
   method_3f = v_0_
 end
+local highlight_marks = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function highlight_marks0(marks, bufnr)
+      for _, mark in ipairs(marks) do
+        local line = (mark.line - 1)
+        vim.highlight.range(bufnr, ns, "Visual", {line, mark.start}, {line, mark.stop})
+      end
+      return nil
+    end
+    v_0_0 = highlight_marks0
+    _0_0["highlight-marks"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["highlight-marks"] = v_0_
+  highlight_marks = v_0_
+end
 return nil

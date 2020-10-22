@@ -96,15 +96,15 @@
 (processor returns
   when #$.return_statement
   build #(let [type-str (%> get-marked-type $ " ")]
-           (%- " * @returns%sThe result" type-str)))
+           (%- " * @returns" type-str (%! "The result"))))
 
 (processor function
   when #(not $.generator)
-  build #(%- " * @function %s" (%= name)))
+  build #(%- " * @function " (%= name)))
 
 (processor module
   build #(let [filename (vim.fn.expand "%:t:r")]
-           (%- " * @module %s" filename)))
+           (%- " * @module " (%! filename))))
 
 (processor template
   when #$.generics
@@ -112,26 +112,26 @@
            (each [generic ($.iter $.generics)]
              (let [name (%= name generic.entry)]
                (table.insert result
-                             (string.format " * @template %s The %s type" name name))))
+                             (%- " * @template " name " " (%! (.. "The " name " type"))))))
            result))
 
 (processor extends
   when #$.extends
-  build #(%- " * @extends %s" (%= extends)))
+  build #(%- " * @extends " (%= extends)))
 
 (processor class
-  build #(%- " * @class %s" (%= name)))
+  build #(%- " * @class " (%= name)))
 
 (processor generator
   when #$.generator)
 
 (processor yields
   when #$.yields
-  build #(%- " * @yields%s" (%> get-marked-type $ "")))
+  build #(%- " * @yields" (%> get-marked-type $ "")))
 
 (processor description
   implicit true
-  build #(let [description (%- " * The %s %s" (%= name) $2.name)
+  build #(let [description (%- " * " (%! (.. "The " (%= name) " " $2.name)))
                {: processors : index} $2
                next-ps (. processors (+ index 1))]
            (if (or (= next-ps :doc-end)
@@ -142,7 +142,7 @@
 (processor type
   when #$.type
   build #(let [type-str (%> get-marked-type $ " ")]
-           (%- " * @type%s" type-str)))
+           (%- " * @type" type-str)))
 
 (processor export
   when #$.export)
@@ -157,15 +157,19 @@
                    name (%= name param.entry)]
                (table.insert
                  result
-                 (%- " * @param %s%s- The %s param" param-name type-str name))))
+                 (%- " * @param "
+                     param-name
+                     type-str
+                     "- "
+                     (%! (.. "The " name " param"))))))
            result))
 
 (processor memberof
   when #$.class
-  build #(%-  " * @memberof %s" (%= class)))
+  build #(%-  " * @memberof " (%= class)))
 
 (processor
-  build #(%- " * @%s" $2.name))
+  build #(%- " * @" $2.name))
 
 (util get-param-name [$ param]
   (if param.default_value

@@ -18,7 +18,8 @@
                     :inherits nil
                     :spec ,(tostring config.spec)
                     :lang ,(tostring config.lang)
-                    :module mod-name#}]
+                    :module mod-name#
+                    :__build template-mod#.build-line}]
        (template-mod#.extend-spec module# :base.base)
        (template-mod#.extend-spec module# ,(if config.extends (tostring config.extends) nil))
        (tset (. template-mod# :loaded-specs)
@@ -47,8 +48,16 @@
   `($.get-text (. ,(or tbl `$) ,(tostring key)) ,default))
 
 (fn %- [...]
-  "Shorthand for `string.format`"
-  `(string.format ,...))
+  "Builds a line of output."
+  `((. ,modsym :__build) ,...))
+
+(fn %^ [content kind]
+  "Marks content for the builder"
+  `{:content ,content :mark ,kind})
+
+(fn %! [content]
+  "Marks a tab stop for the builder"
+  `{:content ,content :mark :tabstop})
 
 (fn %> [util-name ...]
   "Invokes a util function on this specification.
@@ -90,6 +99,8 @@
  : %=
  : %>
  : %-
+ : %^
+ : %!
  : log
  : post-processor
  : processor
