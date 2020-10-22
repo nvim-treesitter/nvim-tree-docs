@@ -16,4 +16,4 @@
 (processor %content%
   implicit true
   build #$.content
-  indent #$)
+  indent #0)

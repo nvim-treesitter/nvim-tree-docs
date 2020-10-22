@@ -325,30 +325,32 @@ do
   _0_0["aniseed/locals"]["normalize-build-output"] = v_0_
   normalize_build_output = v_0_
 end
-local indent_with_processor = nil
+local indent_lines = nil
 do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function indent_with_processor0(lines, processor, context)
-      if utils["method?"](processor, "indent") then
-        return processor.indent(lines, context)
+    local function indent_lines0(lines, indenter, context)
+      local indentation_amount = nil
+      if utils["func?"](indenter) then
+        indentation_amount = indenter(lines, context)
       else
-        local function _4_(line)
-          local function _5_(_241)
-            return vim.tbl_extend("force", _241, {start = (_241.start + context["start-col"]), stop = (_241.stop + context["start-col"])})
-          end
-          return vim.tbl_extend("force", {}, {content = (string.rep(" ", context["start-col"]) .. line.content), marks = core.map(_5_, line.marks)})
-        end
-        return core.map(_4_, lines)
+        indentation_amount = context["start-col"]
       end
+      local function _5_(line)
+        local function _6_(_241)
+          return vim.tbl_extend("force", _241, {start = (_241.start + indentation_amount), stop = (_241.stop + indentation_amount)})
+        end
+        return vim.tbl_extend("force", {}, {content = (string.rep(" ", indentation_amount) .. line.content), marks = core.map(_6_, line.marks)})
+      end
+      return core.map(_5_, lines)
     end
-    v_0_0 = indent_with_processor0
-    _0_0["indent-with-processor"] = v_0_0
+    v_0_0 = indent_lines0
+    _0_0["indent-lines"] = v_0_0
     v_0_ = v_0_0
   end
-  _0_0["aniseed/locals"]["indent-with-processor"] = v_0_
-  indent_with_processor = v_0_
+  _0_0["aniseed/locals"]["indent-lines"] = v_0_
+  indent_lines = v_0_
 end
 local build_slots = nil
 do
@@ -378,14 +380,32 @@ do
           end
         end
         build_fn = (_5_() or _7_())
-        local function _8_()
+        local indent_fn = nil
+        local function _9_()
+          local _8_0 = processor
+          if _8_0 then
+            return _8_0.indent
+          else
+            return _8_0
+          end
+        end
+        local function _11_()
+          local _10_0 = default_processor
+          if _10_0 then
+            return _10_0.indent
+          else
+            return _10_0
+          end
+        end
+        indent_fn = (_9_() or _11_())
+        local function _12_()
           if utils["func?"](build_fn) then
-            return indent_with_processor(normalize_build_output(build_fn(context, {index = i, name = ps_name, processors = ps_list})), processor, context)
+            return indent_lines(normalize_build_output(build_fn(context, {index = i, name = ps_name, processors = ps_list})), indent_fn, context)
           else
             return {}
           end
         end
-        table.insert(result, _8_())
+        table.insert(result, _12_())
       end
       return result
     end

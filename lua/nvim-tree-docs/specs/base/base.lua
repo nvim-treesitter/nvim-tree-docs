@@ -21,8 +21,8 @@ _1_0.processors["%rest%"] = {expand = _2_, implicit = true}
 local function _3_(_241)
   return _241.content
 end
-local function _4_(_241)
-  return _241
+local function _4_()
+  return 0
 end
 _1_0.processors["%content%"] = {build = _3_, implicit = true, indent = _4_}
 return nil

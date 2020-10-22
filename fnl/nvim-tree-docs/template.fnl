@@ -115,20 +115,21 @@
                    $)
                 output))))
 
-(defn indent-with-processor [lines processor context]
-  (if (utils.method? processor :indent)
-    (processor.indent lines context)
+(defn indent-lines [lines indenter context]
+  (let [indentation-amount (if (utils.func? indenter)
+                             (indenter lines context)
+                             context.start-col)]
     (core.map (fn [line]
                 (vim.tbl_extend
                  "force"
                  {}
-                 {:content (.. (string.rep " " context.start-col) line.content)
+                 {:content (.. (string.rep " " indentation-amount) line.content)
                   :marks (core.map
                            #(vim.tbl_extend
                               "force"
                               $
-                              {:start (+ $.start context.start-col)
-                               :stop (+ $.stop context.start-col)})
+                              {:start (+ $.start indentation-amount)
+                               :stop (+ $.stop indentation-amount)})
                            line.marks)}))
               lines)))
 
@@ -138,7 +139,9 @@
       (let [processor (get-processor processors ps-name)
             default-processor processors.__default
             build-fn (or (-?> processor (. :build))
-                         (-?> default-processor (. :build)))]
+                         (-?> default-processor (. :build)))
+            indent-fn (or (-?> processor (. :indent))
+                          (-?> default-processor (. :indent)))]
         (table.insert
           result
           (if (utils.func? build-fn)
@@ -146,7 +149,7 @@
                                    :index i
                                    :name ps-name})
                 (normalize-build-output)
-                (indent-with-processor processor context))
+                (indent-lines indent-fn context))
             []))))
     result))
 
