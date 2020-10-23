@@ -14,6 +14,6 @@
                     :class {:class false
                             :export false
                             :extends false}
-                    :member {:memberOf false
+                    :member {:memberof false
                              :type false}
-                    :method {:memberOf false}}}})
+                    :method {:memberof false}}}})
