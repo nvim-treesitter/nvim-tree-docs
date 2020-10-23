@@ -230,8 +230,14 @@ end
 local get_processor = nil
 do
   local v_0_ = nil
-  local function get_processor0(processors, name)
-    return normalize_processor((processors[name] or processors.__default))
+  local function get_processor0(processors, name, aliased_from_3f)
+    local processor_config = processors[name]
+    if core["string?"](processor_config) then
+      return get_processor0(processors, processor_config, (aliased_from_3f or name))
+    else
+      local result = normalize_processor((processor_config or processors.__default))
+      return {["aliased-from"] = aliased_from_3f, name = name, processor = result}
+    end
   end
   v_0_ = get_processor0
   _0_0["aniseed/locals"]["get-processor"] = v_0_
@@ -243,17 +249,12 @@ do
   do
     local v_0_0 = nil
     local function get_expanded_slots0(ps_list, slot_config, processors)
-      local filter_from_conf = nil
-      local function _4_(_241)
-        local ps = get_processor(processors, _241)
-        return (ps and (ps.implicit or slot_config[_241]))
-      end
-      filter_from_conf = core.filter(_4_, ps_list)
-      local result = {unpack(filter_from_conf)}
+      local result = {unpack(ps_list)}
       local i = 1
       while (i <= #result) do
         local ps_name = result[i]
-        local processor = get_processor(processors, ps_name)
+        local _4_ = get_processor(processors, ps_name)
+        local processor = _4_["processor"]
         if (processor and processor.expand) then
           local expanded = processor.expand(utils["make-inverse-list"](result), slot_config)
           table.remove(result, i)
@@ -277,16 +278,30 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function get_filtered_slots0(ps_list, processors, context)
+    local function get_filtered_slots0(ps_list, processors, slot_config, context)
       local function _4_(_241)
-        local ps = get_processor(processors, _241)
-        if utils["method?"](ps, "when") then
-          return ps.when(context, ps_list)
+        return (_241 ~= nil)
+      end
+      local function _5_(_241)
+        local include_ps = nil
+        if utils["method?"](_241.processor, "when") then
+          include_ps = _241.processor.when(context)
         else
-          return core["table?"](ps)
+          include_ps = core["table?"](_241.processor)
+        end
+        if include_ps then
+          return _241.name
+        else
+          return nil
         end
       end
-      return core.filter(_4_, ps_list)
+      local function _6_(_241)
+        return (_241.processor and (_241.processor.implicit or slot_config[(_241["aliased-from"] or _241.name)]))
+      end
+      local function _7_(_241)
+        return get_processor(processors, _241)
+      end
+      return core.filter(_4_, core.map(_5_, core.filter(_6_, core.map(_7_, ps_list))))
     end
     v_0_0 = get_filtered_slots0
     _0_0["get-filtered-slots"] = v_0_0
@@ -360,52 +375,53 @@ do
     local function build_slots0(ps_list, processors, context)
       local result = {}
       for i, ps_name in ipairs(ps_list) do
-        local processor = get_processor(processors, ps_name)
+        local _4_ = get_processor(processors, ps_name)
+        local processor = _4_["processor"]
         local default_processor = processors.__default
         local build_fn = nil
-        local function _5_()
-          local _4_0 = processor
-          if _4_0 then
-            return _4_0.build
+        local function _6_()
+          local _5_0 = processor
+          if _5_0 then
+            return _5_0.build
           else
-            return _4_0
+            return _5_0
           end
         end
-        local function _7_()
-          local _6_0 = default_processor
-          if _6_0 then
-            return _6_0.build
+        local function _8_()
+          local _7_0 = default_processor
+          if _7_0 then
+            return _7_0.build
           else
-            return _6_0
+            return _7_0
           end
         end
-        build_fn = (_5_() or _7_())
+        build_fn = (_6_() or _8_())
         local indent_fn = nil
-        local function _9_()
-          local _8_0 = processor
-          if _8_0 then
-            return _8_0.indent
+        local function _10_()
+          local _9_0 = processor
+          if _9_0 then
+            return _9_0.indent
           else
-            return _8_0
+            return _9_0
           end
         end
-        local function _11_()
-          local _10_0 = default_processor
-          if _10_0 then
-            return _10_0.indent
-          else
-            return _10_0
-          end
-        end
-        indent_fn = (_9_() or _11_())
         local function _12_()
+          local _11_0 = default_processor
+          if _11_0 then
+            return _11_0.indent
+          else
+            return _11_0
+          end
+        end
+        indent_fn = (_10_() or _12_())
+        local function _13_()
           if utils["func?"](build_fn) then
             return indent_lines(normalize_build_output(build_fn(context, {index = i, name = ps_name, processors = ps_list})), indent_fn, context)
           else
             return {}
           end
         end
-        table.insert(result, _12_())
+        table.insert(result, _13_())
       end
       return result
     end
@@ -497,7 +513,7 @@ do
       end
       slot_config = (_8_() or {})
       local context = new_template_context(collector, config)
-      return package_build_output(build_slots(get_filtered_slots(get_expanded_slots(ps_list, slot_config, processors), processors, context), processors, context), context)
+      return package_build_output(build_slots(get_filtered_slots(get_expanded_slots(ps_list, slot_config, processors), processors, slot_config, context), processors, context), context)
     end
     v_0_0 = process_template0
     _0_0["process-template"] = v_0_0

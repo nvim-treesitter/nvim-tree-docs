@@ -108,12 +108,11 @@
 
 (processor template
   when #$.generics
-  build #(let [result []]
-           (each [generic ($.iter $.generics)]
-             (let [name (%= name generic.entry)]
-               (table.insert result
-                             (%- " * @template " name " " (%! (.. "The " name " type"))))))
-           result))
+  build #(%> build-generics $ :template))
+
+(processor typeParam
+  when #$.generics
+  build #(%> build-generics $ :typeParam))
 
 (processor extends
   when #$.extends
@@ -182,3 +181,11 @@
   (if ($.conf :include_types)
     " {any} "
     (or not-found? "")))
+
+(util build-generics [$ tag]
+  (let [result []]
+    (each [generic ($.iter $.generics)]
+      (let [name (%= name generic.entry)]
+        (table.insert result
+                      (%- " * @" tag " " name " " (%! (.. "The " name " type"))))))
+    result))

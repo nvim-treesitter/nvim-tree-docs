@@ -4,6 +4,7 @@
             collectors nvim-tree-docs.collector}})
 
 (local ts-utils (require "nvim-treesitter.ts_utils"))
+(import-macros {: log} "fnl.nvim-tree-docs.macros")
 
 (def loaded-specs {})
 
@@ -73,20 +74,20 @@
     {:build processor}
     processor))
 
-(defn- get-processor [processors name]
-  (-> (or (. processors name) processors.__default)
-      (normalize-processor)))
+(defn- get-processor [processors name aliased-from?]
+  (let [processor-config (. processors name)]
+    (if (core.string? processor-config)
+      (get-processor processors processor-config (or aliased-from? name))
+      (let [result (-> (or processor-config processors.__default)
+                       (normalize-processor))]
+        {:processor result :name name :aliased-from aliased-from?}))))
 
 (defn get-expanded-slots [ps-list slot-config processors]
-  (let [filter-from-conf (core.filter
-                           #(let [ps (get-processor processors $)]
-                             (and ps (or ps.implicit (. slot-config $))))
-                           ps-list)
-        result [(unpack filter-from-conf)]]
+  (let [result [(unpack ps-list)]]
     (var i 1)
     (while (<= i (length result))
       (let [ps-name (. result i)
-            processor (get-processor processors ps-name)]
+            {: processor} (get-processor processors ps-name)]
         (if (and processor processor.expand)
           (let [expanded (processor.expand
                            (utils.make-inverse-list result)
@@ -97,12 +98,17 @@
         (set i (+ i 1))))
     result))
 
-(defn get-filtered-slots [ps-list processors context]
-  (core.filter #(let [ps (get-processor processors $)]
-                  (if (utils.method? ps :when)
-                    (ps.when context ps-list)
-                    (core.table? ps)))
-               ps-list))
+(defn get-filtered-slots [ps-list processors slot-config context]
+  (->>
+    (core.map #(get-processor processors $) ps-list)
+    (core.filter #(and $.processor
+                       (or $.processor.implicit
+                           (. slot-config (or $.aliased-from $.name)))))
+    (core.map #(let [include-ps (if (utils.method? $.processor :when)
+                                    ($.processor.when context)
+                                    (core.table? $.processor))]
+                 (if include-ps $.name nil)))
+    (core.filter #(not= $ nil))))
 
 (defn normalize-build-output [output]
   (if (core.string? output)
@@ -136,7 +142,7 @@
 (defn build-slots [ps-list processors context]
   (let [result []]
     (each [i ps-name (ipairs ps-list)]
-      (let [processor (get-processor processors ps-name)
+      (let [{: processor} (get-processor processors ps-name)
             default-processor processors.__default
             build-fn (or (-?> processor (. :build))
                          (-?> default-processor (. :build)))
@@ -183,7 +189,7 @@
         context (new-template-context collector config)]
     (-> ps-list
         (get-expanded-slots slot-config processors)
-        (get-filtered-slots processors context)
+        (get-filtered-slots processors slot-config context)
         (build-slots processors context)
         (package-build-output context))))
 
