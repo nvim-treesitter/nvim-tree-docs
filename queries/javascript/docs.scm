@@ -17,7 +17,7 @@
         (identifier) @function.yields)))) @function.definition
 
 ; Function doc
-((comment) @function.doc
+((comment) @function.doc @function.edit_start_point
  .
  (function_declaration) @function.definition)
 
@@ -48,7 +48,7 @@
 ] @function.export @function.start_point
 
 ; Function export doc
-((comment) @function.doc
+((comment) @function.doc @function.edit_start_point
  .
  (export_statement
    (function_declaration) @function.definition))

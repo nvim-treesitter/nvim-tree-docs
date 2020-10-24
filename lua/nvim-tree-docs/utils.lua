@@ -130,23 +130,31 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function get_position0(key, default_position, entry)
-      local explicit_entry = entry[key]
-      local function _5_()
-        if ((type(explicit_entry) == "table") and explicit_entry.node) then
-          return {node = explicit_entry.node, position = (explicit_entry.position or default_position)}
-        else
-          return {node = entry.definition.node, position = default_position}
+    local function get_position0(keys, default_position, entry)
+      local i = 1
+      local result = nil
+      while (not result and (i <= #keys)) do
+        do
+          local key = keys[i]
+          local match_3f = entry[key]
+          local has_match_3f = (core["table?"](match_3f) and match_3f.node)
+          local position_3f = nil
+          if has_match_3f then
+            position_3f = (match_3f.position or default_position)
+          else
+            position_3f = nil
+          end
+          if has_match_3f then
+            if (position_3f == "start") then
+              result = {(match_3f.node):start()}
+            else
+              result = {(match_3f.node):end_()}
+            end
+          end
         end
+        i = core.inc(i)
       end
-      local _4_ = _5_()
-      local node = _4_["node"]
-      local position = _4_["position"]
-      if (position == "start") then
-        return node:start()
-      else
-        return node:end_()
-      end
+      return unpack(result)
     end
     v_0_0 = get_position0
     _0_0["get-position"] = v_0_0
@@ -161,7 +169,7 @@ do
   do
     local v_0_0 = nil
     local function _4_(...)
-      return get_position("start_point", "start", ...)
+      return get_position({"start_point", "definition"}, "start", ...)
     end
     v_0_0 = _4_
     _0_0["get-start-position"] = v_0_0
@@ -176,7 +184,7 @@ do
   do
     local v_0_0 = nil
     local function _4_(...)
-      return get_position("end_point", "end", ...)
+      return get_position({"end_point", "definition"}, "end", ...)
     end
     v_0_0 = _4_
     _0_0["get-end-position"] = v_0_0
@@ -184,6 +192,36 @@ do
   end
   _0_0["aniseed/locals"]["get-end-position"] = v_0_
   get_end_position = v_0_
+end
+local get_edit_start_position = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function _4_(...)
+      return get_position({"edit_start_point", "start_point", "definition"}, "start", ...)
+    end
+    v_0_0 = _4_
+    _0_0["get-edit-start-position"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-edit-start-position"] = v_0_
+  get_edit_start_position = v_0_
+end
+local get_edit_end_position = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function _4_(...)
+      return get_position({"edit_end_point", "end_point", "definition"}, "end", ...)
+    end
+    v_0_0 = _4_
+    _0_0["get-edit-end-position"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-edit-end-position"] = v_0_
+  get_edit_end_position = v_0_
 end
 local get_bufnr = nil
 do

@@ -113,25 +113,58 @@
 (defn doc-node-at-cursor []
   (doc-node (ts-utils.get_node_at_cursor)))
 
-(defn get-docs-in-range [start-line end-line bufnr?]
-  (let [doc-data (collect-docs bufnr?)
+(defn get-docs-from-position [args]
+  (let [{: start-line
+         : end-line
+         : position
+         :inclusion inclusion?
+         :bufnr bufnr?} args
+        is-edit-type? (= position :edit)
+        doc-data (collect-docs bufnr?)
         result []]
     (each [item (collectors.iterate-collector doc-data)]
       (let [{:entry _def} item
-            start-r (utils.get-start-position _def)
-            end-r (utils.get-end-position _def)]
-        (when (and (>= start-r start-line) (<= end-r end-line))
+            start-r (if is-edit-type?
+                      (utils.get-edit-start-position _def)
+                      (utils.get-start-position _def))
+            end-r (if is-edit-type?
+                    (utils.get-edit-end-position _def)
+                    (utils.get-end-position _def))]
+        (when (if inclusion?
+                (and (>= start-line start-r) (<= end-line end-r))
+                (and (>= start-r start-line) (<= end-r end-line)))
           (table.insert result _def))))
     result))
+
+(defn get-docs-in-range [args]
+  (get-docs-from-position (vim.tbl_extend
+                            "force"
+                            args
+                            {:inclusion false :position nil})))
+
+(defn get-docs-at-range [args]
+  (get-docs-from-position (vim.tbl_extend
+                            "force"
+                            args
+                            {:inclusion true :position :edit})))
 
 (defn get-docs-from-selection []
   (let [(_ start _ _) (unpack (vim.fn.getpos "'<"))
         (_ end _ _) (unpack (vim.fn.getpos "'>"))]
-    (get-docs-in-range (- start 1) (- end 1))))
+    (get-docs-in-range {:start-line (- start 1)
+                        :end-line (- end 1)})))
 
 (defn doc-all-in-range []
   (-> (get-docs-from-selection)
       (generate-docs)))
+
+(defn edit-doc-at-cursor []
+  (let [[row] (vim.api.nvim_win_get_cursor 0)
+        doc-data (get-docs-at-range {:start-line (- row 1)
+                                     :end-line (- row 1)})
+        lang (or lang? (vim.api.nvim_buf_get_option bufnr :ft))
+        spec-name (get-spec-for-lang lang)]
+    (print (vim.inspect doc-data))))
 
 (defn attach [bufnr?]
   (let [bufnr (utils.get-bufnr bufnr?)
@@ -162,3 +195,4 @@
 (def doc_node_at_cursor doc-node-at-cursor)
 (def doc_node doc-node)
 (def doc_all_in_range doc-all-in-range)
+(def edit_doc_at_cursor edit-doc-at-cursor)

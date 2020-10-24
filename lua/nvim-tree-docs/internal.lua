@@ -241,24 +241,62 @@ do
   _0_0["aniseed/locals"]["doc-node-at-cursor"] = v_0_
   doc_node_at_cursor = v_0_
 end
+local get_docs_from_position = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function get_docs_from_position0(args)
+      local _3_ = args
+      local bufnr_3f = _3_["bufnr"]
+      local end_line = _3_["end-line"]
+      local inclusion_3f = _3_["inclusion"]
+      local position = _3_["position"]
+      local start_line = _3_["start-line"]
+      local is_edit_type_3f = (position == "edit")
+      local doc_data = collect_docs(bufnr_3f)
+      local result = {}
+      for item in collectors["iterate-collector"](doc_data) do
+        local _4_ = item
+        local _def = _4_["entry"]
+        local start_r = nil
+        if is_edit_type_3f then
+          start_r = utils["get-edit-start-position"](_def)
+        else
+          start_r = utils["get-start-position"](_def)
+        end
+        local end_r = nil
+        if is_edit_type_3f then
+          end_r = utils["get-edit-end-position"](_def)
+        else
+          end_r = utils["get-end-position"](_def)
+        end
+        local _7_
+        if inclusion_3f then
+          _7_ = ((start_line >= start_r) and (end_line <= end_r))
+        else
+          _7_ = ((start_r >= start_line) and (end_r <= end_line))
+        end
+        if _7_ then
+          table.insert(result, _def)
+        end
+      end
+      return result
+    end
+    v_0_0 = get_docs_from_position0
+    _0_0["get-docs-from-position"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-docs-from-position"] = v_0_
+  get_docs_from_position = v_0_
+end
 local get_docs_in_range = nil
 do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function get_docs_in_range0(start_line, end_line, bufnr_3f)
-      local doc_data = collect_docs(bufnr_3f)
-      local result = {}
-      for item in collectors["iterate-collector"](doc_data) do
-        local _3_ = item
-        local _def = _3_["entry"]
-        local start_r = utils["get-start-position"](_def)
-        local end_r = utils["get-end-position"](_def)
-        if ((start_r >= start_line) and (end_r <= end_line)) then
-          table.insert(result, _def)
-        end
-      end
-      return result
+    local function get_docs_in_range0(args)
+      return get_docs_from_position(vim.tbl_extend("force", args, {inclusion = false, position = nil}))
     end
     v_0_0 = get_docs_in_range0
     _0_0["get-docs-in-range"] = v_0_0
@@ -266,6 +304,21 @@ do
   end
   _0_0["aniseed/locals"]["get-docs-in-range"] = v_0_
   get_docs_in_range = v_0_
+end
+local get_docs_at_range = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function get_docs_at_range0(args)
+      return get_docs_from_position(vim.tbl_extend("force", args, {inclusion = true, position = "edit"}))
+    end
+    v_0_0 = get_docs_at_range0
+    _0_0["get-docs-at-range"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["get-docs-at-range"] = v_0_
+  get_docs_at_range = v_0_
 end
 local get_docs_from_selection = nil
 do
@@ -275,7 +328,7 @@ do
     local function get_docs_from_selection0()
       local _, start, _0, _1 = unpack(vim.fn.getpos("'<"))
       local _2, _end, _3, _4 = unpack(vim.fn.getpos("'>"))
-      return get_docs_in_range((start - 1), (_end - 1))
+      return get_docs_in_range({["end-line"] = (_end - 1), ["start-line"] = (start - 1)})
     end
     v_0_0 = get_docs_from_selection0
     _0_0["get-docs-from-selection"] = v_0_0
@@ -298,6 +351,26 @@ do
   end
   _0_0["aniseed/locals"]["doc-all-in-range"] = v_0_
   doc_all_in_range = v_0_
+end
+local edit_doc_at_cursor = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = nil
+    local function edit_doc_at_cursor0()
+      local _3_ = vim.api.nvim_win_get_cursor(0)
+      local row = _3_[1]
+      local doc_data = get_docs_at_range({["end-line"] = (row - 1), ["start-line"] = (row - 1)})
+      local lang = (__fnl_global__lang_3f or vim.api.nvim_buf_get_option(bufnr, "ft"))
+      local spec_name = get_spec_for_lang(lang)
+      return print(vim.inspect(doc_data))
+    end
+    v_0_0 = edit_doc_at_cursor0
+    _0_0["edit-doc-at-cursor"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["edit-doc-at-cursor"] = v_0_
+  edit_doc_at_cursor = v_0_
 end
 local attach = nil
 do
@@ -383,5 +456,16 @@ do
   end
   _0_0["aniseed/locals"]["doc_all_in_range"] = v_0_
   doc_all_in_range0 = v_0_
+end
+local edit_doc_at_cursor0 = nil
+do
+  local v_0_ = nil
+  do
+    local v_0_0 = edit_doc_at_cursor
+    _0_0["edit_doc_at_cursor"] = v_0_0
+    v_0_ = v_0_0
+  end
+  _0_0["aniseed/locals"]["edit_doc_at_cursor"] = v_0_
+  edit_doc_at_cursor0 = v_0_
 end
 return nil

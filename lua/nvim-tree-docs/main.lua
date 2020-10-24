@@ -41,7 +41,7 @@ do
       local function _3_(_241)
         return (queries.get_query(_241, "docs") ~= nil)
       end
-      return require("nvim-treesitter").define_modules({tree_docs = {is_supported = _3_, keymaps = {doc_all_in_range = "gdd", doc_node_at_cursor = "gdd"}, module_path = "nvim-tree-docs.internal"}})
+      return require("nvim-treesitter").define_modules({tree_docs = {is_supported = _3_, keymaps = {doc_all_in_range = "gdd", doc_node_at_cursor = "gdd", edit_doc_at_cursor = "gde"}, module_path = "nvim-tree-docs.internal"}})
     end
     v_0_0 = init0
     _0_0["init"] = v_0_0

@@ -1,6 +1,6 @@
 local _0_0 = nil
 do
-  local name_0_ = "aniseed.dotfiles"
+  local name_0_ = "nvim-tree-docs.aniseed.dotfiles"
   local loaded_0_ = package.loaded[name_0_]
   local module_0_ = nil
   if ("table" == type(loaded_0_)) then
@@ -17,11 +17,11 @@ end
 local function _2_(...)
   local ok_3f_0_, val_0_ = nil, nil
   local function _2_()
-    return {require("aniseed.compile"), require("aniseed.nvim")}
+    return {require("nvim-tree-docs.aniseed.compile"), require("nvim-tree-docs.aniseed.nvim")}
   end
   ok_3f_0_, val_0_ = pcall(_2_)
   if ok_3f_0_ then
-    _0_0["aniseed/local-fns"] = {require = {compile = "aniseed.compile", nvim = "aniseed.nvim"}}
+    _0_0["aniseed/local-fns"] = {require = {compile = "nvim-tree-docs.aniseed.compile", nvim = "nvim-tree-docs.aniseed.nvim"}}
     return val_0_
   else
     return print(val_0_)
@@ -31,7 +31,7 @@ local _1_ = _2_(...)
 local compile = _1_[1]
 local nvim = _1_[2]
 local _2amodule_2a = _0_0
-local _2amodule_name_2a = "aniseed.dotfiles"
+local _2amodule_name_2a = "nvim-tree-docs.aniseed.dotfiles"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
 nvim.out_write("Warning: aniseed.dotfiles is deprecated, see :help aniseed-dotfiles\n")
 local config_dir = nil
