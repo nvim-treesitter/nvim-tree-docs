@@ -2,7 +2,7 @@ local _1_0 = nil
 do
   local mod_name_0_ = ("lua" .. "." .. "luadoc")
   local template_mod_0_ = require("nvim-tree-docs.template")
-  local module_0_ = {__build = template_mod_0_["build-line"], config = vim.tbl_deep_extend("force", {processors = {}, slots = {}}, {slots = {["function"] = {param = true, returns = true}, variable = {}}}), inherits = nil, lang = "lua", module = mod_name_0_, processors = {}, spec = "luadoc", templates = {}, utils = {}}
+  local module_0_ = {["doc-lang"] = "nil", __build = template_mod_0_["build-line"], config = vim.tbl_deep_extend("force", {processors = {}, slots = {}}, {slots = {["function"] = {param = true, returns = true}, variable = {}}}), inherits = nil, lang = "lua", module = mod_name_0_, processors = {}, spec = "luadoc", templates = {}, utils = {}}
   template_mod_0_["extend-spec"](module_0_, "base.base")
   template_mod_0_["extend-spec"](module_0_)
   template_mod_0_["loaded-specs"][mod_name_0_] = module_0_

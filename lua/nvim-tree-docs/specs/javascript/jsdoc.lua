@@ -2,7 +2,7 @@ local _1_0 = nil
 do
   local mod_name_0_ = ("javascript" .. "." .. "jsdoc")
   local template_mod_0_ = require("nvim-tree-docs.template")
-  local module_0_ = {__build = template_mod_0_["build-line"], config = vim.tbl_deep_extend("force", {processors = {}, slots = {}}, {empty_line_after_description = false, include_types = true, slots = {["function"] = {["function"] = true, example = false, export = true, generator = true, param = true, returns = true, template = true, yields = true}, class = {class = true, example = false, export = true, extends = true}, member = {memberof = true, type = true}, method = {example = false, generator = true, memberof = true, param = true, returns = true, yields = true}, module = {module = true}, variable = {export = true, type = true}}}), inherits = nil, lang = "javascript", module = mod_name_0_, processors = {}, spec = "jsdoc", templates = {}, utils = {}}
+  local module_0_ = {["doc-lang"] = "jsdoc", __build = template_mod_0_["build-line"], config = vim.tbl_deep_extend("force", {processors = {}, slots = {}}, {empty_line_after_description = false, include_types = true, slots = {["function"] = {["function"] = true, example = false, export = true, generator = true, param = true, returns = true, template = true, yields = true}, class = {class = true, example = false, export = true, extends = true}, member = {memberof = true, type = true}, method = {example = false, generator = true, memberof = true, param = true, returns = true, yields = true}, module = {module = true}, variable = {export = true, type = true}}}), inherits = nil, lang = "javascript", module = mod_name_0_, processors = {}, spec = "jsdoc", templates = {}, utils = {}}
   template_mod_0_["extend-spec"](module_0_, "base.base")
   template_mod_0_["extend-spec"](module_0_)
   template_mod_0_["loaded-specs"][mod_name_0_] = module_0_
@@ -109,7 +109,7 @@ local function _23_(_241)
     local param_name = _1_0.utils["get-param-name"](_241, param.entry)
     local type_str = _1_0.utils["get-marked-type"](_241, " ")
     local name = _241["get-text"](param.entry.name)
-    table.insert(result, _1_0.__build(" * @param ", param_name, type_str, "- ", {content = ("The " .. name .. " param"), mark = "tabstop"}))
+    table.insert(result, _1_0.__build(" * @param", type_str, param_name, " - ", {content = ("The " .. name .. " param"), mark = "tabstop"}))
   end
   return result
 end

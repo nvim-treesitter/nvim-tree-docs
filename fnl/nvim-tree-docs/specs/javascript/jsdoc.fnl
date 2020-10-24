@@ -3,6 +3,7 @@
 (doc-spec
   {:spec jsdoc
    :lang javascript
+   :doc-lang jsdoc
    :config {:include_types true
             :empty_line_after_description false
             :slots {:function {:param true
@@ -156,10 +157,10 @@
                    name (%= name param.entry)]
                (table.insert
                  result
-                 (%- " * @param "
-                     param-name
+                 (%- " * @param"
                      type-str
-                     "- "
+                     param-name
+                     " - "
                      (%! (.. "The " name " param"))))))
            result))
 

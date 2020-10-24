@@ -10,6 +10,7 @@
            module# {:templates {}
                     :utils {}
                     :processors {}
+                    :doc-lang ,(tostring config.doc-lang)
                     :config (vim.tbl_deep_extend
                               "force"
                               {:slots {}

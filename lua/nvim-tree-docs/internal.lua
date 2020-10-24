@@ -17,11 +17,11 @@ end
 local function _2_(...)
   local ok_3f_0_, val_0_ = nil, nil
   local function _2_()
-    return {require("nvim-tree-docs.collector"), require("aniseed.core"), require("nvim-tree-docs.template"), require("nvim-tree-docs.utils")}
+    return {require("nvim-tree-docs.collector"), require("aniseed.core"), require("nvim-tree-docs.editing"), require("nvim-tree-docs.template"), require("nvim-tree-docs.utils")}
   end
   ok_3f_0_, val_0_ = pcall(_2_)
   if ok_3f_0_ then
-    _0_0["aniseed/local-fns"] = {require = {collectors = "nvim-tree-docs.collector", core = "aniseed.core", templates = "nvim-tree-docs.template", utils = "nvim-tree-docs.utils"}}
+    _0_0["aniseed/local-fns"] = {require = {collectors = "nvim-tree-docs.collector", core = "aniseed.core", editing = "nvim-tree-docs.editing", templates = "nvim-tree-docs.template", utils = "nvim-tree-docs.utils"}}
     return val_0_
   else
     return print(val_0_)
@@ -30,8 +30,9 @@ end
 local _1_ = _2_(...)
 local collectors = _1_[1]
 local core = _1_[2]
-local templates = _1_[3]
-local utils = _1_[4]
+local editing = _1_[3]
+local templates = _1_[4]
+local utils = _1_[5]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "nvim-tree-docs.internal"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
@@ -361,9 +362,28 @@ do
       local _3_ = vim.api.nvim_win_get_cursor(0)
       local row = _3_[1]
       local doc_data = get_docs_at_range({["end-line"] = (row - 1), ["start-line"] = (row - 1)})
-      local lang = (__fnl_global__lang_3f or vim.api.nvim_buf_get_option(bufnr, "ft"))
+      local bufnr = vim.api.nvim_get_current_buf()
+      local lang = vim.api.nvim_buf_get_option(bufnr, "ft")
       local spec_name = get_spec_for_lang(lang)
-      return print(vim.inspect(doc_data))
+      local spec = templates["get-spec"](lang, spec_name)
+      local doc_lang = spec["doc-lang"]
+      local doc_entry = nil
+      do
+        local _4_0 = doc_data
+        if _4_0 then
+          local _5_0 = _4_0[1]
+          if _5_0 then
+            doc_entry = _5_0.doc
+          else
+            doc_entry = _5_0
+          end
+        else
+          doc_entry = _4_0
+        end
+      end
+      if (core["table?"](doc_entry) and doc_entry.node and doc_lang) then
+        return editing["edit-doc"]({["doc-lang"] = doc_lang, ["spec-name"] = spec_name, bufnr = bufnr, lang = lang, node = doc_entry.node})
+      end
     end
     v_0_0 = edit_doc_at_cursor0
     _0_0["edit-doc-at-cursor"] = v_0_0

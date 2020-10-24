@@ -2,7 +2,8 @@
   {require {utils nvim-tree-docs.utils
             core aniseed.core
             templates nvim-tree-docs.template
-            collectors nvim-tree-docs.collector}})
+            collectors nvim-tree-docs.collector
+            editing nvim-tree-docs.editing}})
 
 (local configs (require "nvim-treesitter.configs"))
 (local queries (require "nvim-treesitter.query"))
@@ -162,9 +163,18 @@
   (let [[row] (vim.api.nvim_win_get_cursor 0)
         doc-data (get-docs-at-range {:start-line (- row 1)
                                      :end-line (- row 1)})
-        lang (or lang? (vim.api.nvim_buf_get_option bufnr :ft))
-        spec-name (get-spec-for-lang lang)]
-    (print (vim.inspect doc-data))))
+        bufnr (vim.api.nvim_get_current_buf)
+        lang (vim.api.nvim_buf_get_option bufnr :ft)
+        spec-name (get-spec-for-lang lang)
+        spec (templates.get-spec lang spec-name)
+        doc-lang spec.doc-lang
+        doc-entry (-?> doc-data (. 1) (. :doc))]
+    (when (and (core.table? doc-entry) doc-entry.node doc-lang)
+      (editing.edit-doc {: lang
+                         : spec-name
+                         : bufnr
+                         : doc-lang
+                         :node doc-entry.node}))))
 
 (defn attach [bufnr?]
   (let [bufnr (utils.get-bufnr bufnr?)
