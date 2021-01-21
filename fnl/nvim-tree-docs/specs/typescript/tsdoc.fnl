@@ -1,4 +1,4 @@
-(require-macros "fnl.nvim-tree-docs.macros")
+(require-macros "nvim-tree-docs.macros")
 
 (doc-spec
   {:spec tsdoc

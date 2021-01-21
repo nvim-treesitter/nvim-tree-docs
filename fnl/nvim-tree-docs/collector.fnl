@@ -35,7 +35,7 @@
   (let [(srow scol erow ecol) (node:range)]
     (string.format "%d_%d_%d_%d" srow scol erow ecol)))
 
-(defn collect [collector entry _match key add-fn]
+(defn collect_ [collector entry _match key add-fn]
   (if _match.definition
     (do
       (when (not (. entry key))
@@ -81,5 +81,5 @@
           (tset collector.__entries node-id {:kind kind :definition _def})))
       (each [key submatch (pairs _match)]
         (when (not= key :definition)
-          (collect collector (. collector.__entries node-id) submatch key add-match))))))
+          (collect_ collector (. collector.__entries node-id) submatch key add-match))))))
 

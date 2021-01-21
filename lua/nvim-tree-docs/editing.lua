@@ -14,12 +14,12 @@ do
   package.loaded[name_0_] = module_0_
   _0_0 = module_0_
 end
-local function _2_(...)
+local function _1_(...)
   local ok_3f_0_, val_0_ = nil, nil
-  local function _2_()
+  local function _1_()
     return {}
   end
-  ok_3f_0_, val_0_ = pcall(_2_)
+  ok_3f_0_, val_0_ = pcall(_1_)
   if ok_3f_0_ then
     _0_0["aniseed/local-fns"] = {}
     return val_0_
@@ -27,7 +27,7 @@ local function _2_(...)
     return print(val_0_)
   end
 end
-local _1_ = _2_(...)
+local _local_0_ = _1_(...)
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "nvim-tree-docs.editing"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
@@ -40,11 +40,11 @@ do
   do
     local v_0_0 = nil
     local function get_doc_comment_data0(args)
-      local _3_ = args
-      local bufnr = _3_["bufnr"]
-      local doc_lang = _3_["doc-lang"]
-      local lang = _3_["lang"]
-      local node = _3_["node"]
+      local _let_0_ = args
+      local bufnr = _let_0_["bufnr"]
+      local doc_lang = _let_0_["doc-lang"]
+      local lang = _let_0_["lang"]
+      local node = _let_0_["node"]
       local doc_lines = ts_utils.get_node_text(node, bufnr)
       local doc_string = table.concat(doc_lines, "\n")
       local parser = vim.treesitter.get_string_parser(doc_string, doc_lang)
@@ -53,9 +53,9 @@ do
       local result = {}
       local item = {iter()}
       while item[1] do
-        local _4_ = item
-        local pattern_id = _4_[1]
-        local matches = _4_[2]
+        local _let_1_ = item
+        local pattern_id = _let_1_[1]
+        local matches = _let_1_[2]
         for id, match_node in pairs(matches) do
           local match_name = query.captures[id]
           if not result[match_name] then
@@ -80,11 +80,11 @@ do
   do
     local v_0_0 = nil
     local function edit_doc0(args)
-      local _3_ = args
-      local bufnr = _3_["bufnr"]
-      local doc_node = _3_["node"]
-      local _4_ = get_doc_comment_data(args)
-      local edit = _4_["edit"]
+      local _let_0_ = args
+      local bufnr = _let_0_["bufnr"]
+      local doc_node = _let_0_["node"]
+      local _let_1_ = get_doc_comment_data(args)
+      local edit = _let_1_["edit"]
       local sr = doc_node:range()
       vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
       for _, node in ipairs(edit) do

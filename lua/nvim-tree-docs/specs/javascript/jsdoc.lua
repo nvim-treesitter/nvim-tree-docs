@@ -80,9 +80,9 @@ end
 _1_0.processors["yields"] = {build = _17_, when = _18_}
 local function _19_(_241, _242)
   local description = _1_0.__build(" * ", {content = ("The " .. _241["get-text"](_241.name) .. " " .. _242.name), mark = "tabstop"})
-  local _20_ = _242
-  local index = _20_["index"]
-  local processors = _20_["processors"]
+  local _let_0_ = _242
+  local index = _let_0_["index"]
+  local processors = _let_0_["processors"]
   local next_ps = processors[(index + 1)]
   if ((next_ps == "doc-end") or not _241.conf("empty_line_after_description")) then
     return description

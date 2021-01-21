@@ -14,12 +14,12 @@ do
   package.loaded[name_0_] = module_0_
   _0_0 = module_0_
 end
-local function _2_(...)
+local function _1_(...)
   local ok_3f_0_, val_0_ = nil, nil
-  local function _2_()
+  local function _1_()
     return {require("nvim-tree-docs.collector"), require("aniseed.core"), require("nvim-tree-docs.editing"), require("nvim-tree-docs.template"), require("nvim-tree-docs.utils")}
   end
-  ok_3f_0_, val_0_ = pcall(_2_)
+  ok_3f_0_, val_0_ = pcall(_1_)
   if ok_3f_0_ then
     _0_0["aniseed/local-fns"] = {require = {collectors = "nvim-tree-docs.collector", core = "aniseed.core", editing = "nvim-tree-docs.editing", templates = "nvim-tree-docs.template", utils = "nvim-tree-docs.utils"}}
     return val_0_
@@ -27,12 +27,12 @@ local function _2_(...)
     return print(val_0_)
   end
 end
-local _1_ = _2_(...)
-local collectors = _1_[1]
-local core = _1_[2]
-local editing = _1_[3]
-local templates = _1_[4]
-local utils = _1_[5]
+local _local_0_ = _1_(...)
+local collectors = _local_0_[1]
+local core = _local_0_[2]
+local editing = _local_0_[3]
+local templates = _local_0_[4]
+local utils = _local_0_[5]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "nvim-tree-docs.internal"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
@@ -119,12 +119,12 @@ do
       local spec_config = get_spec_config(lang, spec_name)
       local edits = {}
       local marks = {}
-      local function _3_(_241, _242)
+      local function _2_(_241, _242)
         local _, _0, start_byte_a = utils["get-start-position"](_241)
         local _1, _2, start_byte_b = utils["get-start-position"](_242)
         return (start_byte_a < start_byte_b)
       end
-      table.sort(data_list, _3_)
+      table.sort(data_list, _2_)
       local line_offset = 0
       for _, doc_data in ipairs(data_list) do
         local node_sr, node_sc = utils["get-start-position"](doc_data)
@@ -186,8 +186,8 @@ do
       local _, _0, node_start = node:start()
       for iter_item in collectors["iterate-collector"](doc_data) do
         local is_more_specific = true
-        local _3_ = iter_item
-        local doc_def = _3_["entry"]
+        local _let_0_ = iter_item
+        local doc_def = _let_0_["entry"]
         local _1, _2, start = utils["get-start-position"](doc_def)
         local _3, _4, _end = utils["get-end-position"](doc_def)
         local is_in_range = ((node_start >= start) and (node_start < _end))
@@ -248,18 +248,18 @@ do
   do
     local v_0_0 = nil
     local function get_docs_from_position0(args)
-      local _3_ = args
-      local bufnr_3f = _3_["bufnr"]
-      local end_line = _3_["end-line"]
-      local inclusion_3f = _3_["inclusion"]
-      local position = _3_["position"]
-      local start_line = _3_["start-line"]
+      local _let_0_ = args
+      local bufnr_3f = _let_0_["bufnr"]
+      local end_line = _let_0_["end-line"]
+      local inclusion_3f = _let_0_["inclusion"]
+      local position = _let_0_["position"]
+      local start_line = _let_0_["start-line"]
       local is_edit_type_3f = (position == "edit")
       local doc_data = collect_docs(bufnr_3f)
       local result = {}
       for item in collectors["iterate-collector"](doc_data) do
-        local _4_ = item
-        local _def = _4_["entry"]
+        local _let_1_ = item
+        local _def = _let_1_["entry"]
         local start_r = nil
         if is_edit_type_3f then
           start_r = utils["get-edit-start-position"](_def)
@@ -272,13 +272,13 @@ do
         else
           end_r = utils["get-end-position"](_def)
         end
-        local _7_
+        local _4_
         if inclusion_3f then
-          _7_ = ((start_line >= start_r) and (end_line <= end_r))
+          _4_ = ((start_line >= start_r) and (end_line <= end_r))
         else
-          _7_ = ((start_r >= start_line) and (end_r <= end_line))
+          _4_ = ((start_r >= start_line) and (end_r <= end_line))
         end
-        if _7_ then
+        if _4_ then
           table.insert(result, _def)
         end
       end
@@ -359,8 +359,8 @@ do
   do
     local v_0_0 = nil
     local function edit_doc_at_cursor0()
-      local _3_ = vim.api.nvim_win_get_cursor(0)
-      local row = _3_[1]
+      local _let_0_ = vim.api.nvim_win_get_cursor(0)
+      local row = _let_0_[1]
       local doc_data = get_docs_at_range({["end-line"] = (row - 1), ["start-line"] = (row - 1)})
       local bufnr = vim.api.nvim_get_current_buf()
       local lang = vim.api.nvim_buf_get_option(bufnr, "ft")
@@ -369,16 +369,16 @@ do
       local doc_lang = spec["doc-lang"]
       local doc_entry = nil
       do
-        local _4_0 = doc_data
-        if _4_0 then
-          local _5_0 = _4_0[1]
-          if _5_0 then
-            doc_entry = _5_0.doc
+        local _2_0 = doc_data
+        if _2_0 then
+          local _3_0 = _2_0[1]
+          if _3_0 then
+            doc_entry = _3_0.doc
           else
-            doc_entry = _5_0
+            doc_entry = _3_0
           end
         else
-          doc_entry = _4_0
+          doc_entry = _2_0
         end
       end
       if (core["table?"](doc_entry) and doc_entry.node and doc_lang) then

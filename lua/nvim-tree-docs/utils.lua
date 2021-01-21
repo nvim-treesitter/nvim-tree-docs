@@ -14,12 +14,12 @@ do
   package.loaded[name_0_] = module_0_
   _0_0 = module_0_
 end
-local function _3_(...)
+local function _2_(...)
   local ok_3f_0_, val_0_ = nil, nil
-  local function _3_()
+  local function _2_()
     return {require("aniseed.core")}
   end
-  ok_3f_0_, val_0_ = pcall(_3_)
+  ok_3f_0_, val_0_ = pcall(_2_)
   if ok_3f_0_ then
     _0_0["aniseed/local-fns"] = {require = {core = "aniseed.core"}}
     return val_0_
@@ -27,8 +27,8 @@ local function _3_(...)
     return print(val_0_)
   end
 end
-local _2_ = _3_(...)
-local core = _2_[1]
+local _local_0_ = _2_(...)
+local core = _local_0_[1]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "nvim-tree-docs.utils"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
@@ -49,33 +49,34 @@ do
   do
     local v_0_0 = nil
     local function get_start_node0(entry)
-      local function _5_()
-        local _4_0 = entry
-        if _4_0 then
-          local _6_0 = _4_0.start_point
-          if _6_0 then
-            return _6_0.node
+      local _4_
+      do
+        local _3_0 = entry
+        if _3_0 then
+          local _5_0 = _3_0.start_point
+          if _5_0 then
+            _4_ = _5_0.node
           else
-            return _6_0
+            _4_ = _5_0
           end
         else
-          return _4_0
+          _4_ = _3_0
         end
       end
-      local function _7_()
-        local _6_0 = entry
-        if _6_0 then
-          local _8_0 = _6_0.definition
-          if _8_0 then
-            return _8_0.node
+      local function _6_()
+        local _5_0 = entry
+        if _5_0 then
+          local _7_0 = _5_0.definition
+          if _7_0 then
+            return _7_0.node
           else
-            return _8_0
+            return _7_0
           end
         else
-          return _6_0
+          return _5_0
         end
       end
-      return (_5_() or _7_())
+      return (_4_ or _6_())
     end
     v_0_0 = get_start_node0
     _0_0["get-start-node"] = v_0_0
@@ -90,33 +91,34 @@ do
   do
     local v_0_0 = nil
     local function get_end_node0(entry)
-      local function _5_()
-        local _4_0 = entry
-        if _4_0 then
-          local _6_0 = _4_0.end_point
-          if _6_0 then
-            return _6_0.node
+      local _4_
+      do
+        local _3_0 = entry
+        if _3_0 then
+          local _5_0 = _3_0.end_point
+          if _5_0 then
+            _4_ = _5_0.node
           else
-            return _6_0
+            _4_ = _5_0
           end
         else
-          return _4_0
+          _4_ = _3_0
         end
       end
-      local function _7_()
-        local _6_0 = entry
-        if _6_0 then
-          local _8_0 = _6_0.definition
-          if _8_0 then
-            return _8_0.node
+      local function _6_()
+        local _5_0 = entry
+        if _5_0 then
+          local _7_0 = _5_0.definition
+          if _7_0 then
+            return _7_0.node
           else
-            return _8_0
+            return _7_0
           end
         else
-          return _6_0
+          return _5_0
         end
       end
-      return (_5_() or _7_())
+      return (_4_ or _6_())
     end
     v_0_0 = get_end_node0
     _0_0["get-end-node"] = v_0_0
@@ -168,10 +170,10 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function _4_(...)
+    local function _3_(...)
       return get_position({"start_point", "definition"}, "start", ...)
     end
-    v_0_0 = _4_
+    v_0_0 = _3_
     _0_0["get-start-position"] = v_0_0
     v_0_ = v_0_0
   end
@@ -183,10 +185,10 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function _4_(...)
+    local function _3_(...)
       return get_position({"end_point", "definition"}, "end", ...)
     end
-    v_0_0 = _4_
+    v_0_0 = _3_
     _0_0["get-end-position"] = v_0_0
     v_0_ = v_0_0
   end
@@ -198,10 +200,10 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function _4_(...)
+    local function _3_(...)
       return get_position({"edit_start_point", "start_point", "definition"}, "start", ...)
     end
-    v_0_0 = _4_
+    v_0_0 = _3_
     _0_0["get-edit-start-position"] = v_0_0
     v_0_ = v_0_0
   end
@@ -213,10 +215,10 @@ do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function _4_(...)
+    local function _3_(...)
       return get_position({"edit_end_point", "end_point", "definition"}, "end", ...)
     end
-    v_0_0 = _4_
+    v_0_0 = _3_
     _0_0["get-edit-end-position"] = v_0_0
     v_0_ = v_0_0
   end

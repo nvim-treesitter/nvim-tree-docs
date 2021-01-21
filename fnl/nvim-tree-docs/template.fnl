@@ -4,7 +4,7 @@
             collectors nvim-tree-docs.collector}})
 
 (local ts-utils (require "nvim-treesitter.ts_utils"))
-(import-macros {: log} "fnl.nvim-tree-docs.macros")
+(import-macros {: log} "nvim-tree-docs.macros")
 
 (def loaded-specs {})
 

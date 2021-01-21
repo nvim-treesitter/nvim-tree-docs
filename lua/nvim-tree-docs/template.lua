@@ -14,12 +14,12 @@ do
   package.loaded[name_0_] = module_0_
   _0_0 = module_0_
 end
-local function _3_(...)
+local function _2_(...)
   local ok_3f_0_, val_0_ = nil, nil
-  local function _3_()
+  local function _2_()
     return {require("nvim-tree-docs.collector"), require("aniseed.core"), require("nvim-tree-docs.utils")}
   end
-  ok_3f_0_, val_0_ = pcall(_3_)
+  ok_3f_0_, val_0_ = pcall(_2_)
   if ok_3f_0_ then
     _0_0["aniseed/local-fns"] = {require = {collectors = "nvim-tree-docs.collector", core = "aniseed.core", utils = "nvim-tree-docs.utils"}}
     return val_0_
@@ -27,10 +27,10 @@ local function _3_(...)
     return print(val_0_)
   end
 end
-local _2_ = _3_(...)
-local collectors = _2_[1]
-local core = _2_[2]
-local utils = _2_[3]
+local _local_0_ = _2_(...)
+local collectors = _local_0_[1]
+local core = _local_0_[2]
+local utils = _local_0_[3]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "nvim-tree-docs.template"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
@@ -91,10 +91,10 @@ do
       if collector then
         return collectors["iterate-collector"](collector)
       else
-        local function _4_()
+        local function _3_()
           return nil
         end
-        return _4_
+        return _3_
       end
     end
     v_0_0 = iter0
@@ -142,11 +142,11 @@ do
     local function build_line0(...)
       local result = {content = "", marks = {}}
       local add_content = nil
-      local function _4_(_241)
+      local function _3_(_241)
         result.content = (result.content .. _241)
         return nil
       end
-      add_content = _4_
+      add_content = _3_
       for _, value in ipairs({...}) do
         if core["string?"](value) then
           add_content(value)
@@ -177,14 +177,14 @@ do
     local function new_template_context0(collector, options_3f)
       local options = (options_3f or {})
       local context = vim.tbl_extend("keep", {["empty?"] = empty_3f, ["start-col"] = (options["start-col"] or 0), ["start-line"] = (options["start-line"] or 0), bufnr = utils["get-bufnr"](options.bufnr), build = build_line, config = options.config, content = (options.content or {}), iter = iter, kind = options.kind}, collector)
-      local function _4_(...)
+      local function _3_(...)
         return get_text(context, ...)
       end
-      context["get-text"] = _4_
-      local function _5_(...)
+      context["get-text"] = _3_
+      local function _4_(...)
         return conf(context, ...)
       end
-      context.conf = _5_
+      context.conf = _4_
       return context
     end
     v_0_0 = new_template_context0
@@ -253,8 +253,8 @@ do
       local i = 1
       while (i <= #result) do
         local ps_name = result[i]
-        local _4_ = get_processor(processors, ps_name)
-        local processor = _4_["processor"]
+        local _let_0_ = get_processor(processors, ps_name)
+        local processor = _let_0_["processor"]
         if (processor and processor.expand) then
           local expanded = processor.expand(utils["make-inverse-list"](result), slot_config)
           table.remove(result, i)
@@ -279,10 +279,10 @@ do
   do
     local v_0_0 = nil
     local function get_filtered_slots0(ps_list, processors, slot_config, context)
-      local function _4_(_241)
+      local function _3_(_241)
         return (_241 ~= nil)
       end
-      local function _5_(_241)
+      local function _4_(_241)
         local include_ps = nil
         if utils["method?"](_241.processor, "when") then
           include_ps = _241.processor.when(context)
@@ -295,13 +295,13 @@ do
           return nil
         end
       end
-      local function _6_(_241)
+      local function _5_(_241)
         return (_241.processor and (_241.processor.implicit or slot_config[(_241["aliased-from"] or _241.name)]))
       end
-      local function _7_(_241)
+      local function _6_(_241)
         return get_processor(processors, _241)
       end
-      return core.filter(_4_, core.map(_5_, core.filter(_6_, core.map(_7_, ps_list))))
+      return core.filter(_3_, core.map(_4_, core.filter(_5_, core.map(_6_, ps_list))))
     end
     v_0_0 = get_filtered_slots0
     _0_0["get-filtered-slots"] = v_0_0
@@ -322,14 +322,14 @@ do
         if core["string?"](output.content) then
           return {output}
         else
-          local function _4_(_241)
+          local function _3_(_241)
             if core["string?"](_241) then
               return {content = _241, marks = {}}
             else
               return _241
             end
           end
-          return core.map(_4_, output)
+          return core.map(_3_, output)
         end
       end
     end
@@ -352,13 +352,13 @@ do
       else
         indentation_amount = context["start-col"]
       end
-      local function _5_(line)
-        local function _6_(_241)
+      local function _4_(line)
+        local function _5_(_241)
           return vim.tbl_extend("force", _241, {start = (_241.start + indentation_amount), stop = (_241.stop + indentation_amount)})
         end
-        return vim.tbl_extend("force", {}, {content = (string.rep(" ", indentation_amount) .. line.content), marks = core.map(_6_, line.marks)})
+        return vim.tbl_extend("force", {}, {content = (string.rep(" ", indentation_amount) .. line.content), marks = core.map(_5_, line.marks)})
       end
-      return core.map(_5_, lines)
+      return core.map(_4_, lines)
     end
     v_0_0 = indent_lines0
     _0_0["indent-lines"] = v_0_0
@@ -375,53 +375,55 @@ do
     local function build_slots0(ps_list, processors, context)
       local result = {}
       for i, ps_name in ipairs(ps_list) do
-        local _4_ = get_processor(processors, ps_name)
-        local processor = _4_["processor"]
+        local _let_0_ = get_processor(processors, ps_name)
+        local processor = _let_0_["processor"]
         local default_processor = processors.__default
         local build_fn = nil
+        local _4_
+        do
+          local _3_0 = processor
+          if _3_0 then
+            _4_ = _3_0.build
+          else
+            _4_ = _3_0
+          end
+        end
         local function _6_()
-          local _5_0 = processor
+          local _5_0 = default_processor
           if _5_0 then
             return _5_0.build
           else
             return _5_0
           end
         end
-        local function _8_()
-          local _7_0 = default_processor
+        build_fn = (_4_ or _6_())
+        local indent_fn = nil
+        local _8_
+        do
+          local _7_0 = processor
           if _7_0 then
-            return _7_0.build
+            _8_ = _7_0.indent
           else
-            return _7_0
+            _8_ = _7_0
           end
         end
-        build_fn = (_6_() or _8_())
-        local indent_fn = nil
         local function _10_()
-          local _9_0 = processor
+          local _9_0 = default_processor
           if _9_0 then
             return _9_0.indent
           else
             return _9_0
           end
         end
-        local function _12_()
-          local _11_0 = default_processor
-          if _11_0 then
-            return _11_0.indent
-          else
-            return _11_0
-          end
-        end
-        indent_fn = (_10_() or _12_())
-        local function _13_()
+        indent_fn = (_8_ or _10_())
+        local function _11_()
           if utils["func?"](build_fn) then
             return indent_lines(normalize_build_output(build_fn(context, {index = i, name = ps_name, processors = ps_list})), indent_fn, context)
           else
             return {}
           end
         end
-        table.insert(result, _13_())
+        table.insert(result, _11_())
       end
       return result
     end
@@ -438,10 +440,10 @@ do
   do
     local v_0_0 = nil
     local function output_to_lines0(output)
-      local function _4_(_241, _242)
+      local function _3_(_241, _242)
         return vim.list_extend(_241, _242)
       end
-      return core.reduce(_4_, {}, output)
+      return core.reduce(_3_, {}, output)
     end
     v_0_0 = output_to_lines0
     _0_0["output-to-lines"] = v_0_0
@@ -461,10 +463,10 @@ do
         for j, line in ipairs(entry) do
           local lnum = (#result.content + 1)
           table.insert(result.content, line.content)
-          local function _4_(_241)
+          local function _3_(_241)
             return vim.tbl_extend("force", {}, _241, {line = (lnum + (context["start-line"] or 0))})
           end
-          vim.list_extend(result.marks, core.map(_4_, line.marks))
+          vim.list_extend(result.marks, core.map(_3_, line.marks))
         end
       end
       return result
@@ -482,36 +484,38 @@ do
   do
     local v_0_0 = nil
     local function process_template0(collector, config)
-      local _4_ = config
-      local spec_conf = _4_["config"]
-      local kind = _4_["kind"]
-      local spec = _4_["spec"]
+      local _let_0_ = config
+      local spec_conf = _let_0_["config"]
+      local kind = _let_0_["kind"]
+      local spec = _let_0_["spec"]
       local ps_list = nil
-      local function _6_()
-        local _5_0 = spec_conf
-        if _5_0 then
-          local _7_0 = _5_0.templates
-          if _7_0 then
-            return _7_0[kind]
+      local _4_
+      do
+        local _3_0 = spec_conf
+        if _3_0 then
+          local _5_0 = _3_0.templates
+          if _5_0 then
+            _4_ = _5_0[kind]
           else
-            return _7_0
+            _4_ = _5_0
           end
         else
-          return _5_0
+          _4_ = _3_0
         end
       end
-      ps_list = (_6_() or spec.templates[kind])
+      ps_list = (_4_ or spec.templates[kind])
       local processors = vim.tbl_extend("force", spec.processors, (spec_conf.processors or {}))
       local slot_config = nil
-      local function _8_()
-        local _7_0 = spec_conf.slots
-        if _7_0 then
-          return _7_0[kind]
+      local _6_
+      do
+        local _5_0 = spec_conf.slots
+        if _5_0 then
+          _6_ = _5_0[kind]
         else
-          return _7_0
+          _6_ = _5_0
         end
       end
-      slot_config = (_8_() or {})
+      slot_config = (_6_ or {})
       local context = new_template_context(collector, config)
       return package_build_output(build_slots(get_filtered_slots(get_expanded_slots(ps_list, slot_config, processors), processors, slot_config, context), processors, context), context)
     end

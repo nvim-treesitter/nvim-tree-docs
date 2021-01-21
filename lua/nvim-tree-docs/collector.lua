@@ -14,12 +14,12 @@ do
   package.loaded[name_0_] = module_0_
   _0_0 = module_0_
 end
-local function _2_(...)
+local function _1_(...)
   local ok_3f_0_, val_0_ = nil, nil
-  local function _2_()
+  local function _1_()
     return {require("aniseed.core")}
   end
-  ok_3f_0_, val_0_ = pcall(_2_)
+  ok_3f_0_, val_0_ = pcall(_1_)
   if ok_3f_0_ then
     _0_0["aniseed/local-fns"] = {require = {core = "aniseed.core"}}
     return val_0_
@@ -27,13 +27,13 @@ local function _2_(...)
     return print(val_0_)
   end
 end
-local _1_ = _2_(...)
-local core = _1_[1]
+local _local_0_ = _1_(...)
+local core = _local_0_[1]
 local _2amodule_2a = _0_0
 local _2amodule_name_2a = "nvim-tree-docs.collector"
 do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
 local collector_metatable = nil
-local function _3_(tbl, key)
+local function _2_(tbl, key)
   if (type(key) == "number") then
     local id = tbl.__order[key]
     if id then
@@ -45,7 +45,7 @@ local function _3_(tbl, key)
     return rawget(tbl, key)
   end
 end
-collector_metatable = {__index = _3_}
+collector_metatable = {__index = _2_}
 local new_collector = nil
 do
   local v_0_ = nil
@@ -98,7 +98,7 @@ do
     local v_0_0 = nil
     local function iterate_collector0(collector)
       local i = 1
-      local function _4_()
+      local function _3_()
         local id = collector.__order[i]
         if id then
           i = (i + 1)
@@ -107,7 +107,7 @@ do
           return nil
         end
       end
-      return _4_
+      return _3_
     end
     v_0_0 = iterate_collector0
     _0_0["iterate-collector"] = v_0_0
@@ -132,17 +132,17 @@ do
   _0_0["aniseed/locals"]["get-node-id"] = v_0_
   get_node_id = v_0_
 end
-local collect = nil
+local collect_ = nil
 do
   local v_0_ = nil
   do
     local v_0_0 = nil
-    local function collect0(collector, entry, _match, key, add_fn)
+    local function collect_0(collector, entry, _match, key, add_fn)
       if _match.definition then
         if not entry[key] then
           entry[key] = new_collector()
         end
-        return add_fn(entry[key], key, _match, collect0)
+        return add_fn(entry[key], key, _match, collect)
       elseif not entry[key] then
         entry[key] = _match
         return nil
@@ -162,12 +162,12 @@ do
         end
       end
     end
-    v_0_0 = collect0
-    _0_0["collect"] = v_0_0
+    v_0_0 = collect_0
+    _0_0["collect_"] = v_0_0
     v_0_ = v_0_0
   end
-  _0_0["aniseed/locals"]["collect"] = v_0_
-  collect = v_0_
+  _0_0["aniseed/locals"]["collect_"] = v_0_
+  collect_ = v_0_
 end
 local add_match = nil
 do
@@ -188,11 +188,11 @@ do
           while not done do
             local entry = nil
             do
-              local _4_0 = entry_keys[i]
-              if _4_0 then
-                entry = collector.__entries[_4_0]
+              local _3_0 = entry_keys[i]
+              if _3_0 then
+                entry = collector.__entries[_3_0]
               else
-                entry = _4_0
+                entry = _3_0
               end
             end
             if not entry then
@@ -212,7 +212,7 @@ do
         end
         for key, submatch in pairs(_match) do
           if (key ~= "definition") then
-            collect(collector, collector.__entries[node_id], submatch, key, add_match0)
+            collect_(collector, collector.__entries[node_id], submatch, key, add_match0)
           end
         end
         return nil
