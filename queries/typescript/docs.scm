@@ -1,4 +1,4 @@
-; inherits: javascript
+; inherits: ecma
 
 ; ---- Functions
 
@@ -190,3 +190,6 @@
 (export_statement
   (type_alias_declaration) @type_alias.definition) @type_alias.start_point
 
+; Member name
+(public_field_definition
+  name: (property_identifier) @member.name @member.end_point) @member.definition
