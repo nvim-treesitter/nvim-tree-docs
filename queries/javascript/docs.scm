@@ -49,5 +49,5 @@
     (identifier) @class.extends)) @class.definition
 
 ; Member name
-(public_field_definition
+(field_definition
   property: (property_identifier) @member.name @member.end_point) @member.definition
