@@ -132,9 +132,9 @@
 (class_declaration
   name: (_) @member.class
   body: (class_body
-    (public_field_definition) @member.definition))
+    (field_definition) @member.definition))
 
 ; Member doc
 ((comment) @member.doc
  .
- (public_field_definition) @member.definition)
+ (field_definition) @member.definition)
