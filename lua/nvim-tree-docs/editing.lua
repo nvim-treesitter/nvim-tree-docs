@@ -25,23 +25,29 @@ autoload = _1_
 local function _2_(...)
   local ok_3f_0_, val_0_ = nil, nil
   local function _2_()
-    return {}
+    return {autoload("nvim-treesitter.ts_utils"), autoload("vim.treesitter.query")}
   end
   ok_3f_0_, val_0_ = pcall(_2_)
   if ok_3f_0_ then
-    _0_["aniseed/local-fns"] = {}
+    _0_["aniseed/local-fns"] = {autoload = {["ts-utils"] = "nvim-treesitter.ts_utils", tsq = "vim.treesitter.query"}}
     return val_0_
   else
     return print(val_0_)
   end
 end
 local _local_0_ = _2_(...)
+local ts_utils = _local_0_[1]
+local tsq = _local_0_[2]
 local _2amodule_2a = _0_
 local _2amodule_name_2a = "nvim-tree-docs.editing"
 do local _ = ({nil, _0_, nil, {{}, nil, nil, nil}})[2] end
-local ts_utils = require("nvim-treesitter.ts_utils")
-local tsq = require("vim.treesitter.query")
-local ns = vim.api.nvim_create_namespace("doc-edit")
+local ns
+do
+  local v_0_ = vim.api.nvim_create_namespace("doc-edit")
+  local t_0_ = (_0_)["aniseed/locals"]
+  t_0_["ns"] = v_0_
+  ns = v_0_
+end
 local get_doc_comment_data
 do
   local v_0_

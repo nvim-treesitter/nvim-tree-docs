@@ -1,5 +1,5 @@
 (module nvim-tree-docs.utils
-  {require {core nvim-tree-docs.aniseed.core}})
+  {autoload {core nvim-tree-docs.aniseed.core}})
 
 (def ns (vim.api.nvim_create_namespace "blorg"))
 

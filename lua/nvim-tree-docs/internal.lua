@@ -25,11 +25,11 @@ autoload = _1_
 local function _2_(...)
   local ok_3f_0_, val_0_ = nil, nil
   local function _2_()
-    return {require("nvim-tree-docs.collector"), require("nvim-tree-docs.aniseed.core"), require("nvim-tree-docs.editing"), require("nvim-tree-docs.template"), require("nvim-tree-docs.utils")}
+    return {autoload("nvim-tree-docs.collector"), autoload("nvim-treesitter.configs"), autoload("nvim-tree-docs.aniseed.core"), autoload("nvim-tree-docs.editing"), autoload("nvim-treesitter.query"), autoload("nvim-tree-docs.template"), autoload("nvim-treesitter.ts_utils"), autoload("nvim-tree-docs.utils")}
   end
   ok_3f_0_, val_0_ = pcall(_2_)
   if ok_3f_0_ then
-    _0_["aniseed/local-fns"] = {require = {collectors = "nvim-tree-docs.collector", core = "nvim-tree-docs.aniseed.core", editing = "nvim-tree-docs.editing", templates = "nvim-tree-docs.template", utils = "nvim-tree-docs.utils"}}
+    _0_["aniseed/local-fns"] = {autoload = {["ts-utils"] = "nvim-treesitter.ts_utils", collectors = "nvim-tree-docs.collector", configs = "nvim-treesitter.configs", core = "nvim-tree-docs.aniseed.core", editing = "nvim-tree-docs.editing", queries = "nvim-treesitter.query", templates = "nvim-tree-docs.template", utils = "nvim-tree-docs.utils"}}
     return val_0_
   else
     return print(val_0_)
@@ -37,16 +37,16 @@ local function _2_(...)
 end
 local _local_0_ = _2_(...)
 local collectors = _local_0_[1]
-local core = _local_0_[2]
-local editing = _local_0_[3]
-local templates = _local_0_[4]
-local utils = _local_0_[5]
+local configs = _local_0_[2]
+local core = _local_0_[3]
+local editing = _local_0_[4]
+local queries = _local_0_[5]
+local templates = _local_0_[6]
+local ts_utils = _local_0_[7]
+local utils = _local_0_[8]
 local _2amodule_2a = _0_
 local _2amodule_name_2a = "nvim-tree-docs.internal"
 do local _ = ({nil, _0_, nil, {{}, nil, nil, nil}})[2] end
-local configs = require("nvim-treesitter.configs")
-local queries = require("nvim-treesitter.query")
-local ts_utils = require("nvim-treesitter.ts_utils")
 local language_specs
 do
   local v_0_ = {javascript = "jsdoc", lua = "luadoc", typescript = "tsdoc"}

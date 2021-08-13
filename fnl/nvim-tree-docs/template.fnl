@@ -1,9 +1,9 @@
 (module nvim-tree-docs.template
-  {require {core nvim-tree-docs.aniseed.core
-            utils nvim-tree-docs.utils
-            collectors nvim-tree-docs.collector}})
+  {autoload {core nvim-tree-docs.aniseed.core
+             utils nvim-tree-docs.utils
+             collectors nvim-tree-docs.collector
+             ts-utils nvim-treesitter.ts_utils}})
 
-(local ts-utils (require "nvim-treesitter.ts_utils"))
 (import-macros {: log} "nvim-tree-docs.macros")
 
 (def loaded-specs {})

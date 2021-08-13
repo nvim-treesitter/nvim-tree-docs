@@ -1,12 +1,12 @@
 (module nvim-tree-docs.collector
-  {require {core nvim-tree-docs.aniseed.core}})
+  {autoload {core nvim-tree-docs.aniseed.core}})
 
-(local collector-metatable
+(def- collector-metatable
   {:__index (fn [tbl key]
               (if (= (type key) :number)
-                  (let [id (. tbl.__order key)]
-                    (if id (. tbl.__entries id) nil))
-                  (rawget tbl key)))})
+                (let [id (. tbl.__order key)]
+                  (if id (. tbl.__entries id) nil))
+                (rawget tbl key)))})
 
 (defn new-collector []
   (setmetatable {:__entries {}

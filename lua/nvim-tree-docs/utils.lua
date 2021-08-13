@@ -25,11 +25,11 @@ autoload = _2_
 local function _3_(...)
   local ok_3f_0_, val_0_ = nil, nil
   local function _3_()
-    return {require("nvim-tree-docs.aniseed.core")}
+    return {autoload("nvim-tree-docs.aniseed.core")}
   end
   ok_3f_0_, val_0_ = pcall(_3_)
   if ok_3f_0_ then
-    _0_["aniseed/local-fns"] = {require = {core = "nvim-tree-docs.aniseed.core"}}
+    _0_["aniseed/local-fns"] = {autoload = {core = "nvim-tree-docs.aniseed.core"}}
     return val_0_
   else
     return print(val_0_)

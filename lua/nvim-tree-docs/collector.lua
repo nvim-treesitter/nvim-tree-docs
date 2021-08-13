@@ -25,11 +25,11 @@ autoload = _1_
 local function _2_(...)
   local ok_3f_0_, val_0_ = nil, nil
   local function _2_()
-    return {require("nvim-tree-docs.aniseed.core")}
+    return {autoload("nvim-tree-docs.aniseed.core")}
   end
   ok_3f_0_, val_0_ = pcall(_2_)
   if ok_3f_0_ then
-    _0_["aniseed/local-fns"] = {require = {core = "nvim-tree-docs.aniseed.core"}}
+    _0_["aniseed/local-fns"] = {autoload = {core = "nvim-tree-docs.aniseed.core"}}
     return val_0_
   else
     return print(val_0_)
@@ -41,19 +41,25 @@ local _2amodule_2a = _0_
 local _2amodule_name_2a = "nvim-tree-docs.collector"
 do local _ = ({nil, _0_, nil, {{}, nil, nil, nil}})[2] end
 local collector_metatable
-local function _3_(tbl, key)
-  if (type(key) == "number") then
-    local id = tbl.__order[key]
-    if id then
-      return tbl.__entries[id]
+do
+  local v_0_
+  local function _3_(tbl, key)
+    if (type(key) == "number") then
+      local id = tbl.__order[key]
+      if id then
+        return tbl.__entries[id]
+      else
+        return nil
+      end
     else
-      return nil
+      return rawget(tbl, key)
     end
-  else
-    return rawget(tbl, key)
   end
+  v_0_ = {__index = _3_}
+  local t_0_ = (_0_)["aniseed/locals"]
+  t_0_["collector-metatable"] = v_0_
+  collector_metatable = v_0_
 end
-collector_metatable = {__index = _3_}
 local new_collector
 do
   local v_0_
@@ -109,7 +115,7 @@ do
     local v_0_0
     local function iterate_collector0(collector)
       local i = 1
-      local function _4_()
+      local function _3_()
         local id = collector.__order[i]
         if id then
           i = (i + 1)
@@ -118,7 +124,7 @@ do
           return nil
         end
       end
-      return _4_
+      return _3_
     end
     v_0_0 = iterate_collector0
     _0_["iterate-collector"] = v_0_0
@@ -202,11 +208,11 @@ do
           while not done do
             local entry
             do
-              local _4_ = entry_keys[i]
-              if _4_ then
-                entry = collector.__entries[_4_]
+              local _3_ = entry_keys[i]
+              if _3_ then
+                entry = collector.__entries[_3_]
               else
-                entry = _4_
+                entry = _3_
               end
             end
             if not entry then

@@ -1,9 +1,8 @@
-(module nvim-tree-docs.editing)
+(module nvim-tree-docs.editing
+  {autoload {ts-utils nvim-treesitter.ts_utils
+             tsq vim.treesitter.query}})
 
-(local ts-utils (require "nvim-treesitter.ts_utils"))
-(local tsq (require "vim.treesitter.query"))
-
-(local ns (vim.api.nvim_create_namespace "doc-edit"))
+(def- ns (vim.api.nvim_create_namespace "doc-edit"))
 
 (defn get-doc-comment-data [args]
   (let [{: lang
@@ -43,4 +42,3 @@
           bufnr
           ns
           :Visual)))))
-
