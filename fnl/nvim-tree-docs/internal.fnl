@@ -1,6 +1,6 @@
 (module nvim-tree-docs.internal
   {require {utils nvim-tree-docs.utils
-            core aniseed.core
+            core nvim-tree-docs.aniseed.core
             templates nvim-tree-docs.template
             collectors nvim-tree-docs.collector
             editing nvim-tree-docs.editing}})

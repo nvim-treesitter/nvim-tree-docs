@@ -1,5 +1,5 @@
 (module nvim-tree-docs.collector
-  {require {core aniseed.core}})
+  {require {core nvim-tree-docs.aniseed.core}})
 
 (local collector-metatable
   {:__index (fn [tbl key]

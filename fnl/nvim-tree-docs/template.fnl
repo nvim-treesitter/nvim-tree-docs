@@ -1,5 +1,5 @@
 (module nvim-tree-docs.template
-  {require {core aniseed.core
+  {require {core nvim-tree-docs.aniseed.core
             utils nvim-tree-docs.utils
             collectors nvim-tree-docs.collector}})
 
