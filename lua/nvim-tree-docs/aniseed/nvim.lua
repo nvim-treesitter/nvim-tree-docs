@@ -1,33 +1,41 @@
-local _0_0 = nil
+local _2afile_2a = "fnl/aniseed/nvim.fnl"
+local _0_
 do
   local name_0_ = "nvim-tree-docs.aniseed.nvim"
-  local loaded_0_ = package.loaded[name_0_]
-  local module_0_ = nil
-  if ("table" == type(loaded_0_)) then
-    module_0_ = loaded_0_
-  else
-    module_0_ = require("nvim-tree-docs.aniseed.deps.nvim")
+  local module_0_
+  do
+    local x_0_ = package.loaded[name_0_]
+    if ("table" == type(x_0_)) then
+      module_0_ = x_0_
+    else
+      module_0_ = require("nvim-tree-docs.aniseed.deps.nvim")
+    end
   end
   module_0_["aniseed/module"] = name_0_
-  module_0_["aniseed/locals"] = (module_0_["aniseed/locals"] or {})
-  module_0_["aniseed/local-fns"] = (module_0_["aniseed/local-fns"] or {})
-  package.loaded[name_0_] = module_0_
-  _0_0 = module_0_
+  module_0_["aniseed/locals"] = ((module_0_)["aniseed/locals"] or {})
+  do end (module_0_)["aniseed/local-fns"] = ((module_0_)["aniseed/local-fns"] or {})
+  do end (package.loaded)[name_0_] = module_0_
+  _0_ = module_0_
 end
+local autoload
 local function _1_(...)
+  return (require("nvim-tree-docs.aniseed.autoload")).autoload(...)
+end
+autoload = _1_
+local function _2_(...)
   local ok_3f_0_, val_0_ = nil, nil
-  local function _1_()
+  local function _2_()
     return {}
   end
-  ok_3f_0_, val_0_ = pcall(_1_)
+  ok_3f_0_, val_0_ = pcall(_2_)
   if ok_3f_0_ then
-    _0_0["aniseed/local-fns"] = {}
+    _0_["aniseed/local-fns"] = {}
     return val_0_
   else
     return print(val_0_)
   end
 end
-local _local_0_ = _1_(...)
-local _2amodule_2a = _0_0
+local _local_0_ = _2_(...)
+local _2amodule_2a = _0_
 local _2amodule_name_2a = "nvim-tree-docs.aniseed.nvim"
-return ({nil, _0_0, {{}, nil, nil, nil}})[2]
+return ({nil, _0_, nil, {{}, nil, nil, nil}})[2]

@@ -1,7 +1,7 @@
-local _2afile_2a = "fnl/nvim-tree-docs/main.fnl"
+local _2afile_2a = "fnl/aniseed/autoload.fnl"
 local _0_
 do
-  local name_0_ = "nvim-tree-docs.main"
+  local name_0_ = "nvim-tree-docs.aniseed.autoload"
   local module_0_
   do
     local x_0_ = package.loaded[name_0_]
@@ -37,26 +37,42 @@ local function _2_(...)
 end
 local _local_0_ = _2_(...)
 local _2amodule_2a = _0_
-local _2amodule_name_2a = "nvim-tree-docs.main"
+local _2amodule_name_2a = "nvim-tree-docs.aniseed.autoload"
 do local _ = ({nil, _0_, nil, {{}, nil, nil, nil}})[2] end
-local queries = require("nvim-treesitter.query")
-local init
+local autoload0
 do
   local v_0_
   do
     local v_0_0
-    local function init0()
-      local function _3_(_241)
-        return (queries.get_query(_241, "docs") ~= nil)
+    local function autoload1(name)
+      local res = {["aniseed/autoload-enabled?"] = true, ["aniseed/autoload-module"] = false}
+      local function ensure()
+        if res["aniseed/autoload-module"] then
+          return res["aniseed/autoload-module"]
+        else
+          local m = require(name)
+          do end (res)["aniseed/autoload-module"] = m
+          return m
+        end
       end
-      return (require("nvim-treesitter")).define_modules({tree_docs = {is_supported = _3_, keymaps = {doc_all_in_range = "gdd", doc_node_at_cursor = "gdd", edit_doc_at_cursor = "gde"}, module_path = "nvim-tree-docs.internal"}})
+      local function _3_(t, ...)
+        return ensure()(...)
+      end
+      local function _4_(t, k)
+        return ensure()[k]
+      end
+      local function _5_(t, k, v)
+        ensure()[k] = v
+        return nil
+      end
+      return setmetatable(res, {__call = _3_, __index = _4_, __newindex = _5_})
     end
-    v_0_0 = init0
-    _0_["init"] = v_0_0
+    v_0_0 = autoload1
+    _0_["autoload"] = v_0_0
     v_0_ = v_0_0
   end
   local t_0_ = (_0_)["aniseed/locals"]
-  t_0_["init"] = v_0_
-  init = v_0_
+  t_0_["autoload"] = v_0_
+  autoload0 = v_0_
 end
 return nil
