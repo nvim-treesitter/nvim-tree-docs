@@ -1,13 +1,12 @@
 (module nvim-tree-docs.internal
-  {require {utils nvim-tree-docs.utils
-            core aniseed.core
-            templates nvim-tree-docs.template
-            collectors nvim-tree-docs.collector
-            editing nvim-tree-docs.editing}})
-
-(local configs (require "nvim-treesitter.configs"))
-(local queries (require "nvim-treesitter.query"))
-(local ts-utils (require "nvim-treesitter.ts_utils"))
+  {autoload {utils nvim-tree-docs.utils
+             core nvim-tree-docs.aniseed.core
+             templates nvim-tree-docs.template
+             collectors nvim-tree-docs.collector
+             editing nvim-tree-docs.editing
+             configs nvim-treesitter.configs
+             queries nvim-treesitter.query
+             ts-utils nvim-treesitter.ts_utils}})
 
 (def- language-specs {:javascript :jsdoc
                       :lua :luadoc

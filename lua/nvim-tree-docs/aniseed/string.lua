@@ -1,52 +1,60 @@
-local _0_0 = nil
+local _2afile_2a = "fnl/aniseed/string.fnl"
+local _0_
 do
   local name_0_ = "nvim-tree-docs.aniseed.string"
-  local loaded_0_ = package.loaded[name_0_]
-  local module_0_ = nil
-  if ("table" == type(loaded_0_)) then
-    module_0_ = loaded_0_
-  else
-    module_0_ = {}
+  local module_0_
+  do
+    local x_0_ = package.loaded[name_0_]
+    if ("table" == type(x_0_)) then
+      module_0_ = x_0_
+    else
+      module_0_ = {}
+    end
   end
   module_0_["aniseed/module"] = name_0_
-  module_0_["aniseed/locals"] = (module_0_["aniseed/locals"] or {})
-  module_0_["aniseed/local-fns"] = (module_0_["aniseed/local-fns"] or {})
-  package.loaded[name_0_] = module_0_
-  _0_0 = module_0_
+  module_0_["aniseed/locals"] = ((module_0_)["aniseed/locals"] or {})
+  do end (module_0_)["aniseed/local-fns"] = ((module_0_)["aniseed/local-fns"] or {})
+  do end (package.loaded)[name_0_] = module_0_
+  _0_ = module_0_
 end
+local autoload
 local function _1_(...)
+  return (require("nvim-tree-docs.aniseed.autoload")).autoload(...)
+end
+autoload = _1_
+local function _2_(...)
   local ok_3f_0_, val_0_ = nil, nil
-  local function _1_()
-    return {require("nvim-tree-docs.aniseed.core")}
+  local function _2_()
+    return {autoload("nvim-tree-docs.aniseed.core")}
   end
-  ok_3f_0_, val_0_ = pcall(_1_)
+  ok_3f_0_, val_0_ = pcall(_2_)
   if ok_3f_0_ then
-    _0_0["aniseed/local-fns"] = {require = {a = "nvim-tree-docs.aniseed.core"}}
+    _0_["aniseed/local-fns"] = {autoload = {a = "nvim-tree-docs.aniseed.core"}}
     return val_0_
   else
     return print(val_0_)
   end
 end
-local _local_0_ = _1_(...)
+local _local_0_ = _2_(...)
 local a = _local_0_[1]
-local _2amodule_2a = _0_0
+local _2amodule_2a = _0_
 local _2amodule_name_2a = "nvim-tree-docs.aniseed.string"
-do local _ = ({nil, _0_0, {{}, nil, nil, nil}})[2] end
-local join = nil
+do local _ = ({nil, _0_, nil, {{}, nil, nil, nil}})[2] end
+local join
 do
-  local v_0_ = nil
+  local v_0_
   do
-    local v_0_0 = nil
+    local v_0_0
     local function join0(...)
       local args = {...}
-      local function _2_(...)
+      local function _3_(...)
         if (2 == a.count(args)) then
           return args
         else
           return {"", a.first(args)}
         end
       end
-      local _let_0_ = _2_(...)
+      local _let_0_ = _3_(...)
       local sep = _let_0_[1]
       local xs = _let_0_[2]
       local len = a.count(xs)
@@ -54,16 +62,16 @@ do
       if (len > 0) then
         for i = 1, len do
           local x = xs[i]
-          local _3_0 = nil
+          local _4_
           if ("string" == type(x)) then
-            _3_0 = x
+            _4_ = x
           elseif (nil == x) then
-            _3_0 = x
+            _4_ = x
           else
-            _3_0 = a["pr-str"](x)
+            _4_ = a["pr-str"](x)
           end
-          if _3_0 then
-            table.insert(result, _3_0)
+          if _4_ then
+            table.insert(result, _4_)
           else
           end
         end
@@ -71,17 +79,18 @@ do
       return table.concat(result, sep)
     end
     v_0_0 = join0
-    _0_0["join"] = v_0_0
+    _0_["join"] = v_0_0
     v_0_ = v_0_0
   end
-  _0_0["aniseed/locals"]["join"] = v_0_
+  local t_0_ = (_0_)["aniseed/locals"]
+  t_0_["join"] = v_0_
   join = v_0_
 end
-local split = nil
+local split
 do
-  local v_0_ = nil
+  local v_0_
   do
-    local v_0_0 = nil
+    local v_0_0
     local function split0(s, pat)
       local done_3f = false
       local acc = {}
@@ -99,70 +108,75 @@ do
       return acc
     end
     v_0_0 = split0
-    _0_0["split"] = v_0_0
+    _0_["split"] = v_0_0
     v_0_ = v_0_0
   end
-  _0_0["aniseed/locals"]["split"] = v_0_
+  local t_0_ = (_0_)["aniseed/locals"]
+  t_0_["split"] = v_0_
   split = v_0_
 end
-local blank_3f = nil
+local blank_3f
 do
-  local v_0_ = nil
+  local v_0_
   do
-    local v_0_0 = nil
+    local v_0_0
     local function blank_3f0(s)
       return (a["empty?"](s) or not string.find(s, "[^%s]"))
     end
     v_0_0 = blank_3f0
-    _0_0["blank?"] = v_0_0
+    _0_["blank?"] = v_0_0
     v_0_ = v_0_0
   end
-  _0_0["aniseed/locals"]["blank?"] = v_0_
+  local t_0_ = (_0_)["aniseed/locals"]
+  t_0_["blank?"] = v_0_
   blank_3f = v_0_
 end
-local triml = nil
+local triml
 do
-  local v_0_ = nil
+  local v_0_
   do
-    local v_0_0 = nil
+    local v_0_0
     local function triml0(s)
       return string.gsub(s, "^%s*(.-)", "%1")
     end
     v_0_0 = triml0
-    _0_0["triml"] = v_0_0
+    _0_["triml"] = v_0_0
     v_0_ = v_0_0
   end
-  _0_0["aniseed/locals"]["triml"] = v_0_
+  local t_0_ = (_0_)["aniseed/locals"]
+  t_0_["triml"] = v_0_
   triml = v_0_
 end
-local trimr = nil
+local trimr
 do
-  local v_0_ = nil
+  local v_0_
   do
-    local v_0_0 = nil
+    local v_0_0
     local function trimr0(s)
       return string.gsub(s, "(.-)%s*$", "%1")
     end
     v_0_0 = trimr0
-    _0_0["trimr"] = v_0_0
+    _0_["trimr"] = v_0_0
     v_0_ = v_0_0
   end
-  _0_0["aniseed/locals"]["trimr"] = v_0_
+  local t_0_ = (_0_)["aniseed/locals"]
+  t_0_["trimr"] = v_0_
   trimr = v_0_
 end
-local trim = nil
+local trim
 do
-  local v_0_ = nil
+  local v_0_
   do
-    local v_0_0 = nil
+    local v_0_0
     local function trim0(s)
       return string.gsub(s, "^%s*(.-)%s*$", "%1")
     end
     v_0_0 = trim0
-    _0_0["trim"] = v_0_0
+    _0_["trim"] = v_0_0
     v_0_ = v_0_0
   end
-  _0_0["aniseed/locals"]["trim"] = v_0_
+  local t_0_ = (_0_)["aniseed/locals"]
+  t_0_["trim"] = v_0_
   trim = v_0_
 end
 return nil

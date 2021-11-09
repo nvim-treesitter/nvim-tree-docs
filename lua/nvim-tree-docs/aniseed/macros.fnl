@@ -19,10 +19,10 @@
 (fn module [name new-local-fns initial-mod]
   `(-> [(local ,module-sym
           (let [name# ,(tostring name)
-                loaded# (. package.loaded name#)
-                module# (if (= :table (type loaded#))
-                          loaded#
-                          ,(or initial-mod {}))]
+                module# (let [x# (. package.loaded name#)]
+                          (if (= :table (type x#))
+                            x#
+                            ,(or initial-mod {})))]
             (tset module# :aniseed/module name#)
             (tset module# :aniseed/locals (or (. module# :aniseed/locals) {}))
             (tset module# :aniseed/local-fns (or (. module# :aniseed/local-fns) {}))
@@ -31,16 +31,19 @@
 
         ,module-sym
 
+        ;; Meta! Autoload the autoload function, so it's only loaded when used.
+        (local ,(sym :autoload)
+          (fn [...] ((. (require :aniseed.autoload) :autoload) ...)))
+
         ,(let [aliases []
                vals []
                effects []
-               locals (-?> package.loaded
-                           (. (tostring name))
-                           (. :aniseed/locals))
+               pkg (let [x (. package.loaded (tostring name))]
+                     (when (= :table (type x))
+                       x))
+               locals (-?> pkg (. :aniseed/locals))
                local-fns (or (and (not new-local-fns)
-                                  (-?> package.loaded
-                                       (. (tostring name))
-                                       (. :aniseed/local-fns)))
+                                  (?. pkg :aniseed/local-fns))
                              {})]
 
            (when new-local-fns
@@ -74,7 +77,7 @@
              (sorted-each
                (fn [alias val]
                  (table.insert aliases (sym alias))
-                 (table.insert vals `(-> ,module-sym (. :aniseed/locals) (. ,alias))))
+                 (table.insert vals `(. ,module-sym :aniseed/locals ,alias)))
                locals))
 
            `[,effects
@@ -93,8 +96,9 @@
 
 (fn def- [name value]
   `(local ,name
-     (let [v# ,value]
-       (tset (. ,module-sym :aniseed/locals) ,(tostring name) v#)
+     (let [v# ,value
+           t# (. ,module-sym :aniseed/locals)]
+       (tset t# ,(tostring name) v#)
        v#)))
 
 (fn def [name value]
@@ -112,7 +116,7 @@
 
 (fn defonce- [name value]
   `(def- ,name
-     (or (. (. ,module-sym :aniseed/locals) ,(tostring name))
+     (or (. ,module-sym :aniseed/locals ,(tostring name))
          ,value)))
 
 (fn defonce [name value]
