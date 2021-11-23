@@ -51,3 +51,14 @@
 ; Member name
 (field_definition
   property: (property_identifier) @member.name @member.end_point) @member.definition
+
+; Member class
+(class_declaration
+  name: (_) @member.class
+  body: (class_body
+    (field_definition) @member.definition))
+
+; Member doc
+((comment) @member.doc
+ .
+ (field_definition) @member.definition)

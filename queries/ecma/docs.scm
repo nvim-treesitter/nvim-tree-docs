@@ -127,14 +127,3 @@
 ; Exported class
 (export_statement
   declaration: (class_declaration) @class.definition) @class.export @class.start_point
-
-; Member class
-(class_declaration
-  name: (_) @member.class
-  body: (class_body
-    (field_definition) @member.definition))
-
-; Member doc
-((comment) @member.doc
- .
- (field_definition) @member.definition)

@@ -104,25 +104,31 @@
 (class_declaration
   type_parameters: (type_parameters
     (type_parameter
-      (type_identifier) @class.generics.name @class.generics.definition)) @class.end_point) @class.definition
+      name: (type_identifier) @class.generics.name @class.generics.definition)) @class.end_point) @class.definition
 
 (class_declaration
   (class_heritage
     (extends_clause
-      (type_identifier) @class.extentions.name @class.extentions.definition))) @class.definition
+      value: (identifier) @class.extentions.name @class.extentions.definition))) @class.definition
 
 (class_declaration
   (class_heritage
     (implements_clause
       (type_identifier) @class.implementations.name @class.implementations.definition))) @class.definition
 
-; ; ---- Interfaces
+(class_declaration
+  (class_heritage
+    (implements_clause
+      (generic_type
+        name: (type_identifier) @class.implementations.name @class.implementations.definition)))) @class.definition
 
-; ; Interface doc
-; (
-;   (comment) @interface.doc
-;   (interface_declaration) @interface.definition
-; )
+; ---- Interfaces
+
+; Interface doc
+(
+  (comment) @interface.doc
+  (interface_declaration) @interface.definition
+)
 
 ; Interface name
 (interface_declaration
@@ -132,11 +138,11 @@
 (interface_declaration
   type_parameters: (type_parameters
     (type_parameter
-      (type_identifier) @interface.generics.name @interface.generics.definition)) @interface.end_point) @interface.definition
+      name: (type_identifier) @interface.generics.name @interface.generics.definition)) @interface.end_point) @interface.definition
 
 ; Interface extend clause
 (interface_declaration
-  (extends_clause
+  (extends_type_clause
     (_) @interface.extentions.name @interface.extentions.definition) @interface.end_point) @interface.definition
 
 ; Exported interface doc
@@ -178,7 +184,7 @@
 (type_alias_declaration
   type_parameters: (type_parameters
     (type_parameter
-      (type_identifier) @type_alias.generics.name @type_alias.generics.definition)) @type_alias.end_point) @type_alias.definition
+      name: (type_identifier) @type_alias.generics.name @type_alias.generics.definition)) @type_alias.end_point) @type_alias.definition
 
 ; Type alias export doc
 ((comment) @type_alias.doc
@@ -191,5 +197,16 @@
   (type_alias_declaration) @type_alias.definition) @type_alias.start_point
 
 ; Member name
-(field_definition
+(public_field_definition
   name: (property_identifier) @member.name @member.end_point) @member.definition
+
+; Member class
+(class_declaration
+  name: (_) @member.class
+  body: (class_body
+    (public_field_definition) @member.definition))
+
+; Member doc
+((comment) @member.doc
+ .
+ (public_field_definition) @member.definition)
