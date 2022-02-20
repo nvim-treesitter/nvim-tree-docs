@@ -17,7 +17,7 @@ Plug 'nvim-treesitter/nvim-tree-docs'
 You can configure `nvim-tree-docs` as part of your `nvim-treesitter` configuration.
 
 ```lua
-require "nvim-treesitter.config".setup {
+require "nvim-treesitter.configs".setup {
   tree_docs = {enable = true}
 }
 ```
@@ -81,7 +81,7 @@ You can enable the `author` slot to generate an author tag.
 This is done in the configuration for the spec.
 
 ```lua
-require "nvim-treesitter.config".setup {
+require "nvim-treesitter.configs".setup {
   tree_docs = {
     enable = true,
     spec_config = {
@@ -110,7 +110,7 @@ of jsdoc, just generates a tag. What if we could modify the behavior of that pro
 We can configure author processor in the same config.
 
 ```lua
-require "nvim-treesitter.config".setup {
+require "nvim-treesitter.configs".setup {
   tree_docs = {
     enable = true,
     spec_config = {
@@ -145,7 +145,7 @@ an issue ticket number. If the user doesn't enter anything
 the tag won't get generated.
 
 ```lua
-require "nvim-treesitter.config".setup {
+require "nvim-treesitter.configs".setup {
   tree_docs = {
     enable = true,
     spec_config = {
@@ -183,7 +183,7 @@ Templates aren't traditional templates. It's basically just a set of slots in a 
 You can configure the template in the config.
 
 ```lua
-require "nvim-treesitter.config".setup {
+require "nvim-treesitter.configs".setup {
   tree_docs = {
     enable = true,
     spec_config = {
