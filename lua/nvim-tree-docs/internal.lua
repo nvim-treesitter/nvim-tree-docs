@@ -72,7 +72,7 @@ local function generate_docs(data_list, bufnr_3f, lang_3f)
     vim.list_extend(marks, result.marks)
     line_offset = ((line_offset + #result.content) - replaced_count)
   end
-  return vim.lsp.util.apply_text_edits(edits, bufnr)
+  return vim.lsp.util.apply_text_edits(edits, bufnr, "utf-16")
 end
 _2amodule_2a["generate-docs"] = generate_docs
 local function collect_docs(bufnr_3f)
