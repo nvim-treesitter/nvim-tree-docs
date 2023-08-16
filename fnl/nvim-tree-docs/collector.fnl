@@ -41,7 +41,7 @@
       (when (not (. entry key))
         (tset entry key (new-collector)))
       (-> (. entry key)
-          (add-fn key _match collect)))
+          (add-fn key _match collect_)))
     (not (. entry key))
     (tset entry key _match)
     (and (= key :start_point) _match.node)

@@ -65,7 +65,7 @@
                                :end {:line (+ node-er 1) :character 0}}})
         (vim.list_extend marks result.marks)
         (set line-offset (- (+ line-offset (length result.content)) replaced-count))))
-    (vim.lsp.util.apply_text_edits edits bufnr)))
+    (vim.lsp.util.apply_text_edits edits bufnr :utf-16)))
     ; Uncomment to test marks
     ;(utils.highlight-marks marks bufnr)))
 

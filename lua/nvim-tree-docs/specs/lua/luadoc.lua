@@ -1,13 +1,13 @@
 local _2afile_2a = "fnl/nvim-tree-docs/specs/lua/luadoc.fnl"
 local _1_
 do
-  local mod_name_0_ = ("lua" .. "." .. "luadoc")
-  local template_mod_0_ = require("nvim-tree-docs.template")
-  local module_0_ = {["doc-lang"] = "nil", __build = template_mod_0_["build-line"], config = vim.tbl_deep_extend("force", {processors = {}, slots = {}}, {slots = {["function"] = {param = true, returns = true}, variable = {}}}), inherits = nil, lang = "lua", module = mod_name_0_, processors = {}, spec = "luadoc", templates = {}, utils = {}}
-  template_mod_0_["extend-spec"](module_0_, "base.base")
-  template_mod_0_["extend-spec"](module_0_)
-  do end ((template_mod_0_)["loaded-specs"])[mod_name_0_] = module_0_
-  _1_ = module_0_
+  local mod_name_1_auto = ("lua" .. "." .. "luadoc")
+  local template_mod_2_auto = require("nvim-tree-docs.template")
+  local module_3_auto = {__build = template_mod_2_auto["build-line"], config = vim.tbl_deep_extend("force", {processors = {}, slots = {}}, {slots = {["function"] = {param = true, returns = true}, variable = {}}}), ["doc-lang"] = "nil", inherits = nil, lang = "lua", module = mod_name_1_auto, processors = {}, spec = "luadoc", templates = {}, utils = {}}
+  template_mod_2_auto["extend-spec"](module_3_auto, "base.base")
+  template_mod_2_auto["extend-spec"](module_3_auto)
+  do end ((template_mod_2_auto)["loaded-specs"])[mod_name_1_auto] = module_3_auto
+  _1_ = module_3_auto
 end
 (_1_).templates["function"] = {"description", "param", "returns"}
 (_1_).templates["variable"] = {"description"}
